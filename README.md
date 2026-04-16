@@ -4,9 +4,9 @@
 ## Grupo N° 1
 
 ## Integrantes:
-- Nombre
-- Nombre
-- Nombre
+- Delfina Ibañez
+- Candela Aguilar
+- Carolina Fetta
 
 ## Problema que resuelve
 
