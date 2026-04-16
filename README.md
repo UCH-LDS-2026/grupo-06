@@ -22,20 +22,16 @@ Este sistema busca resolver estos problemas mediante una aplicación web que per
 
 
 ## Funcionalidades principales
+registrar clientes con sus datos personales y medidas
+registrar encargos de costura asociados a un cliente 
+visualizar una agenda de pedidos ordenada por fecha de entrega 
+editar o eliminar encargos y clientes
+guardar observaciones especificas de cada trabajo 
+consultar historial de cambios realizados
 
-- Feature 1
-- Feature 2
-- Feature 3
 
 ## Stack tecnológico
 
-Frontend:
-Backend:
-Base de datos:
-
-## Cómo ejecutar el proyecto
-
-Instrucciones
-
-
-prueba !!
+Frontend: html y css 
+Backend: php y js
+Base de datos: mysql
