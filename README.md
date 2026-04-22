@@ -61,16 +61,22 @@ El objetivo de este sistema es desarrollar una aplicación web que permita centr
 ---
 
 ## Extensiones Futuras
+El sistema podrá ampliarse incorporando las siguientes funcionalidades:
 
-El sistema podrá ampliarse con las siguientes funcionalidades:
+Historial de encargos por temporada: permite visualizar todos los trabajos realizados en un período determinado, analizar ingresos mensuales y detectar los tipos de encargos más frecuentes.
 
-* Gestión de stock de telas
-* Notificaciones automáticas de vencimientos
-* Estadísticas de ingresos
-* Gestión de talles estándar por rubro
-* Módulo de logística de entregas
-* Panel para clientes
-* Historial de encargos por temporada
-* Facturación
-* Escalabilidad para múltiples talleres
+Fotos del encargo: posibilidad de adjuntar imágenes de referencia o del trabajo finalizado, tanto por parte del cliente como de la costurera.
 
+Gestión de stock de telas: registro y control de telas disponibles, con actualización automática del stock según los encargos y alertas cuando los niveles sean bajos.
+
+Panel para el cliente: acceso mediante un enlace para consultar el estado del encargo sin necesidad de contacto directo con la costurera.
+
+Módulo de logística: agrupación de entregas por zona, cálculo de rutas y registro de confirmación de recepción.
+
+Presupuesto automático: generación de precios sugeridos en base a trabajos anteriores similares, considerando tipo de encargo y medidas.
+
+Versión mobile: adaptación de la aplicación web a formato instalable en dispositivos móviles utilizando tecnologías web modernas.
+
+Integración con MercadoPago: posibilidad de que el cliente abone una seña de manera online directamente desde el sistema, aportando valor comercial real al proyecto.
+
+Integración con WhatsApp: automatización del registro de pedidos recibidos mediante WhatsApp, permitiendo capturar la información relevante de los mensajes y almacenarla directamente en el sistema para su seguimiento y gestió
