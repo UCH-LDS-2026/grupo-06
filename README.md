@@ -1,82 +1,150 @@
+# Sistema de Gestión para Taller de Costura
 
-# Universidad Champagnat
+## Integrantes
 
-## Laboratorio de Desarrollo de Software – 2026
-
-# Proyecto Final
-
-## Grupo N° 6
-
-### Integrantes
-
-* Delfina Ibañez
-* Candela Aguilar
-* Carolina Fetta
+- Carolina Fetta
+- Delfina Ibañez
+- Candela Aguilar
 
 ---
 
-## Descripción del Problema
+# Descripción del proyecto
 
-Las costureras independientes suelen gestionar sus pedidos de forma manual, utilizando cuadernos y mensajes de WhatsApp. Este método genera desorganización y aumenta el riesgo de pérdida de información.
-
-Cuando se manejan múltiples encargos en simultáneo, se dificulta el seguimiento de:
-
-* Fechas de entrega
-* Medidas de clientes
-* Observaciones específicas de cada trabajo
-
-Además, ante la pérdida o deterioro del cuaderno, toda la información acumulada desaparece. Por otro lado, los clientes recurrentes deben proporcionar sus medidas en cada nuevo pedido, lo que implica pérdida de tiempo y posibles errores.
+Sistema web destinado a la gestión de encargos de un taller de costura.  
+Permite registrar clientes, almacenar medidas, gestionar encargos, registrar señas y visualizar entregas próximas mediante una agenda organizada.
 
 ---
 
-## Objetivo del Sistema
+# Tecnologías utilizadas
 
-El objetivo de este sistema es desarrollar una aplicación web que permita centralizar y organizar la información relacionada con clientes y encargos de costura, mejorando la gestión del negocio, optimizando tiempos y reduciendo errores.
+## Frontend
+- HTML5
+- CSS3
+- JavaScript
 
----
+## Backend
+- PHP 8
 
-## Usuarios del Sistema
-
-* Administrador
-
----
-
-## Funcionalidades Principales
-
-* Registro de clientes con datos personales y medidas
-* Registro de encargos de costura asociados a un cliente
-* Visualización de agenda de pedidos ordenada por fecha de entrega
-* Edición y eliminación de clientes y encargos
-* Registro de observaciones específicas por trabajo
-* Consulta de historial de cambios realizados
+## Base de datos
+- MySQL
 
 ---
 
-## Stack Tecnológico
+# Justificación del Stack
 
-* **Frontend:** HTML, CSS
-* **Backend:** PHP, JavaScript
-* **Base de Datos:** MySQL
+Se eligió JavaScript para el frontend debido a su facilidad para generar interfaces dinámicas e interactivas, especialmente útil para la agenda visual y la actualización de estados de encargos en tiempo real.
+
+PHP fue seleccionado para el backend por su integración sencilla con aplicaciones web y bases de datos relacionales, además de ser una tecnología ampliamente utilizada y adecuada para proyectos CRUD como este sistema.
+
+MySQL se eligió como sistema gestor de base de datos por su estabilidad, facilidad de uso y compatibilidad con PHP, permitiendo almacenar clientes, encargos, observaciones y pagos de forma estructurada y segura.
+
+Además, el sistema se plantea como una aplicación web porque permite acceder desde distintos dispositivos sin necesidad de instalación local. La arquitectura cliente-servidor facilita la separación entre interfaz, lógica y datos, permitiendo escalabilidad y mantenimiento futuro.
 
 ---
 
-## Extensiones Futuras
-El sistema podrá ampliarse incorporando las siguientes funcionalidades:
+# Requisitos
 
-Historial de encargos por temporada: permite visualizar todos los trabajos realizados en un período determinado, analizar ingresos mensuales y detectar los tipos de encargos más frecuentes.
+- PHP 8 o superior
+- MySQL 8
+- Node.js 18+
+- XAMPP o Laragon
+- Navegador web moderno
 
-Fotos del encargo: posibilidad de adjuntar imágenes de referencia o del trabajo finalizado, tanto por parte del cliente como de la costurera.
+---
 
-Gestión de stock de telas: registro y control de telas disponibles, con actualización automática del stock según los encargos y alertas cuando los niveles sean bajos.
+# Instalación
 
-Panel para el cliente: acceso mediante un enlace para consultar el estado del encargo sin necesidad de contacto directo con la costurera.
+## 1. Clonar repositorio
 
-Módulo de logística: agrupación de entregas por zona, cálculo de rutas y registro de confirmación de recepción.
+```bash
+git clone https://github.com/UCH-LDS-2026/grupo-06
 
-Presupuesto automático: generación de precios sugeridos en base a trabajos anteriores similares, considerando tipo de encargo y medidas.
+## 2. Instalar dependencias
 
-Versión mobile: adaptación de la aplicación web a formato instalable en dispositivos móviles utilizando tecnologías web modernas.
+```bash
+npm install
+```
 
-Integración con MercadoPago: posibilidad de que el cliente abone una seña de manera online directamente desde el sistema, aportando valor comercial real al proyecto.
+## 3. Configurar base de datos
 
-Integración con WhatsApp: automatización del registro de pedidos recibidos mediante WhatsApp, permitiendo capturar la información relevante de los mensajes y almacenarla directamente en el sistema para su seguimiento y gestió
+- Crear base de datos MySQL
+- Importar archivo:
+
+```bash
+database/script.sql
+```
+
+## 4. Iniciar servidor
+
+Con XAMPP o Laragon ejecutar Apache y MySQL.
+
+---
+
+# Estrategia de ramas
+
+- `main` → versión estable
+- `develop` → integración
+- `feature/nombre-feature` → nuevas funcionalidades
+- `fix/nombre-fix` → corrección de errores
+
+La rama `main` se encuentra protegida para evitar cambios directos.
+
+---
+
+# Funcionalidades MVP
+
+- Registro de clientes
+- Gestión de encargos
+- Agenda visual
+- Registro de señas
+- Cálculo de saldo pendiente
+- Gestión de observaciones
+- Historial de encargos
+
+---
+
+# Entorno configurado
+
+| Herramienta | Versión |
+|---|---|
+| PHP | 8.2 |
+| MySQL | 8 |
+| Node.js | 18 |
+| VS Code | Última |
+| XAMPP | Última |
+
+---
+
+# Diagramas UML
+
+## Casos de uso
+- Gestión de clientes
+- Gestión de encargos
+- Gestión de pagos
+- Consulta de historial
+- Agenda visual
+
+## Clases principales
+- Cliente
+- FichaCliente
+- Encargo
+- Observaciones
+- Administrador
+- Alerta
+
+---
+
+# Documentación
+
+La carpeta `/docs` contiene:
+
+- Diagrama de casos de uso
+- Diagrama de clases
+- Informe PDF
+- Capturas del sistema
+
+---
+
+# Objetivo del proyecto
+
+Digitalizar la organización de un taller de costura para evitar pérdidas de información, mejorar el control de entregas y facilitar la gestión de clientes y pagos.
