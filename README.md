@@ -47,7 +47,7 @@ Además, el sistema se plantea como una aplicación web porque permite acceder d
 - PHP 8 o superior
 - MySQL 8
 - Node.js 18+
-- XAMPP o Laragon
+- XAMPP
 - Navegador web moderno
 
 ---
@@ -105,13 +105,11 @@ La rama `main` se encuentra protegida para evitar cambios directos.
 
 # Entorno configurado
 
-| Herramienta | Versión |
-|---|---|
-| PHP | 8.2 |
-| MySQL | 8 |
-| Node.js | 18 |
-| VS Code | Última |
-| XAMPP | Última |
+| PHP → 8.2 |
+| MySQL → 8 |
+| Node.js → 18 |
+| VS Code → Última |
+| XAMPP → Última |
 
 ---
 
@@ -141,7 +139,6 @@ La carpeta `/docs` contiene:
 - Diagrama de casos de uso
 - Diagrama de clases
 - Informe PDF
-- Capturas del sistema
 
 ---
 
