@@ -145,5 +145,5 @@ La carpeta `/docs` contiene:
 # Objetivo del proyecto
 
 Digitalizar la organización de un taller de costura para evitar pérdidas de información, mejorar el control de entregas y facilitar la gestión de clientes y pagos.
-Holis hice un cambio 
+
 
