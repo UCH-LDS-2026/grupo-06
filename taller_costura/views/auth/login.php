@@ -1,12 +1,11 @@
 <?php
 require_once __DIR__ . '/../../controllers/AuthController.php';
  
-// Si ya hay sesión activa, redirigir
+// Cerrar sesión activa al entrar al login
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (isset($_SESSION['admin_id'])) {
-    header('Location: /sistema_costura/grupo-06/taller_costura/views/encargos/index.php');
-    exit;
-}
+session_unset();
+session_destroy();
+session_start(); // nueva sesión limpia para mensajes de error
  
 $error  = $_SESSION['error_login'] ?? null;
 unset($_SESSION['error_login']);
