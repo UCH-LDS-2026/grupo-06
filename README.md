@@ -8,142 +8,199 @@
 
 ---
 
-# Descripción del proyecto
+## Descripción del proyecto
 
 Sistema web destinado a la gestión de encargos de un taller de costura.  
 Permite registrar clientes, almacenar medidas, gestionar encargos, registrar señas y visualizar entregas próximas mediante una agenda organizada.
 
 ---
 
-# Tecnologías utilizadas
+## Tecnologías utilizadas
 
-## Frontend
-- HTML5
-- CSS3
-- JavaScript
-
-## Backend
-- PHP 8
-
-## Base de datos
-- MySQL
+| Capa | Tecnología |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript |
+| Backend | PHP 8 |
+| Base de datos | MySQL 8 |
+| Servidor local | WAMP / XAMPP |
 
 ---
 
-# Justificación del Stack
+## Justificación del Stack
 
-Se eligió JavaScript para el frontend debido a su facilidad para generar interfaces dinámicas e interactivas, especialmente útil para la agenda visual y la actualización de estados de encargos en tiempo real.
+**JavaScript** se eligió para el frontend por su facilidad para generar interfaces dinámicas, especialmente útil para la agenda visual y la actualización de estados de encargos.
 
-PHP fue seleccionado para el backend por su integración sencilla con aplicaciones web y bases de datos relacionales, además de ser una tecnología ampliamente utilizada y adecuada para proyectos CRUD como este sistema.
+**PHP** fue seleccionado para el backend por su integración sencilla con bases de datos relacionales y su adecuación para proyectos CRUD como este sistema.
 
-MySQL se eligió como sistema gestor de base de datos por su estabilidad, facilidad de uso y compatibilidad con PHP, permitiendo almacenar clientes, encargos, observaciones y pagos de forma estructurada y segura.
+**MySQL** se eligió como gestor de base de datos por su estabilidad, facilidad de uso y compatibilidad con PHP, permitiendo almacenar clientes, encargos, observaciones y pagos de forma estructurada.
 
-Además, el sistema se plantea como una aplicación web porque permite acceder desde distintos dispositivos sin necesidad de instalación local. La arquitectura cliente-servidor facilita la separación entre interfaz, lógica y datos, permitiendo escalabilidad y mantenimiento futuro.
+El sistema se plantea como aplicación web para permitir el acceso desde distintos dispositivos sin instalación local, con arquitectura MVC que facilita la separación entre interfaz, lógica y datos.
 
 ---
 
-# Requisitos
+## Requisitos
 
 - PHP 8 o superior
 - MySQL 8
-- Node.js 18+
-- XAMPP
+- WAMP o XAMPP
 - Navegador web moderno
 
 ---
 
-# Instalación
+## Instalación
 
-## 1. Clonar repositorio
+### 1. Clonar repositorio
 
 ```bash
 git clone https://github.com/UCH-LDS-2026/grupo-06
-
-## 2. Instalar dependencias
-
-```bash
-npm install
 ```
 
-## 3. Configurar base de datos
+### 2. Configurar base de datos
 
-- Crear base de datos MySQL
-- Importar archivo:
+- Crear la base de datos `sistema_costura` en MySQL
+- Importar el archivo:
 
 ```bash
-database/script.sql
+taller_costura/database/sistema_costura.sql
 ```
 
-## 4. Iniciar servidor
+### 3. Configurar conexión
 
-Con XAMPP o Laragon ejecutar Apache y MySQL.
+Cada integrante debe crear su propio `config/database.php` con sus credenciales locales (este archivo está excluido del repositorio por `.gitignore`).
+
+```php
+<?php
+define('DB_HOST', 'localhost');
+define('DB_PORT', '3306');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'sistema_costura');
+```
+
+### 4. Iniciar servidor
+
+Con WAMP o XAMPP iniciá Apache y MySQL.
+
+### 5. Acceder al sistema
+
+```
+http://localhost/sistema_costura/grupo-06/taller_costura/views/auth/login.php
+```
 
 ---
 
-# Estrategia de ramas
+## Credenciales de prueba
 
-- `main` → versión estable
-- `develop` → integración
-- `feature/nombre-feature` → nuevas funcionalidades
-- `fix/nombre-fix` → corrección de errores
+| Campo | Valor |
+|---|---|
+| Email | admin@taller.com |
+| Contraseña | Admin1234 |
 
-La rama `main` se encuentra protegida para evitar cambios directos.
+> ⚠️ Recordá correr el script `actualizar_pass.php` una sola vez para generar el hash correcto, luego eliminarlo.
 
 ---
 
-# Funcionalidades MVP
+## Estrategia de ramas
+
+| Rama | Uso |
+|---|---|
+| `main` | Versión estable — protegida, solo merge por PR |
+| `development` | Integración de funcionalidades |
+| `feature/nombre-feature` | Nuevas funcionalidades |
+| `fix/nombre-fix` | Corrección de errores |
+
+---
+
+## Funcionalidades MVP
 
 - Registro de clientes
 - Gestión de encargos
-- Agenda visual
+- Agenda visual con colores según proximidad de entrega
 - Registro de señas
 - Cálculo de saldo pendiente
-- Gestión de observaciones
-- Historial de encargos
+- Gestión de observaciones por encargo
+- Historial de encargos entregados
 
 ---
 
-# Entorno configurado
+## Arquitectura — MVC
 
-| PHP → 8.2 |
-| MySQL → 8 |
-| Node.js → 18 |
-| VS Code → Última |
-| XAMPP → Última |
+```
+taller_costura/
+├── config/
+│   ├── config.php
+│   └── database.php          # ⚠️ No se sube al repo (credenciales locales)
+├── controllers/
+│   ├── AuthController.php
+│   ├── ClienteController.php
+│   ├── EncargoController.php
+│   ├── AgendaController.php
+│   └── PagoController.php
+├── models/
+│   ├── Administrador.php
+│   ├── Cliente.php
+│   ├── FichaCliente.php
+│   ├── Encargo.php
+│   ├── Observacion.php
+│   └── Alerta.php
+├── views/
+│   ├── auth/
+│   ├── clientes/
+│   ├── encargos/
+│   ├── agenda/
+│   ├── pagos/
+│   └── layout/
+├── database/
+│   └── sistema_costura.sql
+├── public/
+│   ├── css/
+│   └── js/
+└── index.php
+```
 
 ---
 
-# Diagramas UML
+## División de tareas
 
-## Casos de uso
-- Gestión de clientes
-- Gestión de encargos
-- Gestión de pagos
-- Consulta de historial
-- Agenda visual
-
-## Clases principales
-- Cliente
-- FichaCliente
-- Encargo
-- Observaciones
-- Administrador
-- Alerta
+| Integrante | Módulo | Archivos |
+|---|---|---|
+| Delfina Ibañez | Autenticación & Clientes | `Administrador.php`, `Cliente.php`, `FichaCliente.php`, `AuthController.php`, `ClienteController.php`, `views/auth/`, `views/clientes/` |
+| Carolina Fetta | Encargos & Agenda | `Encargo.php`, `Observacion.php`, `EncargoController.php`, `AgendaController.php`, `views/encargos/`, `views/agenda/` |
+| Candela Aguilar | Pagos, Alertas & Infraestructura | `Alerta.php`, `PagoController.php`, `config/database.php`, `index.php`, `.htaccess`, `views/layout/`, `views/pagos/` |
 
 ---
 
-# Documentación
+## Diagrama ER — Tablas principales
 
-La carpeta `/docs` contiene:
+| Tabla | Descripción |
+|---|---|
+| `administrador` | Usuario único del sistema |
+| `cliente` | Clientes del taller |
+| `ficha_cliente` | Medidas de cada cliente (1:1 con cliente) |
+| `encargo` | Encargos de costura |
+| `observacion` | Notas por encargo |
+| `alerta` | Alertas de vencimiento y estado |
+
+---
+
+## Estados de un encargo
+
+```
+pendiente → en_proceso → listo → entregado
+```
+
+---
+
+## Diagramas UML
+
+> 📁 En construcción — se agregarán en la carpeta `/docs`
 
 - Diagrama de casos de uso
 - Diagrama de clases
-- Informe PDF
+- Informe final
 
 ---
 
-# Objetivo del proyecto
+## Objetivo del proyecto
 
 Digitalizar la organización de un taller de costura para evitar pérdidas de información, mejorar el control de entregas y facilitar la gestión de clientes y pagos.
-
-
