@@ -47,7 +47,7 @@ class Cliente {
      * @return self[]
      */
     public static function getAll(): array {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->query(
             "SELECT id, nombre, telefono, email, created_at
              FROM cliente
@@ -70,7 +70,7 @@ class Cliente {
      * Busca un cliente por ID. Devuelve null si no existe.
      */
     public static function getById(int $id): ?self {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "SELECT id, nombre, telefono, email, created_at
              FROM cliente
@@ -94,7 +94,7 @@ class Cliente {
      * @return self[]
      */
     public static function buscar(string $termino): array {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "SELECT id, nombre, telefono, email, created_at
              FROM cliente
@@ -122,7 +122,7 @@ class Cliente {
      * Útil para validar duplicados antes de guardar.
      */
     public static function getByEmail(string $email): ?self {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "SELECT id, nombre, telefono, email, created_at
              FROM cliente
@@ -151,7 +151,7 @@ class Cliente {
             return false;
         }
  
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "INSERT INTO cliente (nombre, telefono, email)
              VALUES (:nombre, :telefono, :email)"
@@ -172,7 +172,7 @@ class Cliente {
      * Actualiza los datos de este cliente en la base de datos.
      */
     public function actualizar(): bool {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "UPDATE cliente
              SET nombre   = :nombre,
@@ -192,9 +192,8 @@ class Cliente {
      * Elimina este cliente de la base de datos.
      */
     public function eliminar(): bool {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare("DELETE FROM cliente WHERE id = :id");
         return $stmt->execute([':id' => $this->id]);
     }
 }
- 

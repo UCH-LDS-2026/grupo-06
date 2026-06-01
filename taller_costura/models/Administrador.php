@@ -45,7 +45,7 @@ class Administrador {
      * Devuelve el objeto Administrador si las credenciales son válidas, null si no.
      */
     public static function login(string $email, string $password): ?self {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "SELECT id, nombre, email, contrasena, created_at
              FROM administrador
@@ -81,7 +81,7 @@ class Administrador {
      * @return self[]
      */
     public static function getAll(): array {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->query(
             "SELECT id, nombre, email, contrasena, created_at
              FROM administrador
@@ -104,7 +104,7 @@ class Administrador {
      * Busca un administrador por ID. Devuelve null si no existe.
      */
     public static function getById(int $id): ?self {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "SELECT id, nombre, email, contrasena, created_at
              FROM administrador
@@ -127,7 +127,7 @@ class Administrador {
      * Útil para validar duplicados antes de guardar.
      */
     public static function getByEmail(string $email): ?self {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "SELECT id, nombre, email, contrasena, created_at
              FROM administrador
@@ -156,7 +156,7 @@ class Administrador {
             return false; // email duplicado
         }
  
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $hash = password_hash($passwordPlano, PASSWORD_BCRYPT);
  
         $stmt = $pdo->prepare(
@@ -180,7 +180,7 @@ class Administrador {
      * Actualiza nombre y email del administrador.
      */
     public function actualizar(): bool {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "UPDATE administrador
              SET nombre = :nombre, email = :email
@@ -203,7 +203,7 @@ class Administrador {
         }
  
         $nuevoHash = password_hash($nuevaPlano, PASSWORD_BCRYPT);
-        $pdo       = Database::getConnection();
+        $pdo       = Database::getInstance()->getConnection();
         $stmt      = $pdo->prepare(
             "UPDATE administrador SET contrasena = :contrasena WHERE id = :id"
         );
@@ -219,7 +219,7 @@ class Administrador {
      * Elimina este administrador de la base de datos.
      */
     public function eliminar(): bool {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare("DELETE FROM administrador WHERE id = :id");
         return $stmt->execute([':id' => $this->id]);
     }

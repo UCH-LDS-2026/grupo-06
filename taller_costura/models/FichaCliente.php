@@ -66,7 +66,7 @@ class FichaCliente {
      * Devuelve null si el cliente todavía no tiene ficha.
      */
     public static function getByClienteId(int $cliente_id): ?self {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "SELECT id, cliente_id, talle, contorno_pecho, contorno_cintura,
                     contorno_cadera, largo_manga, observaciones_cliente, updated_at
@@ -94,7 +94,7 @@ class FichaCliente {
      * Devuelve null si no existe.
      */
     public static function getById(int $id): ?self {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "SELECT id, cliente_id, talle, contorno_pecho, contorno_cintura,
                     contorno_cadera, largo_manga, observaciones_cliente, updated_at
@@ -145,7 +145,7 @@ class FichaCliente {
      * Actualiza $this->id al terminar.
      */
     private function guardar(): bool {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "INSERT INTO ficha_cliente
                 (cliente_id, talle, contorno_pecho, contorno_cintura,
@@ -167,7 +167,7 @@ class FichaCliente {
      * updated_at se actualiza automáticamente por la BD (ON UPDATE CURRENT_TIMESTAMP).
      */
     private function actualizar(): bool {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
             "UPDATE ficha_cliente
              SET talle                 = :talle,
@@ -185,7 +185,7 @@ class FichaCliente {
      * Elimina la ficha de este cliente.
      */
     public function eliminar(): bool {
-        $pdo  = Database::getConnection();
+        $pdo  = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare("DELETE FROM ficha_cliente WHERE cliente_id = :cliente_id");
         return $stmt->execute([':cliente_id' => $this->cliente_id]);
     }
