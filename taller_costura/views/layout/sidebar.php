@@ -56,25 +56,35 @@ $paginaActual = $_GET['page'] ?? 'inicio';
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+        }
+
+        /* SVG de las tijeras estilizadas en marrón */
+        .sidebar-logo-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: #8B7355;
+            fill: none;
+            stroke-width: 1.5;
         }
 
         .sidebar-logo-text h2 {
             font-family: 'Playfair Display', serif;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 500;
             color: #2C1810;
+            line-height: 1.2;
         }
 
         .sidebar-logo-text span {
-            font-size: 12px;
+            font-size: 11px;
             color: #8B7355;
+            letter-spacing: 0.3px;
         }
 
         .sidebar-nav {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
 
         .sidebar-nav a {
@@ -85,21 +95,38 @@ $paginaActual = $_GET['page'] ?? 'inicio';
             border-radius: 10px;
             text-decoration: none;
             font-size: 14px;
+            font-weight: 400;
             color: #5C4A3A;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+        }
+
+        /* Estilo para los SVG de navegación */
+        .sidebar-nav a svg {
+            width: 18px;
+            height: 18px;
+            stroke: #5C4A3A;
+            fill: none;
+            stroke-width: 1.75;
+            transition: stroke 0.2s ease;
         }
 
         .sidebar-nav a:hover {
             background: #FAF8F5;
+            color: #2C1810;
         }
 
+        .sidebar-nav a:hover svg {
+            stroke: #2C1810;
+        }
+
+        /* Estado Activo coincidiendo con la maqueta */
         .sidebar-nav a.activo {
             background: #7D4E2F;
             color: #FFFFFF;
+            font-weight: 500;
         }
 
-        .sidebar-nav a.activo svg path,
-        .sidebar-nav a.activo svg rect {
+        .sidebar-nav a.activo svg {
             stroke: #FFFFFF;
         }
 
@@ -124,25 +151,34 @@ $paginaActual = $_GET['page'] ?? 'inicio';
         .campana-alertas a {
             position: relative;
             text-decoration: none;
-            font-size: 20px;
-            color: #5C4A3A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .campana-alertas svg {
+            width: 22px;
+            height: 22px;
+            stroke: #5C4A3A;
+            fill: none;
+            stroke-width: 1.75;
         }
 
         .campana-alertas .badge {
             position: absolute;
-            top: -6px;
-            right: -8px;
+            top: -4px;
+            right: -4px;
             background: #C0392B;
             color: white;
             font-size: 10px;
             font-family: 'Inter', sans-serif;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .content-area {
@@ -155,24 +191,51 @@ $paginaActual = $_GET['page'] ?? 'inicio';
 
 <aside class="sidebar">
     <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">✂️</div>
+        <div class="sidebar-logo-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="6" r="3"></circle>
+                <circle cx="6" cy="18" r="3"></circle>
+                <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+            </svg>
+        </div>
         <div class="sidebar-logo-text">
             <h2>Atelier</h2>
             <span>Gestión de Encargos</span>
         </div>
     </div>
+    
     <nav class="sidebar-nav">
         <a href="/grupo-06/taller_costura/index.php"
            class="<?= $paginaActual == 'inicio' ? 'activo' : '' ?>">
-            📅 Agenda
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Agenda
         </a>
+        
         <a href="/grupo-06/taller_costura/index.php?page=clientes"
            class="<?= $paginaActual == 'clientes' ? 'activo' : '' ?>">
-            👤 Clientes
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Clientes
         </a>
+        
         <a href="/grupo-06/taller_costura/index.php?page=pagos"
            class="<?= $paginaActual == 'pagos' ? 'activo' : '' ?>">
-            💰 Pagos
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            Pagos
         </a>
     </nav>
 </aside>
@@ -181,7 +244,10 @@ $paginaActual = $_GET['page'] ?? 'inicio';
     <div class="topbar">
         <div class="campana-alertas">
             <a href="/grupo-06/taller_costura/index.php?page=alertas">
-                🔔
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
                 <?php if ($alertasNoLeidas > 0): ?>
                     <span class="badge"><?= $alertasNoLeidas ?></span>
                 <?php endif; ?>
