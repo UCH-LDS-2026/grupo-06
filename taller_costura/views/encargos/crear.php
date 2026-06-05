@@ -1,7 +1,7 @@
 
 <?php $baseUrl = dirname($_SERVER['SCRIPT_NAME']); ?>
 
-<a href="<?= $baseUrl ?>/index.php?page=agenda" class="nav-back">← Volver a Agenda</a>
+<a href="<?= $baseUrl ?>/index.php" class="nav-back">← Volver a Agenda</a>
 <h1 class="page-title">Nuevo Encargo</h1>
 
 <?php if (!empty($errorCrear)): ?>
@@ -99,7 +99,7 @@
 
   <!-- Acciones Finales con Icono de Guardar -->
   <div class="form-actions">
-    <a href="<?= $baseUrl ?>/index.php?page=agenda" class="btn-cancel">Cancelar</a>
+    <a href="<?= $baseUrl ?>/index.php" class="btn-cancel">Cancelar</a>
     <button type="submit" class="btn-submit">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
       Guardar Encargo

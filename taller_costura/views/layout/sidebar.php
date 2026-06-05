@@ -210,7 +210,7 @@ $paginaActual = $_GET['page'] ?? 'agenda';
     </div>
     
     <nav class="sidebar-nav">
-        <a href="/grupo-06/taller_costura/index.php?page=agenda"
+        <a href="/grupo-06/taller_costura/index.php"
            class="<?= $paginaActual == 'agenda' ? 'activo' : '' ?>">
             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>

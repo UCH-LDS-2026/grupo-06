@@ -38,7 +38,7 @@ $estadoLabel = ['pendiente'=>'Pendiente','en_proceso'=>'En Proceso','listo'=>'Li
 $saldo = $enc['monto_total'] - $enc['sena'];
 ?>
 
-<a href="index.php?page=agenda" class="nav-back">← Volver a Agenda</a>
+<a href="index.php" class="nav-back">← Volver a Agenda</a>
 
 <div class="det-top">
   <div>
