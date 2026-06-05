@@ -2,21 +2,31 @@
 require_once __DIR__ . '/../../config/config.php';
 // AuthController::requiereLogin();
 
-// Simulación de datos (Aquí conectarás tus modelos después)
-$fechaHoy = "lunes, 13 de abril de 2026"; // Puedes usar date() en español
+$encargoModel = new Encargo($db->getConnection());
+$todos = $encargoModel->getAll()->fetchAll(PDO::FETCH_ASSOC);
+
+// Fecha en español
+$meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+$dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+$fechaHoy = $dias[date('w')] . ', ' . date('d') . ' de ' . $meses[date('n')-1] . ' de ' . date('Y');
+
+// Estadísticas
 $estadisticas = [
-    'activos' => 5,
-    'en_proceso' => 1,
-    'listos' => 2,
-    'senas' => '49.500',
-    'cobrado' => '58.500',
-    'pendiente' => '51.500'
+    'activos'    => count(array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente', 'en_proceso']))),
+    'en_proceso' => count(array_filter($todos, fn($e) => $e['estado'] === 'en_proceso')),
+    'listos'     => count(array_filter($todos, fn($e) => $e['estado'] === 'listo')),
+    'senas'      => number_format(array_sum(array_column($todos, 'sena')), 0, ',', '.'),
+    'cobrado'    => number_format(array_sum(array_column($todos, 'monto_total')), 0, ',', '.'),
+    'pendiente'  => number_format(
+        array_sum(array_column($todos, 'monto_total')) - array_sum(array_column($todos, 'sena')),
+        0, ',', '.'
+    ),
 ];
 
+$proximasEntregas = array_filter($todos, fn($e) => $e['estado'] !== 'entregado');
 ?>
 
 <style>
-    /* Estilos específicos para la vista de Agenda/Encargos */
     .agenda-header {
         display: flex;
         justify-content: space-between;
@@ -52,7 +62,6 @@ $estadisticas = [
 
     .btn-nuevo:hover { background: #5C3A23; }
 
-    /* Grid de Estadísticas */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -80,9 +89,8 @@ $estadisticas = [
         text-transform: capitalize;
     }
 
-    .stat-money { color: #7D4E2F; } /* Color especial para montos */
+    .stat-money { color: #7D4E2F; }
 
-    /* Sección de Entregas */
     .section-title {
         font-family: 'Playfair Display', serif;
         font-size: 24px;
@@ -141,8 +149,10 @@ $estadisticas = [
         font-weight: 500;
     }
 
-    .status-listo { background: #E8F5E9; color: #2E7D32; }
-    .status-atrasado { color: #C0392B; font-size: 11px; font-weight: 500; }
+    .status-listo      { background: #E8F5E9; color: #2E7D32; }
+    .status-en_proceso { background: #FFF8E1; color: #F57F17; }
+    .status-pendiente  { background: #F3E5F5; color: #6A1B9A; }
+    .status-atrasado   { color: #C0392B; font-size: 11px; font-weight: 500; }
 </style>
 
 <div class="agenda-header">
@@ -155,7 +165,6 @@ $estadisticas = [
     </a>
 </div>
 
-<!-- Fila superior de contadores -->
 <div class="stats-grid">
     <div class="stat-card">
         <span class="stat-value"><?= $estadisticas['activos'] ?></span>
@@ -171,7 +180,6 @@ $estadisticas = [
     </div>
 </div>
 
-<!-- Fila de montos económicos -->
 <div class="stats-grid">
     <div class="stat-card">
         <p class="stat-label">Total Señas Recibidas</p>
@@ -189,26 +197,40 @@ $estadisticas = [
 
 <h2 class="section-title">Próximas Entregas</h2>
 
-<!-- Ejemplo de una tarjeta de entrega -->
-<div class="entrega-card">
-    <div class="entrega-fecha">
-        <span class="dia">12</span>
-        <span class="mes">ABR</span>
-        <span class="status-atrasado">Atrasado 1d</span>
-    </div>
-    <div class="entrega-info">
-        <h3>Ajuste de Vestido</h3>
-        <p>María González</p>
-        <p style="margin-top: 8px; color: #5C4A3A;">Ajustar costados y largo de vestido rojo</p>
-    </div>
-    <div class="entrega-status">
-        <span class="status-badge status-listo">Listo</span>
-    </div>
-</div>
-
-<!-- Aquí puedes abrir un foreach para cargar los encargos reales de la DB -->
-<?php if (empty($proximasEntregas)): ?>
-    <!-- Mantenemos el placeholder por si no hay datos -->
+<?php if (!empty($proximasEntregas)): ?>
+    <?php foreach ($proximasEntregas as $encargo): ?>
+        <?php
+            $fecha  = new DateTime($encargo['fecha_entrega']);
+            $hoy    = new DateTime('today');
+            $diff   = (int)$hoy->diff($fecha)->format('%r%a');
+            $dia    = $fecha->format('d');
+            $mes    = strtoupper(substr($meses[(int)$fecha->format('n') - 1], 0, 3));
+            $estadoClass = 'status-' . $encargo['estado'];
+            $estadoLabel = ucfirst(str_replace('_', ' ', $encargo['estado']));
+        ?>
+        <div class="entrega-card">
+            <div class="entrega-fecha">
+                <span class="dia"><?= $dia ?></span>
+                <span class="mes"><?= $mes ?></span>
+                <?php if ($diff < 0): ?>
+                    <span class="status-atrasado">Atrasado <?= abs($diff) ?>d</span>
+                <?php elseif ($diff === 0): ?>
+                    <span class="status-atrasado">¡Hoy!</span>
+                <?php endif; ?>
+            </div>
+            <div class="entrega-info">
+                <h3><?= htmlspecialchars($encargo['tipo']) ?></h3>
+                <p><?= htmlspecialchars($encargo['cliente_nombre'] ?? 'Sin cliente') ?></p>
+                <?php if (!empty($encargo['descripcion'])): ?>
+                    <p style="margin-top: 8px; color: #5C4A3A;"><?= htmlspecialchars($encargo['descripcion']) ?></p>
+                <?php endif; ?>
+            </div>
+            <div class="entrega-status">
+                <span class="status-badge <?= $estadoClass ?>"><?= $estadoLabel ?></span>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php else: ?>
     <div class="placeholder" style="background: white; padding: 40px; border-radius: 12px; text-align: center; border: 1px dashed #EDE8E0;">
         <span style="font-size: 40px;">📋</span>
         <p style="color: #8B7355; margin-top: 10px;">No hay encargos próximos para mostrar.</p>
