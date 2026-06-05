@@ -5,16 +5,11 @@ require_once __DIR__ . '/../../models/Encargo.php';
 $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 $errorCrear = null;
 
-// Clientes hardcodeados - reemplazar por consulta a BD cuando esté listo
-$clientes = [
-    ['id' => 1, 'nombre' => 'María García'],
-    ['id' => 2, 'nombre' => 'Laura Pérez'],
-];
 
 // Reemplazar el array hardcodeado por:
-// $db = Database::getInstance()->getConnection();
-// $stmt = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
-// $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$db = Database::getInstance()->getConnection();
+$stmt = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
+$clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
