@@ -9,10 +9,12 @@ require_once 'models/Encargo.php';
 $page = $_GET['page'] ?? 'agenda';
 
 $vistas = [
-    'agenda'   => 'views/encargos/index.php',
-    'clientes' => 'views/clientes/index.php',
-    'pagos'    => 'views/pagos/index.php',
-    'alertas'  => 'views/alertas/index.php',
+    'agenda'           => 'views/encargos/index.php',
+    'crear'            => 'views/encargos/crear.php',
+    'detalle-encargo' => 'views/encargos/detalle.php',
+    'clientes'         => 'views/clientes/index.php',
+    'pagos'            => 'views/pagos/index.php',
+    'alertas'          => 'views/alertas/index.php',
 ];
 
 $vista = $vistas[$page] ?? $vistas['agenda'];
