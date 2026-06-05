@@ -184,7 +184,7 @@ unset($_SESSION['error_login']);
             <div class="alerta alerta-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
  
-        <form action="/sistema_costura/grupo-06/taller_costura/controllers/AuthController.php" method="POST">
+        <form action="/grupo-06/taller_costura/index.php" method="POST">
             <input type="hidden" name="accion" value="login">
  
             <div class="campo">
@@ -228,7 +228,7 @@ unset($_SESSION['error_login']);
             </div>
         <?php endif; ?>
  
-        <form action="/sistema_costura/grupo-06/taller_costura/controllers/AuthController.php" method="POST">
+        <form action="/grupo-06/taller_costura/index.php" method="POST">
             <input type="hidden" name="accion" value="cambiar_contrasena">
  
             <div class="campo">

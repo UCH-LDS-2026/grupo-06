@@ -12,8 +12,7 @@ class AuthController {
         if (session_status() === PHP_SESSION_NONE) session_start();
  
         if (isset($_SESSION['admin_id'])) {
-            header('Location: /sistema_costura/grupo-06/taller_costura/views/encargos/index.php');
-            exit;
+            header('Location: /sistema_costura/grupo-06/taller_costura/index.php');            exit;
         }
  
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -43,8 +42,7 @@ class AuthController {
         $_SESSION['admin_email']  = $admin->getEmail();
         unset($_SESSION['error_login']);
  
-        header('Location: /sistema_costura/grupo-06/taller_costura/views/encargos/index.php');
-        exit;
+        header('Location: /sistema_costura/grupo-06/taller_costura/index.php');        exit;
     }
  
     // =========================================================================
@@ -114,10 +112,9 @@ class AuthController {
     // =========================================================================
  
     public static function requiereLogin(): void {
-        if (session_status() === PHP_SESSION_NONE) session_start();
  
         if (!isset($_SESSION['admin_id'])) {
-            header('Location: /sistema_costura/grupo-06/taller_costura/views/auth/login.php');
+            header('Location: /grupo-06/taller_costura/views/auth/login.php');
             exit;
         }
     }

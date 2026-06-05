@@ -5,6 +5,10 @@
 
 require_once 'config/database.php';
 
+require_once 'config/config.php';
+require_once 'controllers/AuthController.php';
+
+
 // Incluir el layout
 require_once VIEWS_PATH . '/layout/header.php';
 require_once VIEWS_PATH . '/layout/navbar.php';
@@ -15,6 +19,4 @@ require_once VIEWS_PATH . '/layout/navbar.php';
     <p>Sistema de gestión de talleres de costura</p>
 </div>
 
-<?php
-require_once VIEWS_PATH . '/layout/footer.php';
-?>
+

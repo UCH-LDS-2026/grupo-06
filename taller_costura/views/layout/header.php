@@ -162,15 +162,15 @@ $paginaActual = $_GET['page'] ?? 'inicio';
         </div>
     </div>
     <nav class="sidebar-nav">
-        <a href="/ProyectoFinal/grupo-06/taller_costura/index.php"
+        <a href="/grupo-06/taller_costura/index.php"
            class="<?= $paginaActual == 'inicio' ? 'activo' : '' ?>">
             📅 Agenda
         </a>
-        <a href="/ProyectoFinal/grupo-06/taller_costura/index.php?page=clientes"
+        <a href="/grupo-06/taller_costura/index.php?page=clientes"
            class="<?= $paginaActual == 'clientes' ? 'activo' : '' ?>">
             👤 Clientes
         </a>
-        <a href="/ProyectoFinal/grupo-06/taller_costura/index.php?page=pagos"
+        <a href="/grupo-06/taller_costura/index.php?page=pagos"
            class="<?= $paginaActual == 'pagos' ? 'activo' : '' ?>">
             💰 Pagos
         </a>
@@ -180,7 +180,7 @@ $paginaActual = $_GET['page'] ?? 'inicio';
 <div class="main-wrapper">
     <div class="topbar">
         <div class="campana-alertas">
-            <a href="/ProyectoFinal/grupo-06/taller_costura/index.php?page=alertas">
+            <a href="/grupo-06/taller_costura/index.php?page=alertas">
                 🔔
                 <?php if ($alertasNoLeidas > 0): ?>
                     <span class="badge"><?= $alertasNoLeidas ?></span>
