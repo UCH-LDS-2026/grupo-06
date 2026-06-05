@@ -12,6 +12,9 @@ $paginaActual = $_GET['page'] ?? 'agenda';
     <title>Atelier — Gestión de Encargos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <?php if (in_array($paginaActual, ['agenda', 'crear', 'detalle-encargo'])): ?>
+        <link rel="stylesheet" href="public/css/encargos/encargos.css">
+    <?php endif; ?>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 

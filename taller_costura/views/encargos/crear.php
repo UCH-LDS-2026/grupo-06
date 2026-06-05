@@ -1,55 +1,5 @@
 
 <?php $baseUrl = dirname($_SERVER['SCRIPT_NAME']); ?>
-<style>
-  /* NAVEGACIÓN Y TÍTULOS */
-  .nav-back { color: #8B7355; text-decoration: none; font-size: 14px; display: inline-flex;
-              align-items: center; gap: 8px; margin-bottom: 24px; transition: color .2s; }
-  .nav-back:hover { color: #2C1810; }
-
-  .page-title { font-family: 'Playfair Display', serif; font-size: 36px; color: #2C1810; margin-bottom: 32px; font-weight: 500; }
-
-  /* CONTENEDORES DE SECCIÓN SEGÚN FIGMA */
-  .form-wrap { max-width: 800px; display: flex; flex-direction: column; gap: 24px; padding-bottom: 60px; }
-  .form-section { background: #fff; border: 1px solid #EDE8E0; border-radius: 12px; padding: 32px; }
-  .form-section h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: #2C1810; margin-bottom: 28px; font-weight: 500; }
-
-  /* ESTILO DE INPUTS Y LABELS */
-  .form-group { margin-bottom: 20px; }
-  .form-group:last-child { margin-bottom: 0; }
-  .form-group label { display: block; font-size: 13px; font-weight: 500; color: #8B7355; margin-bottom: 10px; }
-  
-  .form-control { width: 100%; padding: 14px 18px; border: 1px solid #EDE8E0; border-radius: 8px;
-                  background: #fff; color: #2C1810; font-size: 14px; font-family: 'Inter', sans-serif;
-                  outline: none; transition: all .2s ease; }
-  .form-control:focus { border-color: #7D4E2F; box-shadow: 0 0 0 4px rgba(125, 78, 47, 0.05); }
-  .form-control::placeholder { color: #A69580; opacity: 0.6; }
-  
-  textarea.form-control { resize: vertical; min-height: 100px; }
-  
-  /* AYUDAS Y HINTS */
-  .form-hint { font-size: 12px; color: #8B7355; margin-top: 10px; }
-  .link-hint { color: #7D4E2F; font-weight: 500; text-decoration: none; }
-  .link-hint:hover { text-decoration: underline; }
-
-  /* FILAS DINÁMICAS */
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-  /* BOTONES DE ACCIÓN FINALES */
-  .form-actions { display: flex; justify-content: flex-end; align-items: center; gap: 20px; margin-top: 10px; }
-  
-  .btn-submit { background: #7D4E2F; color: #fff; padding: 14px 32px; border: none; border-radius: 8px;
-                font-size: 15px; font-weight: 500; cursor: pointer; transition: background .2s; 
-                display: flex; align-items: center; gap: 10px; }
-  .btn-submit:hover { background: #5C3A23; }
-  
-  .btn-cancel { background: #FAF8F5; color: #8B7355; padding: 14px 28px; border: 1px solid #EDE8E0; 
-                border-radius: 8px; text-decoration: none; font-size: 14px; transition: all .2s; }
-  .btn-cancel:hover { background: #F0EDE9; color: #2C1810; }
-
-  /* ALERTAS */
-  .alert-error { background: #FFF5F5; border: 1px solid #FED7D7; color: #C53030;
-                 padding: 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; display: flex; gap: 10px; }
-</style>
 
 <a href="<?= $baseUrl ?>/index.php?page=agenda" class="nav-back">← Volver a Agenda</a>
 <h1 class="page-title">Nuevo Encargo</h1>
@@ -68,7 +18,7 @@
     <h2>Información del Cliente</h2>
     <div class="form-group">
       <label for="cliente_id">Cliente</label>
-      <select name="cliente_id" id="cliente_id" class="form-control" style="appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%20fill%3D%22none%22%20stroke%3D%22%238B7355%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 15px center; background-size: 18px;">
+      <select name="cliente_id" id="cliente_id" class="form-control custom-select">
         <option value="">Seleccionar cliente...</option>
         <?php foreach ($clientes as $cli): ?>
           <option value="<?= $cli->getId() ?>"
@@ -104,7 +54,7 @@
                 placeholder="Detalles importantes, preferencias del cliente..."><?= htmlspecialchars($_POST['observaciones_encargo'] ?? '') ?></textarea>
     </div>
 
-    <div class="form-group" style="margin-top: 28px;">
+    <div class="form-group form-group-top">
       <label for="fecha_entrega">Fecha de Entrega</label>
       <input type="date" name="fecha_entrega" id="fecha_entrega" class="form-control" required
              value="<?= htmlspecialchars($_POST['fecha_entrega'] ?? '') ?>">
@@ -117,9 +67,9 @@
 
     <div class="form-group">
       <label for="monto_total">Precio Total</label>
-      <div style="position: relative;">
-        <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #8B7355; font-size: 14px;">$</span>
-        <input type="number" name="monto_total" id="monto_total" class="form-control" style="padding-left: 35px;"
+      <div class="input-with-prefix">
+        <span class="input-prefix">$</span>
+        <input type="number" name="monto_total" id="monto_total" class="form-control"
                placeholder="0" min="0" step="0.01"
                value="<?= htmlspecialchars($_POST['monto_total'] ?? '') ?>">
       </div>
@@ -128,9 +78,9 @@
     <div class="form-row">
       <div class="form-group">
         <label for="sena">Seña Inicial</label>
-        <div style="position: relative;">
-          <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #8B7355; font-size: 14px;">$</span>
-          <input type="number" name="sena" id="sena" class="form-control" style="padding-left: 35px;"
+        <div class="input-with-prefix">
+          <span class="input-prefix">$</span>
+          <input type="number" name="sena" id="sena" class="form-control"
                  placeholder="0" min="0" step="0.01"
                  value="<?= htmlspecialchars($_POST['sena'] ?? '') ?>">
         </div>
@@ -138,7 +88,7 @@
       
       <div class="form-group">
         <label for="metodo_pago">Método de Pago</label>
-        <select name="metodo_pago" id="metodo_pago" class="form-control" style="appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%20fill%3D%22none%22%20stroke%3D%22%238B7355%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 15px center; background-size: 18px;">
+        <select name="metodo_pago" id="metodo_pago" class="form-control custom-select">
           <option value="efectivo">Efectivo</option>
           <option value="transferencia">Transferencia</option>
           <option value="tarjeta">Tarjeta</option>
