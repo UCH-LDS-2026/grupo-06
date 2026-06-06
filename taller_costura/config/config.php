@@ -22,4 +22,11 @@ define('CONTROLLERS_PATH', BASE_PATH . '/controllers');
 
 // Zona horaria
 date_default_timezone_set('America/Argentina/Buenos_Aires');
+
+// URL base — funciona para cualquier nombre de carpeta raíz
+define('BASE_URL', '//' . $_SERVER['HTTP_HOST'] . str_replace(
+    str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']),
+    '',
+    str_replace('\\', '/', BASE_PATH)
+));
 ?>
