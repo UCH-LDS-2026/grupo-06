@@ -108,12 +108,22 @@ class Encargo {
         return $this->monto_total - $this->sena;
     }
 
-    // devuelve cuantos dias faltan para la entrega
     public function calcularDemora() {
         $hoy = new DateTime();
         $entrega = new DateTime($this->fecha_entrega);
         $diff = $hoy->diff($entrega);
         return $diff->days;
+    }
+
+    // Función movida correctamente dentro de la clase
+    public function getByClienteId($cliente_id) {
+        $query = "SELECT * FROM " . $this->table . " 
+                  WHERE cliente_id = ?
+                  ORDER BY fecha_entrega ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $cliente_id);
+        $stmt->execute();
+        return $stmt;
     }
 }
 ?>
