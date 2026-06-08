@@ -1,9 +1,9 @@
 <?php
-require_once '../../config/config.php';
-require_once BASE_PATH . '/models/Cliente.php';
-require_once BASE_PATH . '/models/FichaCliente.php';
-require_once BASE_PATH . '/models/Encargo.php';
-require_once BASE_PATH . '/config/database.php'; //
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../models/Cliente.php';
+require_once __DIR__ . '/../../models/FichaCliente.php';
+require_once __DIR__ . '/../../models/Encargo.php';
+require_once __DIR__ . '/../../config/database.php';
  
 $clienteId = (int)($_GET['id'] ?? 0);
  
@@ -39,7 +39,7 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 $modoEdicion = isset($_GET['editar']) && $_GET['editar'] === '1';
 $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] === '1';
 ?>
-<link rel="stylesheet" href="../../public/css/cliente/fichaCliente.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/fichaCliente.css">
  
 <?php if ($exito): ?>
     <div class="alerta alerta-ok"><?= htmlspecialchars($exito) ?></div>

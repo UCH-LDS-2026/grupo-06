@@ -51,7 +51,7 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     </div>
 <?php endif; ?>
 
-<link rel="stylesheet" href="./public/css/cliente/homeCliente.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/homeCliente.css">
 
 <form method="GET" action="">
     <input type="hidden" name="page" value="clientes">
