@@ -80,9 +80,17 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     </div>
 <?php else: ?>
     <div class="clientes-grid">
-        <?php foreach ($clientes as $c):
+            <?php foreach ($clientes as $c):
             $ficha      = FichaCliente::getByClienteId($c->getId());
-            $iniciales  = implode('', array_map(fn($p) => strtoupper($p[0]), array_slice(explode(' ', $c->getNombre()), 0, 2)));
+            
+            // --- AQUÍ ESTÁ EL CAMBIO ---
+            $nombre     = trim($c->getNombre());
+            $partes     = explode(' ', $nombre);
+            $iniciales  = implode('', array_map(function($p) {
+                return !empty($p) ? strtoupper($p[0]) : '';
+            }, array_slice($partes, 0, 2)));
+            // ---------------------------
+
             $tieneFicha = $ficha !== null;
             $desde      = date('M Y', strtotime($c->getCreatedAt()));
         ?>
