@@ -23,10 +23,29 @@ define('CONTROLLERS_PATH', BASE_PATH . '/controllers');
 // Zona horaria
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 
-// URL base — funciona para cualquier nombre de carpeta raíz
-define('BASE_URL', '//' . $_SERVER['HTTP_HOST'] . str_replace(
-    str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']),
-    '',
-    str_replace('\\', '/', BASE_PATH)
-));
+// URL base — Siempre consistente basado en BASE_PATH
+if (!defined('BASE_URL')) {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+    $host = $_SERVER['HTTP_HOST'];
+    
+    // Obtener DOCUMENT_ROOT sin barras al final
+    $docRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/');
+    
+    // Obtener BASE_PATH convertido
+    $basePath = str_replace('\\', '/', BASE_PATH);
+    
+    // Calcular la ruta relativa desde DOCUMENT_ROOT
+    if (strpos($basePath, $docRoot) === 0) {
+        $urlPath = substr($basePath, strlen($docRoot));
+    } else {
+        $urlPath = '/' . basename($basePath);
+    }
+    
+    // Asegurar que comience con /
+    if (strpos($urlPath, '/') !== 0) {
+        $urlPath = '/' . $urlPath;
+    }
+    
+    define('BASE_URL', $protocol . $host . $urlPath);
+}
 ?>

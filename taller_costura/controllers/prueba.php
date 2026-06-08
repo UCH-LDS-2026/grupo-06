@@ -1,0 +1,1 @@
+<?php echo "Acceso confirmado a la carpeta controllers"; ?>

@@ -1,14 +1,33 @@
 <?php
 require_once __DIR__ . '/../../controllers/AuthController.php';
- 
-// Cerrar sesión activa al entrar al login
+require_once __DIR__ . '/../../config/config.php';
+
+// Solo destruir sesión si viene de logout
 if (session_status() === PHP_SESSION_NONE) session_start();
-session_unset();
-session_destroy();
-session_start(); // nueva sesión limpia para mensajes de error
- 
+
+// Si viene redirigido desde un controlador sin sessionid válido, limpiar
+// Pero preservar mensajes de error
+$error  = $_SESSION['error_login'] ?? null;
+$errorCambio = $_SESSION['error_cambio'] ?? null;
+$exitoCambio = $_SESSION['exito_cambio'] ?? null;
+
+// Solo limpiar si no hay admin_id (no está logeado)
+if (!isset($_SESSION['admin_id'])) {
+    session_unset();
+    session_destroy();
+    session_start(); // nueva sesión limpia
+}
+
+$_SESSION['error_login'] = $error;
+$_SESSION['error_cambio'] = $errorCambio;
+$_SESSION['exito_cambio'] = $exitoCambio;
+
 $error  = $_SESSION['error_login'] ?? null;
 unset($_SESSION['error_login']);
+$errorCambio  = $_SESSION['error_cambio'] ?? null;
+unset($_SESSION['error_cambio']);
+$exitoCambio = $_SESSION['exito_cambio'] ?? null;
+unset($_SESSION['exito_cambio']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -184,7 +203,7 @@ unset($_SESSION['error_login']);
             <div class="alerta alerta-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
  
-        <form action="/grupo-06/taller_costura/index.php" method="POST">
+        <form action="<?= BASE_URL ?>/index.php" method="POST">
             <input type="hidden" name="accion" value="login">
  
             <div class="campo">
@@ -228,7 +247,7 @@ unset($_SESSION['error_login']);
             </div>
         <?php endif; ?>
  
-        <form action="/grupo-06/taller_costura/index.php" method="POST">
+        <form action="<?= BASE_URL ?>/index.php" method="POST">
             <input type="hidden" name="accion" value="cambiar_contrasena">
  
             <div class="campo">

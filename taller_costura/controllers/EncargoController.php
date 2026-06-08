@@ -1,6 +1,7 @@
 <?php
-require_once '../models/Encargo.php';
-require_once '../config/database.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../models/Encargo.php';
+require_once __DIR__ . '/../config/database.php';
 
 class EncargoController {
     private $db;

@@ -1,9 +1,10 @@
+
 <?php
 require_once BASE_PATH . '/models/Cliente.php';
 require_once BASE_PATH . '/models/FichaCliente.php';
- 
+
 $clientes = Cliente::getAll();
- 
+
 $conFicha = [];
 $sinFicha = [];
 foreach ($clientes as $c) {
@@ -11,10 +12,10 @@ foreach ($clientes as $c) {
     if ($ficha !== null) $conFicha[] = $c;
     else $sinFicha[] = $c;
 }
- 
+
 $filtro   = $_GET['filtro'] ?? 'todas';
 $busqueda = trim($_GET['buscar'] ?? '');
- 
+
 if ($busqueda !== '') {
     $clientes = Cliente::buscar($busqueda);
 } elseif ($filtro === 'con_ficha') {
@@ -22,14 +23,12 @@ if ($busqueda !== '') {
 } elseif ($filtro === 'sin_ficha') {
     $clientes = $sinFicha;
 }
- 
+
 $exito = $_SESSION['exito_cliente'] ?? null;
 $error = $_SESSION['error_cliente'] ?? null;
 unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 ?>
- 
 
- 
 <?php if ($exito): ?>
     <div class="alerta alerta-ok"><?= htmlspecialchars($exito) ?></div>
 <?php endif; ?>
@@ -44,14 +43,16 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     </div>
     <a href="#" class="btn-nuevo" onclick="abrirModal()">+ Nueva Cliente</a>
 </div>
- 
+
 <?php if (count($sinFicha) > 0): ?>
     <div class="alerta-ficha">
         ⚠️ <strong><?= count($sinFicha) ?> <?= count($sinFicha) === 1 ? 'clienta' : 'clientas' ?> sin ficha de medidas.</strong>
         <a href="?page=clientes&filtro=sin_ficha">Ver las clientas</a>
     </div>
 <?php endif; ?>
- <link rel="stylesheet" href="././public/css/cliente/homeCliente.css">
+
+<link rel="stylesheet" href="./public/css/cliente/homeCliente.css">
+
 <form method="GET" action="">
     <input type="hidden" name="page" value="clientes">
     <div class="toolbar">
@@ -71,7 +72,7 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
         </div>
     </div>
 </form>
- 
+
 <?php if (empty($clientes)): ?>
     <div class="empty">
         <div class="empty-icon">👤</div>
@@ -106,15 +107,14 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
                 <?php endif; ?>
                 <span class="tag">👤 desde <?= $desde ?></span>
             </div>
-            <a href="views/clientes/ficha.php?id=<?= $c->getId() ?>" class="btn-perfil">
-            Ver Ficha de Medidas <span>›</span>
-        </a>
+            <a href="?page=ficha-cliente&id=<?= $c->getId() ?>" class="btn-perfil">
+                Ver Ficha de Medidas <span>›</span>
+            </a>
         </div>
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
- 
-<!-- MODAL NUEVA CLIENTE -->
+
 <div class="modal-overlay" id="modalNueva">
     <div class="modal">
         <button class="modal-close" onclick="cerrarModal()">✕</button>
@@ -122,7 +122,7 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
             <h2>Nuevo Cliente</h2>
             <p>Completá los datos para registrar una nueva clienta</p>
         </div>
-        <form action="/grupo-06/taller_costura/controllers/ClienteController.php" method="POST">
+        <form action="<?= BASE_URL ?>/index.php" method="POST">
             <input type="hidden" name="accion" value="registrar">
             <div class="seccion-label">Datos Personales</div>
             <div class="form-group">
@@ -179,5 +179,5 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
         </form>
     </div>
 </div>
- 
-<script src="././public/js/cliente/clientes.js"></script>
+
+<script src="./public/js/cliente/clientes.js"></script>

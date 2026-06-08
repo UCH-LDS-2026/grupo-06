@@ -1,5 +1,6 @@
 <?php
- 
+
+require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/Administrador.php';
  
 class AuthController {
@@ -12,7 +13,8 @@ class AuthController {
         if (session_status() === PHP_SESSION_NONE) session_start();
  
         if (isset($_SESSION['admin_id'])) {
-            header('Location: /grupo-06/taller_costura/index.php');            exit;
+            header('Location: ' . BASE_URL . '/index.php');
+            exit;
         }
  
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -25,7 +27,7 @@ class AuthController {
  
         if ($email === '' || $contrasena === '') {
             $_SESSION['error_login'] = 'Por favor completá todos los campos.';
-            header('Location: /grupo-06/taller_costura/views/auth/login.php');
+            header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
         }
  
@@ -33,7 +35,7 @@ class AuthController {
  
         if ($admin === null) {
             $_SESSION['error_login'] = 'Email o contraseña incorrectos.';
-            header('Location: /grupo-06/taller_costura/views/auth/login.php');
+            header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
         }
  
@@ -41,8 +43,9 @@ class AuthController {
         $_SESSION['admin_nombre'] = $admin->getNombre();
         $_SESSION['admin_email']  = $admin->getEmail();
         unset($_SESSION['error_login']);
- 
-        header('Location: /grupo-06/taller_costura/index.php');        exit;
+
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
     }
  
     // =========================================================================
@@ -53,8 +56,8 @@ class AuthController {
         if (session_status() === PHP_SESSION_NONE) session_start();
         session_unset();
         session_destroy();
- 
-        header('Location: /grupo-06/taller_costura/views/auth/login.php');
+
+        header('Location: ' . BASE_URL . '/views/auth/login.php');
         exit;
     }
  
@@ -72,38 +75,38 @@ class AuthController {
  
         if ($email === '' || $contrasenaActual === '' || $nueva === '' || $confirmar === '') {
             $_SESSION['error_cambio'] = 'Completá todos los campos.';
-            header('Location: /grupo-06/taller_costura/views/auth/login.php');
+            header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
         }
  
         if (strlen($nueva) < 8) {
             $_SESSION['error_cambio'] = 'La nueva contraseña debe tener al menos 8 caracteres.';
-            header('Location: /grupo-06/taller_costura/views/auth/login.php');
+            header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
         }
  
         if ($nueva !== $confirmar) {
             $_SESSION['error_cambio'] = 'La nueva contraseña y la confirmación no coinciden.';
-            header('Location: /grupo-06/taller_costura/views/auth/login.php');
+            header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
         }
  
         $admin = Administrador::getByEmail($email);
         if ($admin === null) {
             $_SESSION['error_cambio'] = 'No existe un administrador con ese email.';
-            header('Location: /grupo-06/taller_costura/views/auth/login.php');
+            header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
         }
  
         $ok = $admin->cambiarContrasena($contrasenaActual, $nueva);
         if (!$ok) {
             $_SESSION['error_cambio'] = 'La contraseña actual es incorrecta.';
-            header('Location: /grupo-06/taller_costura/views/auth/login.php');
+            header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
         }
  
         $_SESSION['exito_cambio'] = 'Contraseña actualizada correctamente. Ya podés ingresar.';
-        header('Location: /grupo-06/taller_costura/views/auth/login.php');
+        header('Location: ' . BASE_URL . '/views/auth/login.php');
         exit;
     }
  
@@ -112,9 +115,9 @@ class AuthController {
     // =========================================================================
  
     public static function requiereLogin(): void {
- 
+
         if (!isset($_SESSION['admin_id'])) {
-            header('Location: /grupo-06/taller_costura/views/auth/login.php');
+            header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
         }
     }
@@ -153,7 +156,7 @@ class AuthController {
         if ($accion === 'login')              { self::iniciarSesion(); }
         elseif ($accion === 'cambiar_contrasena') { self::cambiarContrasena(); }
         elseif ($accion === 'logout')         { self::cerrarSesion(); }
-        else { header('Location: /grupo-06/taller_costura/views/auth/login.php'); }
+        else { header('Location: ' . BASE_URL . '/views/auth/login.php'); }
         exit;
     }
 }
