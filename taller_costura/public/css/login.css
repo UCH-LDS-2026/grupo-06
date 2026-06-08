@@ -144,22 +144,22 @@ body {
 .btn {
     width: 100%;
     padding: 11px;
-    background: transparent;
-    border: 1px solid #b8956a;
+    background: #c9a96e;
+    border: 1px solid #c9a96e;
     border-radius: 999px;
-    color: #c9a96e;
+    color: #1a1209;
     font-size: 12px;
     font-family: 'DM Sans', sans-serif;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s, border-color 0.15s;
     margin-top: 0.25rem;
 }
 
 .btn:hover {
     background: #b8956a;
-    color: #1a1209;
+    border-color: #b8956a;
 }
 
 .btn:active {
@@ -190,15 +190,16 @@ body {
 
 /* Botón secundario (Cambiar contraseña) */
 .card:first-of-type .btn:last-child {
+    background: transparent;
     border-color: #3d2f1f;
     color: #7a6a52;
     margin-top: 0;
 }
 
 .card:first-of-type .btn:last-child:hover {
-    border-color: #b8956a;
+    background: #251a0e;
+    border-color: #5a3d24;
     color: #c9a96e;
-    background: transparent;
 }
 
 /* ── Sección cambio de contraseña ── */
