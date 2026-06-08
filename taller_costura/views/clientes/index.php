@@ -180,4 +180,4 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     </div>
 </div>
 
-<script src="./public/js/cliente/clientes.js"></script>
+<script src="<?= BASE_URL ?>/public/js/cliente/clientes.js"></script>
