@@ -35,6 +35,9 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 <?php if ($error): ?>
     <div class="alerta alerta-err"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/homeCliente.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <div class="page-top">
     <div>
@@ -45,23 +48,27 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 </div>
 
 <?php if (count($sinFicha) > 0): ?>
-    <div class="alerta-ficha">
-        ⚠️ <strong><?= count($sinFicha) ?> <?= count($sinFicha) === 1 ? 'clienta' : 'clientas' ?> sin ficha de medidas.</strong>
-        <a href="?page=clientes&filtro=sin_ficha">Ver las clientas</a>
-    </div>
+  <div class="alerta-urgente">
+    <span>
+        <span class="material-symbols-outlined" style="font-size:25px; vertical-align:-4px; color:#A98B76; margin-right:6px;">warning</span>
+        <strong><?= count($sinFicha) ?> clienta<?= count($sinFicha) === 1 ? '' : 's' ?> sin ficha de medidas.</strong>
+    </span>
+    <a href="?page=clientes&filtro=sin_ficha">Ver las clientas</a>
+</div>
 <?php endif; ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/homeCliente.css">
 
-<form method="GET" action="">
+<form method="GET" action="" class="toolbar-form">
     <input type="hidden" name="page" value="clientes">
+    
     <div class="toolbar">
         <div class="search-wrap">
-            <span class="search-icon">🔍</span>
+            <span class="material-symbols-outlined search-icon">search</span>
             <input type="text" name="buscar" value="<?= htmlspecialchars($busqueda) ?>" placeholder="Buscar por nombre o teléfono...">
         </div>
+        
         <div class="filtros">
-            <a href="?page=clientes&filtro=todas"     class="filtro-btn <?= $filtro === 'todas'     ? 'activo' : '' ?>">Todas</a>
+            <a href="?page=clientes&filtro=todas" class="filtro-btn <?= $filtro === 'todas' ? 'activo' : '' ?>">Todas</a>
             <a href="?page=clientes&filtro=con_ficha" class="filtro-btn <?= $filtro === 'con_ficha' ? 'activo' : '' ?>">Con ficha</a>
             <a href="?page=clientes&filtro=sin_ficha" class="filtro-btn <?= $filtro === 'sin_ficha' ? 'activo' : '' ?>">
                 Sin ficha
@@ -80,45 +87,45 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     </div>
 <?php else: ?>
     <div class="clientes-grid">
-            <?php foreach ($clientes as $c):
+        <?php foreach ($clientes as $c):
             $ficha      = FichaCliente::getByClienteId($c->getId());
             
-            // --- AQUÍ ESTÁ EL CAMBIO ---
             $nombre     = trim($c->getNombre());
             $partes     = explode(' ', $nombre);
             $iniciales  = implode('', array_map(function($p) {
                 return !empty($p) ? strtoupper($p[0]) : '';
             }, array_slice($partes, 0, 2)));
-            // ---------------------------
 
             $tieneFicha = $ficha !== null;
             $desde      = date('M Y', strtotime($c->getCreatedAt()));
         ?>
-        <div class="cliente-card">
-            <div class="cliente-card-top">
-                <div class="cliente-avatar"><?= htmlspecialchars($iniciales) ?></div>
-                <div><div class="cliente-nombre"><?= htmlspecialchars($c->getNombre()) ?></div></div>
-            </div>
-            <div class="cliente-datos">
-                <?php if ($c->getTelefono()): ?>
-                    <span class="cliente-dato">📞 <?= htmlspecialchars($c->getTelefono()) ?></span>
-                <?php endif; ?>
-                <?php if ($c->getEmail()): ?>
-                    <span class="cliente-dato">✉️ <?= htmlspecialchars($c->getEmail()) ?></span>
-                <?php endif; ?>
-            </div>
-            <div class="cliente-tags">
-                <?php if ($tieneFicha): ?>
-                    <span class="tag verde">📐 Medidas registradas</span>
-                <?php else: ?>
-                    <span class="tag naranja">Sin ficha de medidas</span>
-                <?php endif; ?>
-                <span class="tag">👤 desde <?= $desde ?></span>
-            </div>
-            <a href="?page=ficha-cliente&id=<?= $c->getId() ?>" class="btn-perfil">
-                Ver Ficha de Medidas <span>›</span>
-            </a>
+            <div class="cliente-card">
+    <div class="card-header">
+        <div class="avatar-marco">
+            <div class="avatar-iniciales"><?= htmlspecialchars($iniciales) ?></div>
         </div>
+        <div class="cliente-nombre"><?= htmlspecialchars($c->getNombre()) ?></div>
+    </div>
+
+    <div class="cliente-datos">
+        <span class="dato"><span class="material-symbols-outlined">call</span> <?= htmlspecialchars($c->getTelefono()) ?></span>
+        <span class="dato"><span class="material-symbols-outlined">mail</span> <?= htmlspecialchars($c->getEmail()) ?></span>
+    </div>
+
+   <div class="cliente-tags">
+    <?php if ($tieneFicha): ?>
+        <span class="tag verde">
+    <span class="material-symbols-outlined">check_circle</span> Con ficha
+    </span>
+    <?php else: ?>
+        <span class="tag naranja"><span class="material-symbols-outlined">disabled_by_default</span> Sin ficha</span>
+    <?php endif; ?>
+    <span class="tag"><span class="material-symbols-outlined">person</span> desde <?= $desde ?></span>
+</div>
+    <a href="?page=ficha-cliente&id=<?= $c->getId() ?>" class="btn-perfil">
+        Ver perfil <span class="material-symbols-outlined">chevron_right</span>
+    </a>
+</div>
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
