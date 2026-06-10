@@ -58,14 +58,7 @@ $paginaActual = $_GET['page'] ?? 'agenda';
         </nav>
     </div>
 
-    <div class="sidebar-bottom">
-        <div class="sidebar-user">
-            <div class="sidebar-avatar"><?= strtoupper(substr($adminNombre, 0, 1)) ?></div>
-            <div class="sidebar-user-info">
-                <span class="name"><?= htmlspecialchars($adminNombre) ?></span>
-                <span class="role">Administradora</span>
-            </div>
-        </div>
+    
      <a href="<?= BASE_URL ?>/logout.php" class="logout-btn">
     <span class="material-symbols-outlined">arrow_back</span> Cerrar sesión
 </a>
