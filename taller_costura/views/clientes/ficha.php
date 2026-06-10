@@ -21,9 +21,9 @@ if ($cliente === null) {
 
 $ficha = FichaCliente::getByClienteId($clienteId);
 
-$db      = Database::getInstance()->getConnection();
+$db       = Database::getInstance()->getConnection();
 $encargo = new Encargo($db);
-$stmt    = $encargo->getByClienteId($clienteId);
+$stmt     = $encargo->getByClienteId($clienteId);
 $encargos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $totalEncargos  = count($encargos);
@@ -34,7 +34,7 @@ $exito = $_SESSION['exito_cliente'] ?? null;
 $error = $_SESSION['error_cliente'] ?? null;
 unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 
-$modoEdicion      = isset($_GET['editar'])         && $_GET['editar']         === '1';
+$modoEdicion      = isset($_GET['editar'])         && $_GET['editar']        === '1';
 $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] === '1';
 
 // Iniciales para el avatar
@@ -62,11 +62,7 @@ $iniciales = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : ''
 <p class="cliente-subtitulo">Ficha de cliente</p>
 
 <div class="ficha-layout">
-
-    <!-- ── COLUMNA IZQUIERDA ── -->
     <div>
-
-        <!-- Información de Contacto -->
         <div class="card">
             <div class="card-titulo">
                 <span class="material-symbols-outlined">person</span>
@@ -90,50 +86,40 @@ $iniciales = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : ''
                         <input type="email" name="email" value="<?= htmlspecialchars($cliente->getEmail() ?: '') ?>">
                     </div>
                     <div class="form-footer">
-                        <a href="?page=ficha-cliente&id=<?= $cliente->getId() ?>" class="btn-cancelar">Cancelar</a>
+                        <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>" class="btn-cancelar">Cancelar</a>
                         <button type="submit" class="btn-guardar">Guardar cambios</button>
                     </div>
                 </form>
             <?php else: ?>
                 <div class="contacto-lista">
                     <div class="contacto-item">
-                        <div class="contacto-icono">
-                            <span class="material-symbols-outlined">call</span>
-                        </div>
+                        <div class="contacto-icono"><span class="material-symbols-outlined">call</span></div>
                         <div>
                             <div class="contacto-label">Teléfono</div>
                             <div class="contacto-valor"><?= htmlspecialchars($cliente->getTelefono() ?: '—') ?></div>
                         </div>
                     </div>
                     <div class="contacto-item">
-                        <div class="contacto-icono">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
+                        <div class="contacto-icono"><span class="material-symbols-outlined">mail</span></div>
                         <div>
                             <div class="contacto-label">Email</div>
                             <div class="contacto-valor"><?= htmlspecialchars($cliente->getEmail() ?: '—') ?></div>
                         </div>
                     </div>
                     <div class="contacto-item">
-                        <div class="contacto-icono">
-                            <span class="material-symbols-outlined">calendar_month</span>
-                        </div>
+                        <div class="contacto-icono"><span class="material-symbols-outlined">calendar_month</span></div>
                         <div>
                             <div class="contacto-label">Cliente desde</div>
-                            <div class="contacto-valor">
-                                <?= date('d \d\e F \d\e Y', strtotime($cliente->getCreatedAt())) ?>
-                            </div>
+                            <div class="contacto-valor"><?= date('d \d\e F \d\e Y', strtotime($cliente->getCreatedAt())) ?></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="acciones-cliente">
-                    <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar_cliente=1"
-                       class="btn-accion btn-accion-editar">
+                    <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar_cliente=1" class="btn-accion btn-accion-editar">
                         <span class="material-symbols-outlined">edit</span> Editar datos
                     </a>
-                    <form method="POST" action="<?= BASE_URL ?>/index.php"
-                          onsubmit="return confirm('¿Eliminar este cliente? Esta acción no se puede deshacer.')">
+                    <form method="POST" action="<?= BASE_URL ?>/index.php" onsubmit="return confirm('¿Eliminar este cliente? Esta acción no se puede deshacer.')">
                         <input type="hidden" name="accion" value="eliminar">
                         <input type="hidden" name="id" value="<?= $cliente->getId() ?>">
                         <button type="submit" class="btn-accion btn-accion-eliminar">
@@ -144,7 +130,6 @@ $iniciales = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : ''
             <?php endif; ?>
         </div>
 
-        <!-- Medidas -->
         <div class="card">
             <div class="medidas-header">
                 <div class="medidas-titulo">
@@ -152,8 +137,7 @@ $iniciales = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : ''
                     Medidas Guardadas
                 </div>
                 <?php if (!$modoEdicion): ?>
-                    <a href="?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar=1"
-                       class="btn-editar-medidas">
+                    <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar=1" class="btn-editar-medidas">
                         <span class="material-symbols-outlined">edit</span> Editar medidas
                     </a>
                 <?php endif; ?>
@@ -165,38 +149,22 @@ $iniciales = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : ''
                     <input type="hidden" name="cliente_id" value="<?= $cliente->getId() ?>">
                     <div class="form-medidas-grid">
                         <?php
-                        $campos = [
-                            'contorno_pecho'   => 'Contorno de Busto',
-                            'contorno_cintura' => 'Contorno de Cintura',
-                            'contorno_cadera'  => 'Contorno de Cadera',
-                            'largo_espalda'    => 'Largo de Espalda',
-                            'largo_manga'      => 'Largo de Manga',
-                            'largo_pantalon'   => 'Largo de Pantalón',
-                        ];
-                        $getters = [
-                            'contorno_pecho'   => 'getContornoPecho',
-                            'contorno_cintura' => 'getContornoCintura',
-                            'contorno_cadera'  => 'getContornoCadera',
-                            'largo_espalda'    => 'getLargoEspalda',
-                            'largo_manga'      => 'getLargoManga',
-                            'largo_pantalon'   => 'getLargoPantalon',
-                        ];
+                        $campos = ['contorno_pecho' => 'Contorno de Busto', 'contorno_cintura' => 'Contorno de Cintura', 'contorno_cadera' => 'Contorno de Cadera', 'largo_espalda' => 'Largo de Espalda', 'largo_manga' => 'Largo de Manga', 'largo_pantalon' => 'Largo de Pantalón'];
+                        $getters = ['contorno_pecho' => 'getContornoPecho', 'contorno_cintura' => 'getContornoCintura', 'contorno_cadera' => 'getContornoCadera', 'largo_espalda' => 'getLargoEspalda', 'largo_manga' => 'getLargoManga', 'largo_pantalon' => 'getLargoPantalon'];
                         foreach ($campos as $name => $label):
                             $valor = $ficha ? $ficha->{$getters[$name]}() : null;
                         ?>
                         <div class="form-group">
                             <label><?= $label ?></label>
                             <div class="input-cm">
-                                <input type="number" name="<?= $name ?>"
-                                       value="<?= $valor ?? '' ?>"
-                                       placeholder="—" step="0.5" min="0">
+                                <input type="number" name="<?= $name ?>" value="<?= $valor ?? '' ?>" placeholder="—" step="0.5" min="0">
                                 <span class="cm-label">cm</span>
                             </div>
                         </div>
                         <?php endforeach; ?>
                     </div>
                     <div class="form-footer">
-                        <a href="?page=ficha-cliente&id=<?= $cliente->getId() ?>" class="btn-cancelar">Cancelar</a>
+                        <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>" class="btn-cancelar">Cancelar</a>
                         <button type="submit" class="btn-guardar">Guardar medidas</button>
                     </div>
                 </form>
@@ -204,45 +172,30 @@ $iniciales = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : ''
             <?php elseif ($ficha): ?>
                 <div class="medidas-grid">
                     <?php
-                    $medidas = [
-                        'Contorno de Busto'   => $ficha->getContornoPecho(),
-                        'Contorno de Cintura' => $ficha->getContornoCintura(),
-                        'Contorno de Cadera'  => $ficha->getContornoCadera(),
-                        'Largo de Espalda'    => $ficha->getLargoEspalda(),
-                        'Largo de Manga'      => $ficha->getLargoManga(),
-                        'Largo de Pantalón'   => $ficha->getLargoPantalon(),
-                    ];
+                    $medidas = ['Contorno de Busto' => $ficha->getContornoPecho(), 'Contorno de Cintura' => $ficha->getContornoCintura(), 'Contorno de Cadera' => $ficha->getContornoCadera(), 'Largo de Espalda' => $ficha->getLargoEspalda(), 'Largo de Manga' => $ficha->getLargoManga(), 'Largo de Pantalón' => $ficha->getLargoPantalon()];
                     foreach ($medidas as $label => $valor):
                         if ($valor === null) continue;
                     ?>
                     <div class="medida-card">
                         <div class="medida-label"><?= $label ?></div>
-                        <div class="medida-valor">
-                            <strong><?= number_format($valor, 0) ?></strong>
-                            <span>cm</span>
-                        </div>
+                        <div class="medida-valor"><strong><?= number_format($valor, 0) ?></strong> <span>cm</span></div>
                     </div>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
                 <div class="sin-medidas">
                     Este cliente todavía no tiene medidas registradas.<br>
-                    <a href="?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar=1">Ingresar medidas</a>
+                    <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar=1">Ingresar medidas</a>
                 </div>
             <?php endif; ?>
         </div>
-
     </div>
 
-    <!-- ── COLUMNA DERECHA ── -->
     <div class="panel-derecho">
-
-        <!-- Encargos -->
         <div class="card">
             <div class="encargos-header">
                 <div class="encargos-titulo">Encargos</div>
-                <a href="<?= BASE_URL ?>/index.php?page=crear&cliente_id=<?= $cliente->getId() ?>"
-                   class="btn-nuevo-encargo">+</a>
+                <a href="<?= BASE_URL ?>/index.php?page=crear&cliente_id=<?= $cliente->getId() ?>" class="btn-nuevo-encargo">+</a>
             </div>
 
             <?php if (empty($encargos)): ?>
@@ -269,22 +222,11 @@ $iniciales = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : ''
             <?php endif; ?>
         </div>
 
-        <!-- Resumen -->
         <div class="card">
             <div class="card-titulo">Resumen</div>
-            <div class="resumen-fila">
-                <span class="resumen-label">Total encargos</span>
-                <span class="resumen-valor"><?= $totalEncargos ?></span>
-            </div>
-            <div class="resumen-fila">
-                <span class="resumen-label">Activos</span>
-                <span class="resumen-valor"><?= $activos ?></span>
-            </div>
-            <div class="resumen-fila">
-                <span class="resumen-label">Saldo pendiente</span>
-                <span class="resumen-valor pendiente">$<?= number_format($saldoPendiente, 0, ',', '.') ?></span>
-            </div>
+            <div class="resumen-fila"><span class="resumen-label">Total encargos</span><span class="resumen-valor"><?= $totalEncargos ?></span></div>
+            <div class="resumen-fila"><span class="resumen-label">Activos</span><span class="resumen-valor"><?= $activos ?></span></div>
+            <div class="resumen-fila"><span class="resumen-label">Saldo pendiente</span><span class="resumen-valor pendiente">$<?= number_format($saldoPendiente, 0, ',', '.') ?></span></div>
         </div>
-
     </div>
 </div>
