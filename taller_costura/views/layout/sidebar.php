@@ -41,7 +41,7 @@ $paginaActual = $_GET['page'] ?? 'agenda';
             </div>
             <div class="sidebar-logo-text">
                 <h2>Atelier</h2>
-                <span>Gestión de Encargos</span>
+                <span>Sistema de Gestión </span>
             </div>
         </div>
 
