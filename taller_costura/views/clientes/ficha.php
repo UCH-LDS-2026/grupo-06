@@ -4,65 +4,76 @@ require_once __DIR__ . '/../../models/Cliente.php';
 require_once __DIR__ . '/../../models/FichaCliente.php';
 require_once __DIR__ . '/../../models/Encargo.php';
 require_once __DIR__ . '/../../config/database.php';
- 
+
 $clienteId = (int)($_GET['id'] ?? 0);
- 
+
 if ($clienteId === 0) {
     header('Location: ' . BASE_URL . '/index.php?page=clientes');
     exit;
 }
- 
+
 $cliente = Cliente::getById($clienteId);
- 
+
 if ($cliente === null) {
     header('Location: ' . BASE_URL . '/index.php?page=clientes');
     exit;
 }
- 
+
 $ficha = FichaCliente::getByClienteId($clienteId);
- 
-// Traer encargos del cliente
+
 $db      = Database::getInstance()->getConnection();
 $encargo = new Encargo($db);
 $stmt    = $encargo->getByClienteId($clienteId);
 $encargos = $stmt->fetchAll(PDO::FETCH_ASSOC);
- 
-// Calcular resumen
+
 $totalEncargos  = count($encargos);
 $activos        = count(array_filter($encargos, fn($e) => in_array($e['estado'], ['pendiente', 'en_proceso'])));
 $saldoPendiente = array_sum(array_map(fn($e) => $e['monto_total'] - $e['sena'], $encargos));
- 
+
 $exito = $_SESSION['exito_cliente'] ?? null;
 $error = $_SESSION['error_cliente'] ?? null;
 unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
- 
-$modoEdicion = isset($_GET['editar']) && $_GET['editar'] === '1';
+
+$modoEdicion      = isset($_GET['editar'])         && $_GET['editar']         === '1';
 $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] === '1';
+
+// Iniciales para el avatar
+$nombre    = trim($cliente->getNombre());
+$partes    = explode(' ', $nombre);
+$iniciales = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : '', array_slice($partes, 0, 2)));
 ?>
+
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/fichaCliente.css">
- 
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
 <?php if ($exito): ?>
     <div class="alerta alerta-ok"><?= htmlspecialchars($exito) ?></div>
 <?php endif; ?>
 <?php if ($error): ?>
     <div class="alerta alerta-err"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
- 
+
 <a href="<?= BASE_URL ?>/index.php?page=clientes" class="volver">← Volver a Clientes</a>
- 
-<h1 class="cliente-titulo"><?= htmlspecialchars($cliente->getNombre()) ?></h1>
- 
+
+<div class="cliente-header">
+    <div class="cliente-avatar-grande"><?= htmlspecialchars($iniciales) ?></div>
+    <h1 class="cliente-titulo"><?= htmlspecialchars($cliente->getNombre()) ?></h1>
+</div>
+<p class="cliente-subtitulo">Ficha de cliente</p>
+
 <div class="ficha-layout">
- 
+
     <!-- ── COLUMNA IZQUIERDA ── -->
     <div>
- 
+
         <!-- Información de Contacto -->
         <div class="card">
-            <div class="card-titulo">Información de Contacto</div>
-            
+            <div class="card-titulo">
+                <span class="material-symbols-outlined">person</span>
+                Información de Contacto
+            </div>
+
             <?php if ($modoEdicionDatos): ?>
-                <!-- Formulario edición datos básicos -->
                 <form method="POST" action="<?= BASE_URL ?>/index.php">
                     <input type="hidden" name="accion" value="editar">
                     <input type="hidden" name="id" value="<?= $cliente->getId() ?>">
@@ -84,24 +95,29 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                     </div>
                 </form>
             <?php else: ?>
-                <!-- Vista normal -->
                 <div class="contacto-lista">
                     <div class="contacto-item">
-                        <div class="contacto-icono">📞</div>
+                        <div class="contacto-icono">
+                            <span class="material-symbols-outlined">call</span>
+                        </div>
                         <div>
                             <div class="contacto-label">Teléfono</div>
                             <div class="contacto-valor"><?= htmlspecialchars($cliente->getTelefono() ?: '—') ?></div>
                         </div>
                     </div>
                     <div class="contacto-item">
-                        <div class="contacto-icono">✉️</div>
+                        <div class="contacto-icono">
+                            <span class="material-symbols-outlined">mail</span>
+                        </div>
                         <div>
                             <div class="contacto-label">Email</div>
                             <div class="contacto-valor"><?= htmlspecialchars($cliente->getEmail() ?: '—') ?></div>
                         </div>
                     </div>
                     <div class="contacto-item">
-                        <div class="contacto-icono">📅</div>
+                        <div class="contacto-icono">
+                            <span class="material-symbols-outlined">calendar_month</span>
+                        </div>
                         <div>
                             <div class="contacto-label">Cliente desde</div>
                             <div class="contacto-valor">
@@ -110,35 +126,40 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                         </div>
                     </div>
                 </div>
- 
-            <!-- Botones editar/eliminar cliente -->
-            <div class="acciones-cliente" style="margin-top:20px; margin-bottom:0">
-                <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar_cliente=1"
-                   class="btn-accion btn-accion-editar">✏️ Editar datos</a>
-                <form method="POST" action="<?= BASE_URL ?>/index.php"
-                      onsubmit="return confirm('¿Eliminar esta clienta? Esta acción no se puede deshacer.')">
-                    <input type="hidden" name="accion" value="eliminar">
-                    <input type="hidden" name="id" value="<?= $cliente->getId() ?>">
-                    <button type="submit" class="btn-accion btn-accion-eliminar">🗑 Eliminar clienta</button>
-                </form>
-            </div>
+
+                <div class="acciones-cliente">
+                    <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar_cliente=1"
+                       class="btn-accion btn-accion-editar">
+                        <span class="material-symbols-outlined">edit</span> Editar datos
+                    </a>
+                    <form method="POST" action="<?= BASE_URL ?>/index.php"
+                          onsubmit="return confirm('¿Eliminar este cliente? Esta acción no se puede deshacer.')">
+                        <input type="hidden" name="accion" value="eliminar">
+                        <input type="hidden" name="id" value="<?= $cliente->getId() ?>">
+                        <button type="submit" class="btn-accion btn-accion-eliminar">
+                            <span class="material-symbols-outlined">delete</span> Eliminar cliente
+                        </button>
+                    </form>
+                </div>
             <?php endif; ?>
         </div>
- 
+
         <!-- Medidas -->
         <div class="card">
             <div class="medidas-header">
                 <div class="medidas-titulo">
-                    📐 Medidas Guardadas
+                    <span class="material-symbols-outlined">square_foot</span>
+                    Medidas Guardadas
                 </div>
                 <?php if (!$modoEdicion): ?>
                     <a href="?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar=1"
-                       class="btn-editar-medidas">Editar medidas</a>
+                       class="btn-editar-medidas">
+                        <span class="material-symbols-outlined">edit</span> Editar medidas
+                    </a>
                 <?php endif; ?>
             </div>
- 
+
             <?php if ($modoEdicion): ?>
-                <!-- Formulario edición -->
                 <form method="POST" action="<?= BASE_URL ?>/index.php">
                     <input type="hidden" name="accion" value="guardar_ficha">
                     <input type="hidden" name="cliente_id" value="<?= $cliente->getId() ?>">
@@ -179,18 +200,17 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                         <button type="submit" class="btn-guardar">Guardar medidas</button>
                     </div>
                 </form>
- 
+
             <?php elseif ($ficha): ?>
-                <!-- Mostrar medidas -->
                 <div class="medidas-grid">
                     <?php
                     $medidas = [
-                        'Contorno de Busto'    => $ficha->getContornoPecho(),
-                        'Contorno de Cintura'  => $ficha->getContornoCintura(),
-                        'Contorno de Cadera'   => $ficha->getContornoCadera(),
-                        'Largo de Espalda'     => $ficha->getLargoEspalda(),
-                        'Largo de Manga'       => $ficha->getLargoManga(),
-                        'Largo de Pantalón'    => $ficha->getLargoPantalon(),
+                        'Contorno de Busto'   => $ficha->getContornoPecho(),
+                        'Contorno de Cintura' => $ficha->getContornoCintura(),
+                        'Contorno de Cadera'  => $ficha->getContornoCadera(),
+                        'Largo de Espalda'    => $ficha->getLargoEspalda(),
+                        'Largo de Manga'      => $ficha->getLargoManga(),
+                        'Largo de Pantalón'   => $ficha->getLargoPantalon(),
                     ];
                     foreach ($medidas as $label => $valor):
                         if ($valor === null) continue;
@@ -206,18 +226,17 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                 </div>
             <?php else: ?>
                 <div class="sin-medidas">
-                    Esta clienta todavía no tiene medidas registradas.<br>
-                    <a href="?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar=1"
-                       style="color:var(--marron)">Ingresar medidas</a>
+                    Este cliente todavía no tiene medidas registradas.<br>
+                    <a href="?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar=1">Ingresar medidas</a>
                 </div>
             <?php endif; ?>
         </div>
- 
+
     </div>
- 
+
     <!-- ── COLUMNA DERECHA ── -->
     <div class="panel-derecho">
- 
+
         <!-- Encargos -->
         <div class="card">
             <div class="encargos-header">
@@ -225,7 +244,7 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                 <a href="<?= BASE_URL ?>/index.php?page=crear&cliente_id=<?= $cliente->getId() ?>"
                    class="btn-nuevo-encargo">+</a>
             </div>
- 
+
             <?php if (empty($encargos)): ?>
                 <div class="sin-encargos">Sin encargos registrados</div>
             <?php else: ?>
@@ -249,7 +268,7 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
- 
+
         <!-- Resumen -->
         <div class="card">
             <div class="card-titulo">Resumen</div>
@@ -266,6 +285,6 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                 <span class="resumen-valor pendiente">$<?= number_format($saldoPendiente, 0, ',', '.') ?></span>
             </div>
         </div>
- 
+
     </div>
 </div>
