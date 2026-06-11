@@ -5,6 +5,15 @@ require_once 'controllers/AuthController.php';
 require_once 'models/Encargo.php';
  
 if (session_status() === PHP_SESSION_NONE) session_start();
+
+// POST pagos AJAX — PRIMERO antes de cualquier output
+if (isset($_GET['page']) && $_GET['page'] === 'pagos' && isset($_GET['accion']) && $_GET['accion'] === 'registrar') {
+    $db = Database::getInstance()->getConnection();
+    require_once 'controllers/PagoController.php';
+    $ctrl = new PagoController($db);
+    $ctrl->manejar();
+    exit;
+}
  
 // Manejar todos los POST antes de cualquier output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -59,4 +68,10 @@ $vistas = [
 $vista = $vistas[$page] ?? $vistas['agenda'];
  
 require_once 'views/layout/sidebar.php';
+if ($page === 'pagos') {
+    $db = Database::getInstance()->getConnection();
+    require_once 'controllers/PagoController.php';
+    $ctrl = new PagoController($db);
+    $ctrl->cargarDatos();
+}
 require_once $vista;
