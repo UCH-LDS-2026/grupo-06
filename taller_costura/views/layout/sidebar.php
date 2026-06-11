@@ -85,14 +85,17 @@ $paginaActual    = $_GET['page'] ?? 'agenda';
         <span class="name"><?= htmlspecialchars($adminNombre) ?></span>
     </div>
 
-    <a href="index.php?accion=logout" class="sidebar-logout">
+    <form action="index.php" method="POST" style="margin:0">
+    <input type="hidden" name="accion" value="logout">
+    <button type="submit" class="sidebar-logout">
         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
             <polyline points="16 17 21 12 16 7"/>
             <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
         Cerrar sesión
-    </a>
+    </button>
+</form>
 </div>
 </aside>
 

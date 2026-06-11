@@ -156,6 +156,10 @@ body {
 
 /* ── Cerrar sesión ──────────────────────────────── */
 .sidebar-logout {
+    background: none;
+    width: 100%;
+    cursor: pointer;
+    text-align: left;
     display: flex;
     align-items: center;
     gap: 10px;
