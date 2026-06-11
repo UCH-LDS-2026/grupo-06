@@ -54,6 +54,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
  
 $page = $_GET['page'] ?? 'agenda';
+
+// AJAX: actualizar estado encargo
+if (isset($_GET['page']) && $_GET['page'] === 'actualizar-estado-encargo' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    $data   = json_decode(file_get_contents('php://input'), true);
+    $id     = (int)($data['id'] ?? 0);
+    $estado = $data['estado'] ?? '';
+    $validos = ['pendiente','en_proceso','listo','entregado'];
+    if ($id && in_array($estado, $validos)) {
+        $db   = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("UPDATE encargo SET estado = ? WHERE id = ?");
+        echo json_encode(['ok' => $stmt->execute([$estado, $id])]);
+    } else {
+        echo json_encode(['ok' => false]);
+    }
+    exit;
+}
+
+// AJAX: registrar pago en detalle-encargo
+if (isset($_GET['page']) && $_GET['page'] === 'registrar-pago-detalle' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    $data      = json_decode(file_get_contents('php://input'), true);
+    $encId     = (int)($data['encargo_id'] ?? 0);
+    $monto     = (float)($data['monto'] ?? 0);
+    $metodo    = $data['metodo'] ?? 'efectivo';
+    $nota      = trim($data['nota'] ?? '');
+    $adminId   = $_SESSION['admin_id'] ?? 1;
+    $valMetodo = ['efectivo','transferencia','tarjeta','otro'];
+    if ($encId && $monto > 0 && in_array($metodo, $valMetodo)) {
+        $db   = Database::getInstance()->getConnection();
+        // Verificar que no supere saldo
+        $enc  = $db->prepare("SELECT monto_total, sena FROM encargo WHERE id = ?");
+        $enc->execute([$encId]);
+        $row  = $enc->fetch(PDO::FETCH_ASSOC);
+        $saldo = (float)$row['monto_total'] - (float)$row['sena'];
+        if ($monto > $saldo + 0.01) {
+            echo json_encode(['ok' => false, 'mensaje' => 'El monto supera el saldo pendiente.']);
+            exit;
+        }
+        $nuevaSena = (float)$row['sena'] + $monto;
+        $db->prepare("UPDATE encargo SET sena = ? WHERE id = ?")->execute([$nuevaSena, $encId]);
+        $db->prepare("INSERT INTO pago (encargo_id, administrador_id, monto, metodo, nota) VALUES (?,?,?,?,?)")
+           ->execute([$encId, $adminId, $monto, $metodo, $nota ?: null]);
+        echo json_encode(['ok' => true, 'nueva_sena' => $nuevaSena, 'monto_total' => $row['monto_total']]);
+    } else {
+        echo json_encode(['ok' => false, 'mensaje' => 'Datos inválidos.']);
+    }
+    exit;
+}
  
 $vistas = [
     'agenda'          => 'views/encargos/index.php',

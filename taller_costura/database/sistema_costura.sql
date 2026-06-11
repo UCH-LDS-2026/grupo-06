@@ -192,3 +192,19 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE IF NOT EXISTS `pago` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `encargo_id` int NOT NULL,
+  `administrador_id` int NOT NULL DEFAULT 1,
+  `monto` decimal(10,2) NOT NULL,
+  `metodo` enum('efectivo','transferencia','tarjeta','otro') DEFAULT 'efectivo',
+  `nota` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `encargo_id` (`encargo_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `pago` (`encargo_id`, `administrador_id`, `monto`, `metodo`, `nota`, `created_at`) VALUES
+(1, 1, 10000.00, 'efectivo',      'Seña inicial', '2026-05-14 23:00:00'),
+(2, 1,  5000.00, 'transferencia', 'Seña 50%',     '2026-05-15 10:30:00');

@@ -633,3 +633,117 @@ textarea.form-control {
 .input-with-prefix .form-control {
   padding-left: 35px;
 }
+
+/* ── Estado grid (4 botones) ── */
+.estado-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.estado-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  background: #FAF8F5;
+  border: 1.5px solid #EDE8E0;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #5C4A3A;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all .18s;
+}
+.estado-btn:hover { border-color: #C4A882; background: #F5F0EB; }
+.estado-btn.activo {
+  border-color: #7D4E2F;
+  background: #fff;
+  color: #2C1810;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(125,78,47,.10);
+}
+.estado-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%; flex-shrink: 0;
+}
+.dot-pendiente { background: #C8864A; }
+.dot-proceso   { background: #4682B4; }
+.dot-listo     { background: #558B65; }
+.dot-entregado { background: #6F5294; }
+
+/* ── Progreso de pago ── */
+.progreso-wrap { margin-top: 18px; }
+.progreso-label {
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: #8B7355; margin-bottom: 8px;
+}
+.progreso-bar {
+  background: #EDE8E0; border-radius: 99px;
+  height: 8px; overflow: hidden;
+}
+.progreso-fill {
+  height: 100%; background: #7D4E2F;
+  border-radius: 99px; transition: width .4s ease;
+}
+
+/* ── Botón registrar pago ── */
+.btn-registrar-pago {
+  display: flex; align-items: center;
+  justify-content: center; gap: 8px;
+  width: 100%; margin-top: 20px; padding: 14px;
+  background: #7D4E2F; color: #fff;
+  border: none; border-radius: 8px;
+  font-size: 15px; font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer; transition: background .2s;
+}
+.btn-registrar-pago:hover { background: #5C3A23; }
+
+/* ── Historial de pagos ── */
+.pago-hist-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid #FAF8F5;
+}
+.pago-hist-item:last-child { border-bottom: none; }
+.pago-hist-icon {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #D2E7D6; color: #558B65;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.pago-hist-info { display: flex; flex-direction: column; gap: 3px; }
+.pago-hist-info strong { font-size: 15px; color: #2C1810; }
+.pago-hist-info span   { font-size: 12px; color: #8B7355; }
+.pago-hist-info em     { font-size: 12px; color: #A69580; font-style: normal; }
+.pago-metodo-tag {
+  display: inline-block; background: #F0EDE9;
+  color: #7D4E2F; border-radius: 4px;
+  padding: 1px 8px; font-size: 11px !important; font-weight: 500;
+}
+
+/* ── Observaciones especiales ── */
+.obs-especial-box {
+  background: #FAF8F5; border: 1px solid #EDE8E0;
+  border-radius: 8px; padding: 16px 20px;
+  font-size: 14px; color: #5C4A3A; line-height: 1.6;
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(44,24,16,.35);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal-box {
+  background: #fff; border-radius: 14px; padding: 32px;
+  width: 420px; max-width: 95vw;
+  box-shadow: 0 16px 48px rgba(44,24,16,.18);
+}
+.modal-box h3 {
+  font-family: 'Playfair Display', serif; font-size: 22px;
+  color: #2C1810; margin: 0 0 6px; font-weight: 500;
+}
+.modal-sub { font-size: 14px; color: #8B7355; margin: 0 0 24px; }
+.modal-sub strong { color: #A67C52; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 14px; }
