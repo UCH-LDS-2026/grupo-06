@@ -5,7 +5,12 @@ require_once 'controllers/AuthController.php';
 require_once 'models/Encargo.php';
  
 if (session_status() === PHP_SESSION_NONE) session_start();
-
+// Verificar vencimientos en cada carga
+if (isset($_SESSION['admin_id'])) {
+    require_once 'controllers/AlertaController.php';
+    $alertaCtrl = new AlertaController();
+    $alertaCtrl->verificarVencimientos($_SESSION['admin_id']);
+}
 // POST pagos AJAX — PRIMERO antes de cualquier output
 if (isset($_GET['page']) && $_GET['page'] === 'pagos' && isset($_GET['accion']) && $_GET['accion'] === 'registrar') {
     $db = Database::getInstance()->getConnection();
@@ -66,6 +71,13 @@ $vistas = [
 ];
  
 $vista = $vistas[$page] ?? $vistas['agenda'];
+
+if ($page === 'alertas' && isset($_GET['accion'])) {
+    require_once 'controllers/AlertaController.php';
+    $ctrl = new AlertaController();
+    $ctrl->manejar();
+    exit;
+}
  
 require_once 'views/layout/sidebar.php';
 if ($page === 'pagos') {
@@ -74,4 +86,5 @@ if ($page === 'pagos') {
     $ctrl = new PagoController($db);
     $ctrl->cargarDatos();
 }
+
 require_once $vista;
