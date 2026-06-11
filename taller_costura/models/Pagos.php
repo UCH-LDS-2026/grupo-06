@@ -1,0 +1,193 @@
+<?php
+// models/Pago.php
+ 
+class Pago {
+    private $pdo;
+ 
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
+    }
+ 
+    // -------------------------------------------------------
+    // Resumen general para las tarjetas del header
+    // -------------------------------------------------------
+ 
+    /**
+     * Suma de todas las señas registradas (monto ya cobrado)
+     */
+    public function getTotalCobrado(int $adminId): float {
+        $stmt = $this->pdo->prepare(
+            "SELECT COALESCE(SUM(sena), 0) AS total
+             FROM encargo
+             WHERE administrador_id = :admin_id
+               AND estado != 'entregado'"
+        );
+        $stmt->execute([':admin_id' => $adminId]);
+        return (float) $stmt->fetchColumn();
+    }
+ 
+    /**
+     * Suma de todos los saldos pendientes (monto_total - sena)
+     */
+    public function getSaldoPendienteTotal(int $adminId): float {
+        $stmt = $this->pdo->prepare(
+            "SELECT COALESCE(SUM(monto_total - sena), 0) AS total
+             FROM encargo
+             WHERE administrador_id = :admin_id
+               AND estado != 'entregado'"
+        );
+        $stmt->execute([':admin_id' => $adminId]);
+        return (float) $stmt->fetchColumn();
+    }
+ 
+    /**
+     * Total de señas (igual a getTotalCobrado — alias semántico para la UI)
+     */
+    public function getTotalSenas(int $adminId): float {
+        return $this->getTotalCobrado($adminId);
+    }
+ 
+    /**
+     * Cantidad de encargos con saldo pendiente > 0
+     */
+    public function getCuentasPorCobrarCount(int $adminId): int {
+        $stmt = $this->pdo->prepare(
+            "SELECT COUNT(*) 
+             FROM encargo
+             WHERE administrador_id = :admin_id
+               AND estado != 'entregado'
+               AND (monto_total - sena) > 0"
+        );
+        $stmt->execute([':admin_id' => $adminId]);
+        return (int) $stmt->fetchColumn();
+    }
+ 
+    // -------------------------------------------------------
+    // Listados
+    // -------------------------------------------------------
+ 
+    /**
+     * Encargos con saldo pendiente (tab "Cuentas por Cobrar")
+     */
+    public function getCuentasPorCobrar(int $adminId): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT 
+                e.id,
+                e.tipo,
+                e.descripcion,
+                e.fecha_entrega,
+                e.monto_total,
+                e.sena,
+                (e.monto_total - e.sena) AS saldo_pendiente,
+                CASE WHEN e.monto_total > 0 
+                     THEN ROUND((e.sena / e.monto_total) * 100) 
+                     ELSE 0 END AS porcentaje_pagado,
+                e.estado,
+                c.nombre AS cliente_nombre,
+                -- Conteo de pagos: si hay seña cuenta como 1 pago
+                CASE WHEN e.sena > 0 THEN 1 ELSE 0 END AS pagos_count
+             FROM encargo e
+             LEFT JOIN cliente c ON e.cliente_id = c.id
+             WHERE e.administrador_id = :admin_id
+               AND (e.monto_total - e.sena) > 0
+             ORDER BY e.fecha_entrega ASC"
+        );
+        $stmt->execute([':admin_id' => $adminId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+ 
+    /**
+     * Historial: encargos entregados o con saldo saldado
+     */
+    public function getHistorialPagos(int $adminId): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT 
+                e.id,
+                e.tipo,
+                e.descripcion,
+                e.fecha_entrega,
+                e.monto_total,
+                e.sena,
+                (e.monto_total - e.sena) AS saldo_pendiente,
+                e.estado,
+                c.nombre AS cliente_nombre
+             FROM encargo e
+             LEFT JOIN cliente c ON e.cliente_id = c.id
+             WHERE e.administrador_id = :admin_id
+               AND (e.estado = 'entregado' OR (e.monto_total - e.sena) <= 0)
+             ORDER BY e.fecha_entrega DESC"
+        );
+        $stmt->execute([':admin_id' => $adminId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+ 
+    /**
+     * Obtener un encargo por ID (para validar antes de registrar pago)
+     */
+    public function getEncargoPorId(int $encargoId, int $adminId): array|false {
+        $stmt = $this->pdo->prepare(
+            "SELECT e.*, c.nombre AS cliente_nombre
+             FROM encargo e
+             LEFT JOIN cliente c ON e.cliente_id = c.id
+             WHERE e.id = :id AND e.administrador_id = :admin_id"
+        );
+        $stmt->execute([':id' => $encargoId, ':admin_id' => $adminId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+ 
+    // -------------------------------------------------------
+    // Operaciones de escritura
+    // -------------------------------------------------------
+ 
+    /**
+     * Registra un pago parcial o total sobre el saldo pendiente.
+     * Actualiza la columna `sena` sumando el monto recibido.
+     * Si el saldo queda en 0 y el estado es 'listo', lo pasa a 'entregado'.
+     *
+     * @return array ['ok' => bool, 'mensaje' => string]
+     */
+    public function registrarPago(int $encargoId, int $adminId, float $monto): array {
+        // 1. Buscar encargo
+        $encargo = $this->getEncargoPorId($encargoId, $adminId);
+        if (!$encargo) {
+            return ['ok' => false, 'mensaje' => 'Encargo no encontrado.'];
+        }
+ 
+        $saldoPendiente = (float)$encargo['monto_total'] - (float)$encargo['sena'];
+ 
+        // 2. Validaciones
+        if ($monto <= 0) {
+            return ['ok' => false, 'mensaje' => 'El monto debe ser mayor a cero.'];
+        }
+        if ($monto > $saldoPendiente) {
+            return ['ok' => false, 'mensaje' => "El monto ($monto) supera el saldo pendiente ($saldoPendiente)."];
+        }
+ 
+        // 3. Actualizar seña
+        $nuevaSena = (float)$encargo['sena'] + $monto;
+        $nuevoEstado = $encargo['estado'];
+ 
+        // Si queda saldado y el encargo está listo → entregado
+        if ($nuevaSena >= (float)$encargo['monto_total'] && $encargo['estado'] === 'listo') {
+            $nuevoEstado = 'entregado';
+        }
+ 
+        $stmt = $this->pdo->prepare(
+            "UPDATE encargo 
+             SET sena = :sena, estado = :estado 
+             WHERE id = :id AND administrador_id = :admin_id"
+        );
+        $stmt->execute([
+            ':sena'     => $nuevaSena,
+            ':estado'   => $nuevoEstado,
+            ':id'       => $encargoId,
+            ':admin_id' => $adminId,
+        ]);
+ 
+        $mensaje = $nuevoEstado === 'entregado'
+            ? 'Pago registrado. Encargo marcado como entregado.'
+            : 'Pago registrado correctamente.';
+ 
+        return ['ok' => true, 'mensaje' => $mensaje];
+    }
+}
