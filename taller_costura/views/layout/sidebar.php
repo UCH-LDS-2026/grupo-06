@@ -30,6 +30,9 @@ $paginaActual = $_GET['page'] ?? 'agenda';
     <?php if ($paginaActual === 'pagos'): ?>
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/pagos/pagos.css">
     <?php endif; ?>
+    <?php if ($paginaActual === 'alertas'): ?>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/alertas/alertas.css">
+<?php endif; ?>
 </head>
 <body>
  
@@ -64,6 +67,11 @@ $paginaActual = $_GET['page'] ?? 'agenda';
 </a>
     </div>
 </aside>
+
+<div id="toast-campana" class="toast-campana" style="display:none">
+    <span class="material-symbols-outlined">check_circle</span>
+    <span id="toast-campana-msg"></span>
+</div>
 
 <div class="floating-alerts">
     <a href="<?= BASE_URL ?>/index.php?page=alertas">

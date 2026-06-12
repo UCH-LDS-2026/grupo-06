@@ -18,18 +18,19 @@ class AlertaController {
         $db = Database::getInstance()->getConnection();
 
         // Buscar encargos que vencen en los próximos 3 días
-        $sql = "SELECT id, tipo, fecha_entrega, cliente_id 
-                FROM encargo 
-                WHERE administrador_id = ?
-                AND estado NOT IN ('entregado')
-                AND fecha_entrega <= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
-                AND fecha_entrega >= CURDATE()
-                AND id NOT IN (
-                    SELECT encargo_id FROM alerta 
-                    WHERE administrador_id = ? 
-                    AND tipo = 'vencimiento'
-                    AND DATE(fecha) = CURDATE()
-                )";
+                $sql = "SELECT e.id, e.tipo, e.fecha_entrega, e.cliente_id, c.nombre as nombre_cliente
+        FROM encargo e
+        LEFT JOIN cliente c ON e.cliente_id = c.id
+        WHERE e.administrador_id = ?
+        AND e.estado NOT IN ('entregado')
+        AND e.fecha_entrega <= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+        AND e.fecha_entrega >= CURDATE()
+        AND e.id NOT IN (
+            SELECT encargo_id FROM alerta 
+            WHERE administrador_id = ? 
+            AND tipo = 'vencimiento'
+            AND DATE(fecha) = CURDATE()
+        )";
 
         $stmt = $db->prepare($sql);
         $stmt->execute([$administrador_id, $administrador_id]);
@@ -37,11 +38,12 @@ class AlertaController {
 
         foreach ($encargos as $encargo) {
             $diasRestantes = (strtotime($encargo['fecha_entrega']) - strtotime('today')) / 86400;
-            
+            $cliente = $encargo['nombre_cliente'] ? " de {$encargo['nombre_cliente']}" : '';
+
             if ($diasRestantes == 0) {
-                $mensaje = "El encargo #{$encargo['id']} vence hoy.";
+                $mensaje = "{$encargo['tipo']}{$cliente} vence hoy.";
             } else {
-                $mensaje = "El encargo #{$encargo['id']} vence en {$diasRestantes} día/s.";
+                $mensaje = "{$encargo['tipo']}{$cliente} vence en {$diasRestantes} día/s.";
             }
 
             $this->alertaModel->generarAlerta(
@@ -73,5 +75,30 @@ class AlertaController {
     public function contarNoLeidas($administrador_id) {
         return $this->alertaModel->contarNoLeidas($administrador_id);
     }
+
+    public function marcarTodas($administrador_id) {
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("UPDATE alerta SET leida = 1 WHERE administrador_id = ?");
+        $stmt->execute([$administrador_id]);
+    }
+
+    public function manejar(): void {
+        $accion = $_GET['accion'] ?? '';
+        $adminId = $_SESSION['admin_id'] ?? 1;
+
+        if ($accion === 'marcar') {
+            $id = (int)($_GET['id'] ?? 0);
+            $this->marcarLeida($id);
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => true]);
+            exit;
+        }
+
+        if ($accion === 'marcar_todas') {
+            $this->marcarTodas($adminId);
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => true]);
+            exit;
+        }
+    }
 }
-?>

@@ -32,7 +32,7 @@ function etiquetaEstado(string $estado): string {
     return '<span class="badge ' . $info['class'] . '">' . $info['label'] . '</span>';
 }
 ?>
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <div class="pagos-wrapper">
  
     <!-- ── Encabezado ─────────────────────────────────── -->
@@ -187,7 +187,6 @@ function etiquetaEstado(string $estado): string {
                     <div class="encargo-card-footer">
                         <div class="encargo-footer-info">
                             <span>Precio Total: <strong><?= formatPesos((float)$e['monto_total']) ?></strong></span>
-                            <span>Pagos: <strong><?= $e['pagos_count'] ?></strong></span>
                         </div>
                         <div style="text-align:right">
                             <span class="saldo-pendiente-label">Saldo Pendiente</span>
@@ -398,15 +397,37 @@ function enviarPago() {
     });
 }
  
-/* ── Toast ───────────────────────────────────────── */
 function mostrarToast(msg, tipo) {
+    // Toast local de pagos
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className   = 'toast' + (tipo === 'error' ? ' toast-error' : '');
-    // forzar reflow para la animación
-    void t.offsetWidth;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3200);
+    if (t) {
+        t.textContent = msg;
+        t.className = 'toast' + (tipo === 'error' ? ' toast-error' : '');
+        void t.offsetWidth;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3200);
+    }
+
+    // Toast campana (solo si es éxito)
+    if (tipo !== 'error') {
+        mostrarToastCampana(msg);
+    }
+}
+
+function mostrarToastCampana(msg) {
+    const toast = document.getElementById('toast-campana');
+    const msgEl = document.getElementById('toast-campana-msg');
+    if (!toast || !msgEl) return;
+
+    msgEl.textContent = msg;
+    toast.style.display = 'flex';
+    void toast.offsetWidth;
+    toast.classList.add('visible');
+
+    setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => toast.style.display = 'none', 300);
+    }, 3500);
 }
  
 /* ── Helper formato ──────────────────────────────── */

@@ -425,3 +425,31 @@ body {
 .sidebar-nav .material-symbols-outlined {
     font-size: 20px;
 }
+.toast-campana {
+    position: fixed;
+    bottom: 38px;
+    right: 100px;
+    background: #2C1810;
+    color: #FAF8F5;
+    padding: .7rem 1.1rem;
+    border-radius: 12px;
+    font-size: .82rem;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    box-shadow: 0 8px 24px rgba(44,24,16,.2);
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .3s, transform .3s;
+    pointer-events: none;
+}
+.toast-campana.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.toast-campana .material-symbols-outlined {
+    font-size: 18px;
+    color: #BABF94;
+}
