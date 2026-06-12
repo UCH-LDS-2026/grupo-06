@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../../config/config.php';
+require_once BASE_PATH . '/controllers/AlertaController.php';
 
+$alertaController = new AlertaController();
+$alertaController->verificarClientasSinFicha(1);
 $encargoModel = new Encargo($db->getConnection());
 $todos = $encargoModel->getAll()->fetchAll(PDO::FETCH_ASSOC);
 

@@ -7,6 +7,7 @@
 require_once BASE_PATH . '/controllers/AlertaController.php';
 $alertaCtrl = new AlertaController();
 $alertas = $alertaCtrl->listar($_SESSION['admin_id'] ?? 1);
+$clientasSinFicha = $alertaCtrl->obtenerClientasSinFicha($_SESSION['admin_id'] ?? 1);
 
 function tiempoTranscurrido(string $fecha): string {
     $diff = time() - strtotime($fecha);

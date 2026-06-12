@@ -101,4 +101,37 @@ class AlertaController {
             exit;
         }
     }
+    public function verificarClientasSinFicha($administrador_id) {
+
+    $clientas = $this->alertaModel->getClientasSinMedidas();
+
+    foreach ($clientas as $clienta) {
+
+        $mensaje = "La clienta {$clienta['nombre']} no tiene ficha de medidas.";
+
+        $db = Database::getInstance();
+
+        $existe = $db->fetch(
+            "SELECT id
+             FROM alerta
+             WHERE administrador_id = ?
+             AND mensaje = ?",
+            [$administrador_id, $mensaje]
+        );
+
+        if (!$existe) {
+            $this->alertaModel->generarAlerta(
+                $administrador_id,
+                null,
+                $mensaje,
+                'sin_ficha'
+            );
+        }
+    }
 }
+
+public function obtenerClientasSinFicha() {
+    return $this->alertaModel->getClientasSinMedidas();
+}
+}
+
