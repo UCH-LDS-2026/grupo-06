@@ -9,11 +9,11 @@
         </testsuite>
     </testsuites>
 
-    <source>
+    <coverage>
         <include>
             <directory suffix=".php">taller_costura/models</directory>
             <directory suffix=".php">taller_costura/controllers</directory>
         </include>
-    </source>
+    </coverage>
 
 </phpunit>
