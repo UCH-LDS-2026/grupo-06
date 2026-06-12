@@ -61,5 +61,12 @@ class Alerta {
         $resultado = $this->db->fetch($sql, [$administrador_id]);
         return $resultado['total'];
     }
+public function getClientasSinMedidas() {
+    $sql = "SELECT c.nombre 
+            FROM cliente c
+            LEFT JOIN ficha_cliente f ON c.id = f.cliente_id
+            WHERE f.id IS NULL";
+
+    return $this->db->fetchAll($sql);
 }
-?>
+}
