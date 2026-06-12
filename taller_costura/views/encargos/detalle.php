@@ -22,7 +22,6 @@ $stmtObs = $pdo->prepare("SELECT * FROM observacion WHERE encargo_id = ? ORDER B
 $stmtObs->execute([$idEncargo]);
 $observaciones = $stmtObs->fetchAll(PDO::FETCH_ASSOC);
 
-// Historial de pagos — tabla pago (si no existe devuelve array vacío)
 $historialPagos = [];
 try {
     $stmtPagos = $pdo->prepare("SELECT * FROM pago WHERE encargo_id = ? ORDER BY created_at DESC");
@@ -53,12 +52,17 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
     <div class="sub">Encargo #<?= $enc['id'] ?></div>
     <h1><?= htmlspecialchars($enc['tipo']) ?></h1>
   </div>
-  <span class="badge <?= $badgeClass ?>" id="badgeEstado"><?= $badgeTxt ?></span>
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <a href="index.php?page=encargos&action=editar&id=<?= $enc['id'] ?>" class="btn-cancel" style="display: inline-flex; align-items: center; gap: 6px; padding: 0.52rem 1rem; border-radius: var(--r-m); font-size: 0.88rem; text-decoration: none;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      Editar Encargo
+    </a>
+    <span class="badge <?= $badgeClass ?>" id="badgeEstado"><?= $badgeTxt ?></span>
+  </div>
 </div>
 
 <div class="det-grid">
 
-  <!-- ── Columna izquierda ── -->
   <div>
     <?php if ($cliente): ?>
     <div class="card">
@@ -70,7 +74,7 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
         <h4><?= htmlspecialchars($cliente['nombre']) ?></h4>
         <?php if ($cliente['telefono']): ?><p><?= htmlspecialchars($cliente['telefono']) ?></p><?php endif; ?>
         <?php if ($cliente['email']): ?><p><?= htmlspecialchars($cliente['email']) ?></p><?php endif; ?>
-        <a href="index.php?page=clientes&action=ver&id=<?= $cliente['id'] ?>" class="btn-ficha">Ver ficha completa →</a>
+        <a href="index.php?page=ficha-cliente&id=<?= $cliente['id'] ?>" class="btn-ficha">Ver ficha completa →</a>
       </div>
     </div>
     <?php else: ?>
@@ -83,27 +87,47 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
     </div>
     <?php endif; ?>
 
-    <?php if (!empty($enc['descripcion'])): ?>
     <div class="card">
-      <h3>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-        Descripción
-      </h3>
-      <p><?= nl2br(htmlspecialchars($enc['descripcion'])) ?></p>
-    </div>
-    <?php endif; ?>
-
-    <?php if (!empty($enc['observaciones_encargo'])): ?>
-    <div class="card">
-      <h3>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-        Observaciones Especiales
-      </h3>
-      <div class="obs-especial-box">
-        <?= nl2br(htmlspecialchars($enc['observaciones_encargo'])) ?>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          Descripción
+        </h3>
+        <a href="index.php?page=encargos&action=editar_desc&id=<?= $enc['id'] ?>" class="btn-ficha" style="margin-top: 0;">Editar</a>
       </div>
+      <?php if (!empty($enc['descripcion'])): ?>
+        <p><?= nl2br(htmlspecialchars($enc['descripcion'])) ?></p>
+      <?php else: ?>
+        <p class="info-text">Sin descripción registrada para este encargo.</p>
+      <?php endif; ?>
     </div>
-    <?php endif; ?>
+
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          Observaciones Especiales
+        </h3>
+        <?php if (empty($enc['observaciones_encargo'])): ?>
+          <a href="index.php?page=encargos&action=nueva_obs&id=<?= $enc['id'] ?>" class="btn-ficha" style="margin-top: 0;">+ Agregar</a>
+        <?php else: ?>
+          <a href="index.php?page=encargos&action=editar_obs&id=<?= $enc['id'] ?>" class="btn-ficha" style="margin-top: 0;">Editar</a>
+        <?php endif; ?>
+      </div>
+
+      <?php if (!empty($enc['observaciones_encargo'])): ?>
+        <div class="obs-especial-box">
+          <?= nl2br(htmlspecialchars($enc['observaciones_encargo'])) ?>
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+          <button onclick="eliminarObservacionEspecial(<?= $enc['id'] ?>)" class="btn-cancel" style="font-size: 0.78rem; padding: 6px 12px; color: #b05040; border-color: rgba(176,80,64,0.2); background: transparent; cursor: pointer; border-radius: var(--r-m)">
+            Eliminar observación
+          </button>
+        </div>
+      <?php else: ?>
+        <p class="info-text">Sin observaciones especiales para este encargo.</p>
+      <?php endif; ?>
+    </div>
 
     <?php if (!empty($observaciones)): ?>
     <div class="card">
@@ -117,7 +141,6 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
     </div>
     <?php endif; ?>
 
-    <!-- Estado del Encargo — 4 botones visuales -->
     <div class="card">
       <h3>Estado del Encargo</h3>
       <div class="estado-grid" id="estadoGrid"
@@ -139,7 +162,6 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
     </div>
   </div>
 
-  <!-- ── Columna derecha ── -->
   <div>
     <div class="card">
       <h3>
@@ -158,7 +180,6 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
       </div>
     </div>
 
-    <!-- Resumen de Pagos -->
     <div class="card">
       <h3>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -176,6 +197,7 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
         <span>Saldo Pendiente</span>
         <span class="pago-saldo" id="spanSaldo"><?= fmtMonto($saldo) ?></span>
       </div>
+      
       <div class="progreso-wrap">
         <div class="progreso-label">
           <span>Progreso de pago</span>
@@ -185,15 +207,13 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
           <div class="progreso-fill" id="progresoFill" style="width:<?= $porcentaje ?>%"></div>
         </div>
       </div>
-      <?php if ($saldo > 0): ?>
-      <button class="btn-registrar-pago" id="btnAbrirPago">
+
+      <button class="btn-registrar-pago" id="btnAbrirPago" style="<?= $saldo <= 0 ? 'display:none;' : '' ?>">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Registrar Pago
       </button>
-      <?php endif; ?>
     </div>
 
-    <!-- Historial de Pagos -->
     <div class="card" id="cardHistorial"<?= empty($historialPagos) ? ' style="display:none"' : '' ?>>
       <h3>Historial de Pagos</h3>
       <div id="listaPagos">
@@ -203,7 +223,7 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
           <div class="pago-hist-info">
             <strong><?= fmtMonto($p['monto']) ?></strong>
             <span><?= fmtFecha($p['created_at'], $meses) ?></span>
-            <span class="pago-metodo-tag"><?= ucfirst($p['metodo']) ?></span>
+            <div><span class="pago-metodo-tag"><?= ucfirst($p['metodo']) ?></span></div>
             <?php if (!empty($p['nota'])): ?><em><?= htmlspecialchars($p['nota']) ?></em><?php endif; ?>
           </div>
         </div>
@@ -214,7 +234,6 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
 
 </div>
 
-<!-- Modal registrar pago -->
 <div class="modal-overlay" id="modalPago" style="display:none">
   <div class="modal-box">
     <h3>Registrar Pago</h3>
@@ -259,6 +278,27 @@ function showToast(msg, ok) {
   t.style.background = (ok === false) ? '#C53030' : '#2C1810';
   t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 2800);
+}
+
+// ── Eliminar Observación Especial dinámicamente ──────────
+function eliminarObservacionEspecial(idEncargo) {
+  if (!confirm('¿Estás seguro de que querés eliminar la observación especial?')) return;
+
+  fetch('index.php?page=eliminar-observacion-especial', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({id: idEncargo})
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.ok) {
+      showToast('✅ Observación eliminada con éxito');
+      setTimeout(() => location.reload(), 600);
+    } else {
+      showToast('❌ Error al eliminar la observación', false);
+    }
+  })
+  .catch(() => showToast('❌ Error de conexión de red', false));
 }
 
 // ── Cambio de estado ──────────────────────────────────────
@@ -354,7 +394,7 @@ if (btnConfirmar) {
           <div class="pago-hist-info">
             <strong>${fmtMontoJS(monto)}</strong>
             <span>${fecha}</span>
-            <span class="pago-metodo-tag">${metodo.charAt(0).toUpperCase()+metodo.slice(1)}</span>
+            <div><span class="pago-metodo-tag">${metodo.charAt(0).toUpperCase()+metodo.slice(1)}</span></div>
             ${nota ? '<em>' + nota + '</em>' : ''}
           </div>
         </div>
