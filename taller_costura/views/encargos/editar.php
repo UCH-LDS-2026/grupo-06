@@ -1,129 +1,214 @@
-    <?php
-    require_once __DIR__ . '/../../config/config.php';
-    require_once __DIR__ . '/../../config/database.php';
-    require_once __DIR__ . '/../../models/Encargo.php';
+<?php
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../models/Encargo.php';
 
-    $db = Database::getInstance()->getConnection();
+$db = Database::getInstance()->getConnection();
 
-    $idEncargo = (int)($_GET['id'] ?? 0);
-    if (!$idEncargo) { header('Location: ' . BASE_URL . '/index.php'); exit; }
+$idEncargo = (int)($_GET['id'] ?? 0);
+if (!$idEncargo) { header('Location: ' . BASE_URL . '/index.php'); exit; }
 
-    $encargoModel = new Encargo($db);
-    $encargoModel->id = $idEncargo;
-    $enc = $encargoModel->getById();
-    if (!$enc) { header('Location: ' . BASE_URL . '/index.php'); exit; }
+$encargoModel = new Encargo($db);
+$encargoModel->id = $idEncargo;
+$enc = $encargoModel->getById();
+if (!$enc) { header('Location: ' . BASE_URL . '/index.php'); exit; }
 
-    $stmtClientes = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
-    $clientes = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
+$stmtClientes = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
+$clientes = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
 
-    $baseUrl = BASE_URL;
-    $error   = isset($_GET['error']);
-    ?>
+$clienteSeleccionado = null;
+foreach ($clientes as $c) {
+    if ($c['id'] == $enc['cliente_id']) { $clienteSeleccionado = $c['nombre']; break; }
+}
 
-    <a href="<?= $baseUrl ?>/index.php?page=detalle-encargo&id=<?= $idEncargo ?>" class="nav-back">← Volver al Detalle</a>
-    <h1 class="page-title">Editar Encargo #<?= $idEncargo ?></h1>
+$baseUrl = BASE_URL;
+$error   = isset($_GET['error']);
+?>
 
-    <?php if ($error): ?>
-    <div class="alert-error">
-        <span>⚠️</span>
-        <span>Completá los campos obligatorios: Tipo de prenda y Fecha de entrega.</span>
-    </div>
-    <?php endif; ?>
+<a href="<?= $baseUrl ?>/index.php?page=detalle-encargo&id=<?= $idEncargo ?>" class="nav-back">← Volver al Detalle</a>
 
-    <form method="POST" action="<?= $baseUrl ?>/index.php?page=editar-encargo" class="form-wrap">
-    <input type="hidden" name="id" value="<?= $idEncargo ?>">
+<div class="det-top">
+  <div>
+    <div class="sub">Encargo #<?= $idEncargo ?></div>
+    <h1>Editar Encargo</h1>
+  </div>
+</div>
 
-    <div class="form-section">
-        <h2>Información del Cliente</h2>
-        <div class="form-group">
-        <label for="cliente_id">Cliente <span style="color:#8B7355;font-weight:300">(opcional)</span></label>
-        <select name="cliente_id" id="cliente_id" class="form-control custom-select">
-            <option value="">Sin cliente...</option>
-            <?php foreach ($clientes as $cli): ?>
-            <option value="<?= $cli['id'] ?>" <?= ($enc['cliente_id'] == $cli['id']) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($cli['nombre']) ?>
-            </option>
-            <?php endforeach; ?>
-        </select>
+<?php if ($error): ?>
+<div class="alert-error">
+    <span>⚠️</span>
+    <span>Completá los campos obligatorios: Tipo de prenda y Fecha de entrega.</span>
+</div>
+<?php endif; ?>
+
+<form method="POST" action="<?= $baseUrl ?>/index.php?page=editar-encargo">
+<input type="hidden" name="id" value="<?= $idEncargo ?>">
+
+<div class="det-grid">
+
+  <div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin-bottom:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Cliente
+        </h3>
+        <a href="<?= $baseUrl ?>/index.php?page=clientes" class="btn-ficha"
+           style="margin-top:0; text-decoration:none; font-size:1.2rem; font-weight:700; color: var(--accent); line-height:1;"
+           title="Agregar nuevo cliente">+</a>
+      </div>
+
+      <div class="form-group" style="margin-top:20px; margin-bottom:0;">
+        <label style="display:block; margin-bottom:8px;">Cliente <span style="color:#8B7355;font-weight:300">(opcional)</span></label>
+        <div class="cliente-autocomplete" style="position:relative;">
+          <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
+                 placeholder="Escribí para buscar un cliente..."
+                 value="<?= htmlspecialchars($clienteSeleccionado ?? '') ?>">
+          <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($enc['cliente_id'] ?? '') ?>">
+          <div id="clienteLista" class="cliente-lista"
+               style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #e3d8cc; border-radius:var(--r-m); max-height:220px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
         </div>
+      </div>
     </div>
 
-    <div class="form-section">
-        <h2>Detalles del Encargo</h2>
+    <div class="card">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Detalles del Encargo
+      </h3>
 
-        <div class="form-group">
+      <div class="form-group">
         <label for="tipo">Tipo de Prenda *</label>
         <input type="text" name="tipo" id="tipo" class="form-control" required
-                placeholder="Ej: Vestido de fiesta, Pantalón, Camisa..."
-                value="<?= htmlspecialchars($enc['tipo']) ?>">
-        </div>
+               placeholder="Ej: Vestido de fiesta, Pantalón, Camisa..."
+               value="<?= htmlspecialchars($enc['tipo']) ?>">
+      </div>
 
-        <div class="form-group">
+      <div class="form-group">
         <label for="descripcion">Descripción</label>
         <textarea name="descripcion" id="descripcion" class="form-control"
-                    placeholder="Descripción detallada del encargo..."><?= htmlspecialchars($enc['descripcion'] ?? '') ?></textarea>
-        </div>
+                  placeholder="Descripción detallada del encargo..."><?= htmlspecialchars($enc['descripcion'] ?? '') ?></textarea>
+      </div>
 
-        <div class="form-group">
+      <div class="form-group">
         <label for="observaciones_encargo">Observaciones Especiales</label>
         <textarea name="observaciones_encargo" id="observaciones_encargo" class="form-control"
-                    placeholder="Detalles importantes, preferencias del cliente..."><?= htmlspecialchars($enc['observaciones_encargo'] ?? '') ?></textarea>
-        </div>
-    </div>
+                  placeholder="Detalles importantes, preferencias del cliente..."><?= htmlspecialchars($enc['observaciones_encargo'] ?? '') ?></textarea>
+      </div>
 
-    <div class="form-section">
-        <h2>Estado y Entrega</h2>
-        
-        <div class="form-group">
-        <label for="estado">Estado</label>
-        <select name="estado" id="estado" class="form-control custom-select">
-            <option value="pendiente"  <?= $enc['estado']==='pendiente'  ? 'selected':'' ?>>Pendiente</option>
-            <option value="en_proceso" <?= $enc['estado']==='en_proceso' ? 'selected':'' ?>>En Proceso</option>
-            <option value="listo"      <?= $enc['estado']==='listo'      ? 'selected':'' ?>>Listo</option>
-            <option value="entregado"  <?= $enc['estado']==='entregado'  ? 'selected':'' ?>>Entregado</option>
-        </select>
-        </div>
-
-        <div class="form-group">
+      <div class="form-group" style="margin-bottom:0;">
         <label for="fecha_entrega">Fecha de Entrega *</label>
         <input type="date" name="fecha_entrega" id="fecha_entrega" class="form-control" required
-                value="<?= htmlspecialchars($enc['fecha_entrega']) ?>">
-        </div>
+               value="<?= htmlspecialchars($enc['fecha_entrega']) ?>">
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="9 12 12 15 16 10"></polyline></svg>
+        Estado
+      </h3>
+      <div class="form-group" style="margin-bottom:0;">
+        <select name="estado" id="estado" class="form-control custom-select">
+          <option value="pendiente"  <?= $enc['estado']==='pendiente'  ? 'selected':'' ?>>Pendiente</option>
+          <option value="en_proceso" <?= $enc['estado']==='en_proceso' ? 'selected':'' ?>>En Proceso</option>
+          <option value="listo"      <?= $enc['estado']==='listo'      ? 'selected':'' ?>>Listo</option>
+          <option value="entregado"  <?= $enc['estado']==='entregado'  ? 'selected':'' ?>>Entregado</option>
+        </select>
+      </div>
     </div>
 
-    <div class="form-section">
-        <h2>Información de Pago <span style="color:#8B7355;font-weight:300;font-size:0.85em">(opcional)</span></h2>
+    <div class="card">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        Información de Pago
+      </h3>
 
-        <div class="form-group">
+      <div class="form-group">
         <label for="monto_total">Precio Total</label>
         <div class="input-with-prefix">
-            <span class="input-prefix">$</span>
-            <input type="number" name="monto_total" id="monto_total" class="form-control"
-                placeholder="0" min="0" step="0.01"
-                value="<?= htmlspecialchars($enc['monto_total'] ?? '0') ?>">
+          <span class="input-prefix">$</span>
+          <input type="number" name="monto_total" id="monto_total" class="form-control"
+                 placeholder="0" min="0" step="0.01"
+                 value="<?= htmlspecialchars($enc['monto_total'] ?? '0') ?>">
         </div>
-        </div>
+      </div>
 
-        <div class="form-group">
+      <div class="form-group" style="margin-bottom:0;">
         <label for="sena">Seña / Total Pagado</label>
         <div class="input-with-prefix">
-            <span class="input-prefix">$</span>
-            <input type="number" name="sena" id="sena" class="form-control"
-                placeholder="0" min="0" step="0.01"
-                value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
+          <span class="input-prefix">$</span>
+          <input type="number" name="sena" id="sena" class="form-control"
+                 placeholder="0" min="0" step="0.01"
+                 value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
         </div>
-        </div>
+      </div>
     </div>
 
-    <div class="form-actions">
+    <div class="card">
+      <div class="form-actions" style="margin:0; justify-content:space-between;">
         <a href="<?= $baseUrl ?>/index.php?page=detalle-encargo&id=<?= $idEncargo ?>" class="btn-cancel">Cancelar</a>
         <button type="submit" class="btn-submit">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
             <polyline points="17 21 17 13 7 13 7 21"></polyline>
             <polyline points="7 3 7 8 15 8"></polyline>
-        </svg>
-        Guardar Cambios
+          </svg>
+          Guardar Cambios
         </button>
+      </div>
     </div>
-    </form>
+  </div>
+
+</div>
+</form>
+
+<style>
+  .cliente-opcion { padding: 10px 12px; cursor: pointer; font-size: 0.92rem; }
+  .cliente-opcion:hover { background: #FAF3EA; }
+  .cliente-opcion.vacia { color: #8B7355; cursor: default; }
+</style>
+
+<script>
+const CLIENTES = <?= json_encode($clientes, JSON_UNESCAPED_UNICODE) ?>;
+
+const inputBusqueda = document.getElementById('clienteBusqueda');
+const inputHidden    = document.getElementById('cliente_id');
+const listaEl        = document.getElementById('clienteLista');
+
+function renderListaClientes(filtro) {
+  const texto = filtro.trim().toLowerCase();
+  const filtrados = texto === '' ? CLIENTES : CLIENTES.filter(c => c.nombre.toLowerCase().includes(texto));
+  let html = '<div class="cliente-opcion vacia" data-id="">Sin cliente...</div>';
+  html += filtrados.length
+    ? filtrados.map(c => `<div class="cliente-opcion" data-id="${c.id}" data-nombre="${c.nombre.replace(/"/g,'&quot;')}">${c.nombre}</div>`).join('')
+    : '<div class="cliente-opcion vacia">Sin resultados</div>';
+  listaEl.innerHTML = html;
+  listaEl.style.display = 'block';
+}
+
+inputBusqueda.addEventListener('input', () => {
+  inputHidden.value = '';
+  renderListaClientes(inputBusqueda.value);
+});
+inputBusqueda.addEventListener('focus', () => renderListaClientes(inputBusqueda.value));
+
+listaEl.addEventListener('click', (e) => {
+  const opcion = e.target.closest('.cliente-opcion');
+  if (!opcion) return;
+  if (opcion.dataset.id) {
+    inputHidden.value = opcion.dataset.id;
+    inputBusqueda.value = opcion.dataset.nombre;
+  } else {
+    inputHidden.value = '';
+    inputBusqueda.value = '';
+  }
+  listaEl.style.display = 'none';
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.cliente-autocomplete')) listaEl.style.display = 'none';
+});
+</script>
