@@ -8,8 +8,7 @@ class EncargoController {
     private $encargo;
 
     public function __construct() {
-        $database = new Database();
-        $this->db = $database->getConnection();
+        $this->db = Database::getInstance()->getConnection();
         $this->encargo = new Encargo($this->db);
     }
 

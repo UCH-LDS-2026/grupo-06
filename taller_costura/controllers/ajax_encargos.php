@@ -31,23 +31,27 @@ if ($ajaxPage === 'registrar-pago-detalle' && $_SERVER['REQUEST_METHOD'] === 'PO
     $encId     = (int)($data['encargo_id'] ?? 0);
     $monto     = (float)($data['monto'] ?? 0);
     $metodo    = $data['metodo'] ?? 'efectivo';
-    $nota      = trim($data['nota'] ?? '');
-    $adminId   = $_SESSION['admin_id'] ?? 1;
     $valMetodo = ['efectivo','transferencia','tarjeta','otro'];
+
     if ($encId && $monto > 0 && in_array($metodo, $valMetodo)) {
-        $db   = Database::getInstance()->getConnection();
-        $enc  = $db->prepare("SELECT monto_total, sena FROM encargo WHERE id = ?");
+        $db  = Database::getInstance()->getConnection();
+        $enc = $db->prepare("SELECT monto_total, sena FROM encargo WHERE id = ?");
         $enc->execute([$encId]);
-        $row  = $enc->fetch(PDO::FETCH_ASSOC);
+        $row = $enc->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            echo json_encode(['ok' => false, 'mensaje' => 'Encargo no encontrado.']);
+            exit;
+        }
+
         $saldo = (float)$row['monto_total'] - (float)$row['sena'];
         if ($monto > $saldo + 0.01) {
             echo json_encode(['ok' => false, 'mensaje' => 'El monto supera el saldo pendiente.']);
             exit;
         }
+
         $nuevaSena = (float)$row['sena'] + $monto;
         $db->prepare("UPDATE encargo SET sena = ? WHERE id = ?")->execute([$nuevaSena, $encId]);
-        $db->prepare("INSERT INTO pago (encargo_id, administrador_id, monto, metodo, nota) VALUES (?,?,?,?,?)")
-           ->execute([$encId, $adminId, $monto, $metodo, $nota ?: null]);
         echo json_encode(['ok' => true, 'nueva_sena' => $nuevaSena, 'monto_total' => $row['monto_total']]);
     } else {
         echo json_encode(['ok' => false, 'mensaje' => 'Datos inválidos.']);

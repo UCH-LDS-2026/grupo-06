@@ -23,11 +23,6 @@ $stmtObs->execute([$idEncargo]);
 $observaciones = $stmtObs->fetchAll(PDO::FETCH_ASSOC);
 
 $historialPagos = [];
-try {
-    $stmtPagos = $pdo->prepare("SELECT * FROM pago WHERE encargo_id = ? ORDER BY created_at DESC");
-    $stmtPagos->execute([$idEncargo]);
-    $historialPagos = $stmtPagos->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) { /* tabla aún no creada */ }
 
 $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 function fmtFecha($dateStr, $meses) {
