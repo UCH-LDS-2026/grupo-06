@@ -51,6 +51,10 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
     <a href="index.php?page=editar-encargo&id=<?= $enc['id'] ?>" class="btn-cancel" style="display: inline-flex; align-items: center; gap: 6px; padding: 0.52rem 1rem; border-radius: var(--r-m); font-size: 0.88rem; text-decoration: none;">      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
       Editar Encargo
     </a>
+    <button onclick="eliminarEncargo(<?= $enc['id'] ?>)" class="btn-cancel" style="display: inline-flex; align-items: center; gap: 6px; padding: 0.52rem 1rem; border-radius: var(--r-m); font-size: 0.88rem; color: #b05040; border-color: rgba(176,80,64,0.2); background: transparent; cursor: pointer;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+      Eliminar Encargo
+    </button>
     <span class="badge <?= $badgeClass ?>" id="badgeEstado"><?= $badgeTxt ?></span>
   </div>
 </div>
@@ -288,6 +292,26 @@ function showToast(msg, ok) {
   t.style.background = (ok === false) ? '#C53030' : '#2C1810';
   t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 2800);
+}
+
+function eliminarEncargo(id) {
+  if (!confirm('¿Estás seguro de que querés eliminar este encargo? Esta acción no se puede deshacer.')) return;
+
+  fetch('index.php?page=eliminar-encargo', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({id})
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.ok) {
+      showToast('✅ Encargo eliminado correctamente');
+      setTimeout(() => location.href = 'index.php', 700);
+    } else {
+      showToast('❌ Error al eliminar el encargo', false);
+    }
+  })
+  .catch(() => showToast('❌ Error de red', false));
 }
 
 // ── Eliminar Observación Especial ─────────────────────────

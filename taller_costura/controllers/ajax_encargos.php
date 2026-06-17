@@ -147,6 +147,23 @@ if ($ajaxPage === 'eliminar-observacion' && $_SERVER['REQUEST_METHOD'] === 'POST
     exit;
 }
 
+// ── AJAX: eliminar encargo (baja física) ───────────────────────────────────────
+if ($ajaxPage === 'eliminar-encargo' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/../models/Encargo.php';
+    header('Content-Type: application/json');
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id   = (int)($data['id'] ?? 0);
+    if ($id) {
+        $db  = Database::getInstance()->getConnection();
+        $enc = new Encargo($db);
+        $enc->id = $id;
+        echo json_encode(['ok' => $enc->delete()]);
+    } else {
+        echo json_encode(['ok' => false]);
+    }
+    exit;
+}
+
 // ── POST: guardar edición de encargo (form HTML) ──────────────────────────────
 if ($ajaxPage === 'editar-encargo' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once __DIR__ . '/../models/Encargo.php';
