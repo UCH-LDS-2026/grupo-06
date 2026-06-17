@@ -28,7 +28,13 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="form-section">
     <h2>Información del Cliente</h2>
     <div class="form-group">
-      <label for="cliente_id">Cliente <span style="color:#8B7355;font-weight:300">(opcional)</span></label>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <label for="cliente_id" style="margin-bottom:0;">Cliente <span style="color:#8B7355;font-weight:300">(opcional)</span></label>
+        <a href="<?= $baseUrl ?>/index.php?page=clientes"
+           class="btn-ficha"
+           style="margin-top:0; margin-bottom:5px; text-decoration:none; font-size:1.2rem; font-weight:700; color: var(--accent); line-height:1;"
+           title="Agregar nuevo cliente">+</a>
+      </div>
       <select name="cliente_id" id="cliente_id" class="form-control custom-select">
         <option value="">Sin cliente...</option>
         <?php foreach ($clientes as $cli): ?>
