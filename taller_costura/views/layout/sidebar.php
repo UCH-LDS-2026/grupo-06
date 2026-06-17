@@ -24,7 +24,7 @@ $paginaActual = $_GET['page'] ?? 'agenda';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <?php if (in_array($paginaActual, ['agenda', 'crear', 'detalle-encargo'])): ?>
+    <?php if (in_array($paginaActual, ['agenda', 'crear', 'detalle-encargo', 'editar-encargo'])): ?>
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/encargos/encargos.css">
     <?php endif; ?>
 
