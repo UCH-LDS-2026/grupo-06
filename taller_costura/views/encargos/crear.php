@@ -11,6 +11,13 @@ $db = Database::getInstance()->getConnection();
 $stmt = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
 $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$clienteSeleccionado = null;
+if (!empty($_POST['cliente_id'])) {
+    foreach ($clientes as $c) {
+        if ($c['id'] == $_POST['cliente_id']) { $clienteSeleccionado = $c['nombre']; break; }
+    }
+}
+
 ?>
 
 <a href="<?= $baseUrl ?>/index.php" class="nav-back">← Volver a Agenda</a>
@@ -29,21 +36,21 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <h2>Información del Cliente</h2>
     <div class="form-group">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <label for="cliente_id" style="margin-bottom:0;">Cliente <span style="color:#8B7355;font-weight:300">(opcional)</span></label>
+        <label for="clienteBusqueda" style="margin-bottom:0;">Cliente <span style="color:#8B7355;font-weight:300">(opcional)</span></label>
         <a href="<?= $baseUrl ?>/index.php?page=clientes"
            class="btn-ficha"
            style="margin-top:0; margin-bottom:5px; text-decoration:none; font-size:1.2rem; font-weight:700; color: var(--accent); line-height:1;"
            title="Agregar nuevo cliente">+</a>
       </div>
-      <select name="cliente_id" id="cliente_id" class="form-control custom-select">
-        <option value="">Sin cliente...</option>
-        <?php foreach ($clientes as $cli): ?>
-          <option value="<?= $cli['id'] ?>"
-            <?= (isset($_POST['cliente_id']) && $_POST['cliente_id'] == $cli['id']) ? 'selected' : '' ?>>
-            <?= htmlspecialchars($cli['nombre']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
+
+      <div class="cliente-autocomplete" style="position:relative;">
+        <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
+               placeholder="Escribí para buscar un cliente..."
+               value="<?= htmlspecialchars($clienteSeleccionado ?? '') ?>">
+        <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($_POST['cliente_id'] ?? '') ?>">
+        <div id="clienteLista" class="cliente-lista"
+             style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #e3d8cc; border-radius:var(--r-m); max-height:220px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
+      </div>
     </div>
   </div>
 
@@ -124,3 +131,54 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
 </form>
+
+<style>
+  .cliente-opcion { padding: 10px 12px; cursor: pointer; font-size: 0.92rem; }
+  .cliente-opcion:hover { background: #FAF3EA; }
+  .cliente-opcion.vacia { color: #8B7355; cursor: default; }
+</style>
+
+<script>
+const CLIENTES = <?= json_encode($clientes, JSON_UNESCAPED_UNICODE) ?>;
+
+const inputBusqueda = document.getElementById('clienteBusqueda');
+const inputHidden    = document.getElementById('cliente_id');
+const listaEl        = document.getElementById('clienteLista');
+
+function renderListaClientes(filtro) {
+  const texto = filtro.trim().toLowerCase();
+  const filtrados = texto === '' ? CLIENTES : CLIENTES.filter(c => c.nombre.toLowerCase().includes(texto));
+
+  let html = '<div class="cliente-opcion vacia" data-id="">Sin cliente...</div>';
+  html += filtrados.length
+    ? filtrados.map(c => `<div class="cliente-opcion" data-id="${c.id}" data-nombre="${c.nombre.replace(/"/g,'&quot;')}">${c.nombre}</div>`).join('')
+    : '<div class="cliente-opcion vacia">Sin resultados</div>';
+
+  listaEl.innerHTML = html;
+  listaEl.style.display = 'block';
+}
+
+inputBusqueda.addEventListener('input', () => {
+  inputHidden.value = '';
+  renderListaClientes(inputBusqueda.value);
+});
+
+inputBusqueda.addEventListener('focus', () => renderListaClientes(inputBusqueda.value));
+
+listaEl.addEventListener('click', (e) => {
+  const opcion = e.target.closest('.cliente-opcion');
+  if (!opcion) return;
+  if (opcion.dataset.id) {
+    inputHidden.value = opcion.dataset.id;
+    inputBusqueda.value = opcion.dataset.nombre;
+  } else {
+    inputHidden.value = '';
+    inputBusqueda.value = '';
+  }
+  listaEl.style.display = 'none';
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.cliente-autocomplete')) listaEl.style.display = 'none';
+});
+</script>
