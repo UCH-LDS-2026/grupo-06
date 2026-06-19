@@ -12,7 +12,15 @@ $alertasNoLeidas = $alertaModel->contarNoLeidas($adminId);
 
 $paginaActual = $_GET['page'] ?? 'agenda';
 ?>
+<button class="menu-toggle" onclick="toggleSidebar()">
+    <span class="material-symbols-outlined">menu</span>
+</button>
 
+<script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+}
+</script>
 <!DOCTYPE html>
 <html lang="es">
 <head>
