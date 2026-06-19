@@ -7,9 +7,6 @@
 .content-area {
     padding: 32px;
     flex: 1;
-    min-width: 0;      /* ← esto evita el overflow horizontal */
-    overflow-x: hidden; /* ← seguro de respaldo */
-    max-width: calc(100vw - 260px); /* ← limita al ancho disponible menos el sidebar */
 }
 
 body {
@@ -134,9 +131,8 @@ body {
 .main-wrapper {
     margin-left: 260px;
     flex: 1;
-    min-width: 0;       /* ← añadir esto */
-    overflow-x: hidden;
 }
+
 /* ======================
    TOPBAR
 ====================== */
@@ -206,31 +202,28 @@ body {
 ====================== */
 
 .toast-campana {
-    position: absolute;
-    right: 70px;
-    bottom: 10px;
-
-    display: flex;
+    position: fixed;
+    right: 88px;
+    bottom: 30px;
+    background: white;
+    color: #2C1810;
+    padding: 14px 18px;
+    border-radius: 12px;
+    display: none;
     align-items: center;
     gap: 10px;
-
-    background: #fff;
-    color: #2e7d32;
-
-    padding: 14px 18px;
-    border-radius: 14px;
-
-    box-shadow: 0 8px 25px rgba(0,0,0,.12);
-
+    box-shadow: 0 8px 25px rgba(0,0,0,.15);
     opacity: 0;
+    pointer-events: none;
     transform: translateX(20px);
-    transition: all .3s ease;
+    transition: .3s ease;
     white-space: nowrap;
 }
 
 .toast-campana.visible {
-    opacity: 1;
+opacity: 1;
     transform: translateX(0);
+    display: flex;
 }
 
 .toast-campana .material-symbols-outlined {

@@ -21,7 +21,7 @@ $paginaActual = $_GET['page'] ?? 'agenda';
     <title>Atelier — Gestión de Encargos</title>
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/sidebar.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <?php if (in_array($paginaActual, ['agenda', 'crear', 'detalle-encargo'])): ?>
@@ -86,38 +86,7 @@ $paginaActual = $_GET['page'] ?? 'agenda';
 
 </aside>
 
-<?php if (isset($_SESSION['exito_cliente'])): ?>
-    <div id="toast-campana" class="toast-campana">
-        <span class="material-symbols-outlined">check_circle</span>
-        <span id="toast-campana-msg"></span>
-    </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const toast = document.getElementById('toast-campana');
-        const msg = document.getElementById('toast-campana-msg');
-
-        msg.textContent = "<?= addslashes($_SESSION['exito_cliente']) ?>";
-
-        setTimeout(() => {
-            toast.classList.add('visible');
-        }, 100);
-
-        setTimeout(() => {
-            toast.classList.remove('visible');
-
-            setTimeout(() => {
-                toast.remove();
-            }, 300);
-
-        }, 3000);
-
-    });
-    </script>
-
-    <?php unset($_SESSION['exito_cliente']); ?>
-<?php endif; ?>
 <div class="floating-alerts">
 
     <a href="<?= BASE_URL ?>/index.php?page=alertas" class="campana-btn">
