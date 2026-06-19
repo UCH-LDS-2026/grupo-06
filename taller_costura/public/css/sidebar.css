@@ -7,6 +7,9 @@
 .content-area {
     padding: 32px;
     flex: 1;
+    min-width: 0;      /* ← esto evita el overflow horizontal */
+    overflow-x: hidden; /* ← seguro de respaldo */
+    max-width: calc(100vw - 260px); /* ← limita al ancho disponible menos el sidebar */
 }
 
 body {
@@ -131,8 +134,9 @@ body {
 .main-wrapper {
     margin-left: 260px;
     flex: 1;
+    min-width: 0;       /* ← añadir esto */
+    overflow-x: hidden;
 }
-
 /* ======================
    TOPBAR
 ====================== */
@@ -345,3 +349,4 @@ position: absolute;
     color: #BABF94;
     font-size: 22px;
 }
+
