@@ -92,7 +92,7 @@ function estadoBadge($estado) {
   </a>
   <?php endforeach; ?>
 <?php else: ?>
-  <div class="empty-state">📋 No hay encargos activos.</div>
+  <div class="empty-state"> No hay encargos activos.</div>
 <?php endif; ?>
 
 <?php if (!empty($entregados)): ?>
@@ -117,6 +117,6 @@ function estadoBadge($estado) {
 <?php endif; ?>
 
 <?php if (isset($_GET['nuevo'])): ?>
-<div id="toast" class="toast show">✅ Encargo creado correctamente</div>
+<div id="toast" class="toast show"> Encargo creado correctamente</div>
 <script>setTimeout(()=>document.getElementById('toast').style.display='none', 3000);</script>
 <?php endif; ?>
