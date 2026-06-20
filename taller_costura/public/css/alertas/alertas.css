@@ -21,6 +21,8 @@
     font-size: .88rem;
     color: #8B7355;
     margin: 0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .alertas-acciones {
@@ -90,6 +92,7 @@
 
 .alerta-contenido {
     flex: 1;
+    min-width: 0;
 }
 
 .alerta-mensaje {
@@ -102,7 +105,7 @@
 .alerta-meta {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: .6rem;
     flex-wrap: wrap;
 }
 
@@ -114,11 +117,13 @@
     font-weight: 500;
     background: #F3E4C9;
     color: #8B7355;
+    white-space: nowrap;
 }
 
 .alerta-tiempo {
     font-size: .75rem;
     color: #BFA28C;
+    white-space: nowrap;
 }
 
 .alerta-encargo {
@@ -137,6 +142,7 @@
     transition: background .15s;
     white-space: nowrap;
     flex-shrink: 0;
+    align-self: center;
 }
 .btn-marcar:hover { background: #F3E4C9; }
 
@@ -154,9 +160,7 @@
     display: block;
     margin-bottom: 1rem;
 }
-.empty-state p {
-    font-size: .9rem;
-}
+.empty-state p { font-size: .9rem; }
 
 .toast {
     position: fixed;
@@ -175,3 +179,112 @@
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 
+/* ══════════════════════════════════════════
+   RESPONSIVE MOBILE (≤ 600px)
+══════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+    .alertas-wrapper {
+        padding: 1.2rem 1rem 2rem;
+    }
+
+    /* Encabezado */
+    .alertas-header {
+        margin-bottom: 1.2rem;
+    }
+
+    .alertas-header h1 {
+        font-size: 1.85rem;
+    }
+
+    .alertas-header p {
+        font-size: .75rem;
+        letter-spacing: 1.5px;
+    }
+
+    /* Botón marcar todas */
+    .alertas-acciones {
+        justify-content: stretch;
+        margin-bottom: 1rem;
+    }
+
+    .btn-marcar-todas {
+        width: 100%;
+        justify-content: center;
+        font-size: .82rem;
+        padding: .65rem 1rem;
+    }
+
+    /* Cards */
+    .alerta-card {
+        padding: .9rem 1rem;
+        gap: .75rem;
+        border-radius: 12px;
+        /* En mobile el botón "Marcar leída" baja abajo */
+        flex-wrap: wrap;
+    }
+
+    .alerta-icono {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+    }
+
+    .alerta-icono .material-symbols-outlined {
+        font-size: 18px;
+    }
+
+    .alerta-mensaje {
+        font-size: .86rem;
+    }
+
+    .alerta-meta {
+        gap: .4rem;
+    }
+
+    .alerta-tipo {
+        font-size: .68rem;
+        padding: .18rem .55rem;
+    }
+
+    .alerta-tiempo,
+    .alerta-encargo {
+        font-size: .70rem;
+    }
+
+    /* Botón "Marcar leída" ocupa todo el ancho abajo */
+    .btn-marcar {
+        width: 100%;
+        text-align: center;
+        padding: .5rem;
+        font-size: .78rem;
+        margin-top: .25rem;
+        border-radius: 8px;
+    }
+
+    /* Empty state */
+    .empty-state {
+        padding: 3rem 1rem;
+    }
+
+    .empty-state .material-symbols-outlined {
+        font-size: 36px;
+    }
+
+    /* Toast no choca con la campana */
+    .toast {
+        bottom: 90px;
+        right: 1rem;
+        left: 1rem;
+        text-align: center;
+        font-size: .80rem;
+    }
+}
+
+/* ══════════════════════════════════════════
+   MOBILE PEQUEÑO (≤ 380px)
+══════════════════════════════════════════ */
+@media (max-width: 380px) {
+    .alertas-header h1 { font-size: 1.6rem; }
+    .alerta-card { padding: .8rem .85rem; }
+}
