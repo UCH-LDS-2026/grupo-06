@@ -12,15 +12,6 @@ $alertasNoLeidas = $alertaModel->contarNoLeidas($adminId);
 
 $paginaActual = $_GET['page'] ?? 'agenda';
 ?>
-<button class="menu-toggle" onclick="toggleSidebar()">
-    <span class="material-symbols-outlined">menu</span>
-</button>
-
-<script>
-function toggleSidebar() {
-    document.querySelector('.sidebar').classList.toggle('active');
-}
-</script>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,7 +20,7 @@ function toggleSidebar() {
     <title>Atelier — Gestión de Encargos</title>
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/sidebar.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <?php if (in_array($paginaActual, ['agenda', 'crear', 'detalle-encargo'])): ?>
@@ -51,6 +42,15 @@ function toggleSidebar() {
 
 <body>
 
+<!-- Botón hamburguesa (solo visible en mobile) -->
+<button class="menu-toggle" onclick="toggleSidebar()">
+    <span class="material-symbols-outlined">menu</span>
+</button>
+
+<!-- Overlay oscuro al abrir el sidebar -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-top">
 
@@ -58,41 +58,31 @@ function toggleSidebar() {
             <div class="sidebar-logo-icon">
                 <span class="material-symbols-outlined">content_cut</span>
             </div>
-
             <div class="sidebar-logo-text">
                 <h2>Atelier</h2>
                 <span>Sistema de Gestión</span>
             </div>
         </div>
 
-       <nav class="sidebar-nav">
-    <a href="<?= BASE_URL ?>/index.php" 
-       onclick="closeSidebarMobile()" 
-       class="<?= $paginaActual == 'agenda' ? 'activo' : '' ?>">
-       <span class="material-symbols-outlined">box</span> Encargos
-    </a>
+        <nav class="sidebar-nav">
+            <a href="<?= BASE_URL ?>/index.php"
+               onclick="closeSidebarMobile()"
+               class="<?= $paginaActual == 'agenda' ? 'activo' : '' ?>">
+                <span class="material-symbols-outlined">box</span> Encargos
+            </a>
 
-    <a href="<?= BASE_URL ?>/index.php?page=clientes" 
-       onclick="closeSidebarMobile()" 
-       class="<?= $paginaActual == 'clientes' ? 'activo' : '' ?>">
-       <span class="material-symbols-outlined">group</span> Clientes
-    </a>
+            <a href="<?= BASE_URL ?>/index.php?page=clientes"
+               onclick="closeSidebarMobile()"
+               class="<?= $paginaActual == 'clientes' ? 'activo' : '' ?>">
+                <span class="material-symbols-outlined">group</span> Clientes
+            </a>
 
-    <a href="<?= BASE_URL ?>/index.php?page=pagos" 
-       onclick="closeSidebarMobile()" 
-       class="<?= $paginaActual == 'pagos' ? 'activo' : '' ?>">
-       <span class="material-symbols-outlined">attach_money</span> Pagos
-    </a>
-</nav>
-
-<script>
-function closeSidebarMobile() {
-    // Si la pantalla es pequeña, removemos la clase active
-    if (window.innerWidth <= 768) {
-        document.querySelector('.sidebar').classList.remove('active');
-    }
-}
-</script>
+            <a href="<?= BASE_URL ?>/index.php?page=pagos"
+               onclick="closeSidebarMobile()"
+               class="<?= $paginaActual == 'pagos' ? 'activo' : '' ?>">
+                <span class="material-symbols-outlined">attach_money</span> Pagos
+            </a>
+        </nav>
 
     </div>
 
@@ -100,15 +90,12 @@ function closeSidebarMobile() {
         <span class="material-symbols-outlined">arrow_back</span>
         Cerrar sesión
     </a>
-
 </aside>
 
-
+<!-- Campana flotante -->
 <div class="floating-alerts">
-
     <a href="<?= BASE_URL ?>/index.php?page=alertas" class="campana-btn">
         <span class="material-symbols-outlined">notifications</span>
-
         <?php if ($alertasNoLeidas > 0): ?>
             <span class="badge"><?= $alertasNoLeidas ?></span>
         <?php endif; ?>
@@ -117,28 +104,33 @@ function closeSidebarMobile() {
     <?php if (isset($_SESSION['exito_cliente'])): ?>
         <div id="toast-campana" class="toast-campana">
             <span class="material-symbols-outlined">check_circle</span>
-            <span id="toast-campana-msg">
-                <?= htmlspecialchars($_SESSION['exito_cliente']) ?>
-            </span>
+            <span><?= htmlspecialchars($_SESSION['exito_cliente']) ?></span>
         </div>
-
         <script>
         document.addEventListener('DOMContentLoaded', () => {
             const toast = document.getElementById('toast-campana');
-
-            setTimeout(() => {
-                toast.classList.add('visible');
-            }, 100);
-
-            setTimeout(() => {
-                toast.classList.remove('visible');
-            }, 3500);
+            setTimeout(() => toast.classList.add('visible'), 100);
+            setTimeout(() => toast.classList.remove('visible'), 3500);
         });
         </script>
-
         <?php unset($_SESSION['exito_cliente']); ?>
     <?php endif; ?>
-
 </div>
+
+<!-- Contenido principal -->
 <div class="main-wrapper">
     <div class="content-area">
+
+<script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.getElementById('sidebarOverlay').classList.toggle('visible');
+}
+
+function closeSidebarMobile() {
+    if (window.innerWidth <= 768) {
+        document.querySelector('.sidebar').classList.remove('active');
+        document.getElementById('sidebarOverlay').classList.remove('visible');
+    }
+}
+</script>
