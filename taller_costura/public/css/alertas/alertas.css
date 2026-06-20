@@ -174,3 +174,4 @@
     pointer-events: none;
 }
 .toast.show { opacity: 1; transform: translateY(0); }
+
