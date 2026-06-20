@@ -65,25 +65,34 @@ function toggleSidebar() {
             </div>
         </div>
 
-        <nav class="sidebar-nav">
-            <a href="<?= BASE_URL ?>/index.php"
-               class="<?= $paginaActual == 'agenda' ? 'activo' : '' ?>">
-                <span class="material-symbols-outlined">box</span>
-                Encargos
-            </a>
+       <nav class="sidebar-nav">
+    <a href="<?= BASE_URL ?>/index.php" 
+       onclick="closeSidebarMobile()" 
+       class="<?= $paginaActual == 'agenda' ? 'activo' : '' ?>">
+       <span class="material-symbols-outlined">box</span> Encargos
+    </a>
 
-            <a href="<?= BASE_URL ?>/index.php?page=clientes"
-               class="<?= $paginaActual == 'clientes' ? 'activo' : '' ?>">
-                <span class="material-symbols-outlined">group</span>
-                Clientes
-            </a>
+    <a href="<?= BASE_URL ?>/index.php?page=clientes" 
+       onclick="closeSidebarMobile()" 
+       class="<?= $paginaActual == 'clientes' ? 'activo' : '' ?>">
+       <span class="material-symbols-outlined">group</span> Clientes
+    </a>
 
-            <a href="<?= BASE_URL ?>/index.php?page=pagos"
-               class="<?= $paginaActual == 'pagos' ? 'activo' : '' ?>">
-                <span class="material-symbols-outlined">attach_money</span>
-                Pagos
-            </a>
-        </nav>
+    <a href="<?= BASE_URL ?>/index.php?page=pagos" 
+       onclick="closeSidebarMobile()" 
+       class="<?= $paginaActual == 'pagos' ? 'activo' : '' ?>">
+       <span class="material-symbols-outlined">attach_money</span> Pagos
+    </a>
+</nav>
+
+<script>
+function closeSidebarMobile() {
+    // Si la pantalla es pequeña, removemos la clase active
+    if (window.innerWidth <= 768) {
+        document.querySelector('.sidebar').classList.remove('active');
+    }
+}
+</script>
 
     </div>
 
