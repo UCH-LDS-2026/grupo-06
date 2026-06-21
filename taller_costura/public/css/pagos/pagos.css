@@ -2,27 +2,30 @@
  
 /* =====================================================
    VISTA: PAGOS
-   Estética unificada — Paleta Crema / Oro / Oliva
-   (usa las mismas variables que clientes.css)
+   Estética unificada — Paleta Salvia / Crema / Terracota
+   (usa las mismas variables que sidebar.css y login.css)
 ===================================================== */
 
 :root {
-    --bg:           #F3E4C9;
-    --bg-card:      #ede5d6;
+    --bg:           #F7F3EC;
+    --bg-card:      #E8DFC8;
     --bg-input:     #ffffff;
-    --bg-hover:     #dcd3c2;
+    --bg-hover:     #d9cdab;
  
-    --oro:          #A98B76;
-    --oro-dark:     #8f7564;
-    --oro-glow:     rgba(169, 139, 118, 0.2);
+    --oro:          #A65D45;
+    --oro-dark:     #8a4a35;
+    --oro-glow:     rgba(166, 93, 69, 0.2);
+
+    --salvia:       #9CAF88;
+    --salvia-dark:  #7e9a6b;
  
-    --texto-pri:    #333a2e;
-    --texto-sec:    #7a7465;
-    --texto-ter:    #9c978a;
-    --texto-mute:   #b0ac9f;
+    --texto-pri:    #3D3935;
+    --texto-sec:    #7a7265;
+    --texto-ter:    #a39a87;
+    --texto-mute:   #b3a78c;
  
-    --borde:        #d4ccc0;
-    --borde-hover:  #bfa28c;
+    --borde:        #d9cdab;
+    --borde-hover:  #c8b49e;
  
     --serif: 'Source Serif 4', Georgia, serif;
     --sans:  'DM Sans', system-ui, sans-serif;
@@ -34,7 +37,7 @@
     --pago-danger:  #b35d00;
  
     --shadow-card: 0 4px 12px rgba(0,0,0,0.05);
-    --shadow-btn:  0 4px 10px rgba(169, 139, 118, 0.2);
+    --shadow-btn:  0 4px 10px rgba(166, 93, 69, 0.2);
     --ease: cubic-bezier(0.23, 1, 0.32, 1);
 }
  
@@ -84,9 +87,9 @@
 }
  
 .flash-msg.flash-ok {
-    background: #eef5e6;
-    border: 1px solid #c8e09a;
-    color: #4a7a1e;
+    background: rgba(156, 175, 136, 0.18);
+    border: 1px solid var(--salvia);
+    color: #4a5c3d;
 }
  
 .flash-msg.flash-error {
@@ -107,8 +110,8 @@
 }
  
 .stat-card {
-    background: #fcf9f5;
-    border: 1px solid #e0d8cc;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
     border-radius: 16px;
     padding: 20px;
     display: flex;
@@ -121,8 +124,8 @@
  
 .stat-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(169, 139, 118, 0.12);
-    border-color: #c8b49e;
+    box-shadow: 0 8px 24px rgba(166, 93, 69, 0.14);
+    border-color: var(--borde-hover);
 }
  
 .stat-card-top {
@@ -180,7 +183,7 @@
     font-family: var(--sans);
     font-size: 0.85rem;
     color: var(--texto-sec);
-    background: #e6ded0;
+    background: var(--bg-card);
     border: 1px solid transparent;
     cursor: pointer;
     transition: all 0.2s var(--ease);
@@ -195,7 +198,7 @@
     background: var(--oro);
     color: #fff;
     font-weight: 500;
-    box-shadow: 0 2px 8px rgba(201,169,110,0.22);
+    box-shadow: 0 2px 8px rgba(166, 93, 69, 0.3);
 }
  
 .tab-panel { display: none; }
@@ -229,8 +232,8 @@
 }
  
 .encargo-card {
-    background: #fcf9f5;
-    border: 1px solid #e0d8cc;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
     border-radius: 16px;
     padding: 20px;
     display: flex;
@@ -245,8 +248,8 @@
  
 .encargo-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(169, 139, 118, 0.12);
-    border-color: #c8b49e;
+    box-shadow: 0 8px 24px rgba(166, 93, 69, 0.14);
+    border-color: var(--borde-hover);
 }
  
 .encargo-card-top {
@@ -285,7 +288,7 @@
 .encargo-tipo {
     font-size: 1.05rem;
     font-weight: 600;
-    color: #3a3028;
+    color: var(--texto-pri);
     line-height: 1.3;
 }
  
@@ -322,15 +325,15 @@
 }
  
 .badge-proceso {
-    background: #f0ece4;
+    background: #efe9da;
     color: var(--texto-sec);
-    border: 1px solid #dcd3c2;
+    border: 1px solid var(--borde);
 }
  
 .badge-listo {
-    background: #eef0e6;
-    color: #6f7a4a;
-    border: 1px solid #cfd6b3;
+    background: rgba(156, 175, 136, 0.18);
+    color: #5a7048;
+    border: 1px solid var(--salvia);
 }
  
 .badge-entregado {
@@ -363,7 +366,7 @@
 .btn-registrar:hover {
     background: var(--oro-dark);
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(169, 139, 118, 0.35);
+    box-shadow: 0 6px 20px rgba(166, 93, 69, 0.35);
 }
  
 .btn-registrar:active { transform: scale(0.98); }
@@ -409,7 +412,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    border-top: 1px solid #f0ece4;
+    border-top: 1px solid var(--borde);
     padding-top: 12px;
     flex-wrap: wrap;
     gap: 10px;
@@ -458,7 +461,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(10,6,2,0.75);
+    background: rgba(20,15,10,0.7);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     z-index: 1000;
@@ -539,8 +542,8 @@
 }
  body {
     font-family: 'Inter', sans-serif;
-    background: #FAF8F5;
-    color: #2C1810;
+    background: var(--bg);
+    color: var(--texto-pri);
     display: flex;
     min-height: 100vh;
     overflow-x: hidden; /* ← agregá esto */
@@ -563,8 +566,8 @@
 .modal-body { display: flex; flex-direction: column; gap: 18px; }
  
 .modal-encargo-info {
-    background: #fcf9f5;
-    border: 1px solid #e0d8cc;
+    background: var(--bg);
+    border: 1px solid var(--borde);
     border-radius: var(--r-md);
     padding: 14px 16px;
     font-size: 0.86rem;
@@ -674,7 +677,7 @@
  
 .btn-confirmar:hover {
     background: var(--oro-dark);
-    box-shadow: 0 6px 20px rgba(184,149,106,0.36);
+    box-shadow: 0 6px 20px rgba(166, 93, 69, 0.36);
     transform: translateY(-1px);
 }
  
@@ -709,7 +712,7 @@
     left: 50%;
     transform: translate(-50%, 20px);
     background: var(--texto-pri);
-    color: #fdf9f1;
+    color: var(--bg);
     padding: 12px 24px;
     border-radius: 50px;
     font-size: 0.85rem;
@@ -734,7 +737,7 @@
     grid-template-columns: 80px 1fr; /* Fecha fija, resto flexible */
     gap: 16px;
     padding: 16px;
-    background: #fcf9f5;
+    background: var(--bg-card);
     border-radius: 12px;
 }
 
@@ -743,7 +746,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-right: 1px solid #e0d8cc; /* La línea separadora */
+    border-right: 1px solid var(--borde); /* La línea separadora */
 }
 
 .tarjeta-info {
