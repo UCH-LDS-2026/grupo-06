@@ -54,9 +54,41 @@ function estadoBadge($estado) {
 </div>
 
 <div class="stats-grid">
-  <div class="stat-card"><span class="stat-val"><?= $estadisticas['activos'] ?></span><p class="stat-lbl">Encargos Activos</p></div>
-  <div class="stat-card"><span class="stat-val"><?= $estadisticas['en_proceso'] ?></span><p class="stat-lbl">En Proceso</p></div>
-  <div class="stat-card"><span class="stat-val"><?= $estadisticas['listos'] ?></span><p class="stat-lbl">Listos</p></div>
+  <div class="stat-card stat-card--activos">
+    <div class="stat-icon">📋</div>
+    <span class="stat-val"><?= $estadisticas['activos'] ?></span>
+    <p class="stat-lbl">Encargos Activos</p>
+  </div>
+  <div class="stat-card stat-card--proceso">
+    <div class="stat-icon">🕐</div>
+    <span class="stat-val"><?= $estadisticas['en_proceso'] ?></span>
+    <p class="stat-lbl">En Proceso</p>
+  </div>
+  <div class="stat-card stat-card--proceso2">
+    <div class="stat-icon">🔄</div>
+    <span class="stat-val"><?= $estadisticas['en_proceso'] ?></span>
+    <p class="stat-lbl">En Proceso</p>
+  </div>
+  <div class="stat-card stat-card--listos">
+    <div class="stat-icon">✅</div>
+    <span class="stat-val"><?= $estadisticas['listos'] ?></span>
+    <p class="stat-lbl">Listos</p>
+  </div>
+</div>
+
+<div class="stats-money-grid">
+  <div class="stat-money-card">
+    <p class="stat-money-lbl">Total Señas Recibidas</p>
+    <span class="stat-money-val val-senas"><?= fmtMonto($estadisticas['senas']) ?></span>
+  </div>
+  <div class="stat-money-card">
+    <p class="stat-money-lbl">Total Cobrado</p>
+    <span class="stat-money-val val-cobrado"><?= fmtMonto($estadisticas['cobrado']) ?></span>
+  </div>
+  <div class="stat-money-card">
+    <p class="stat-money-lbl">Saldo Pendiente</p>
+    <span class="stat-money-val val-pendiente"><?= fmtMonto($estadisticas['pendiente_pago']) ?></span>
+  </div>
 </div>
 
 <div class="ag-buscador-bar">
