@@ -35,9 +35,8 @@ $error   = isset($_GET['error']);
 </div>
 
 <?php if ($error): ?>
-<div class="alert-error">
-    <span>⚠️</span>
-    <span>Completá los campos obligatorios: Tipo de prenda y Fecha de entrega.</span>
+<div class="alerta alerta-err">
+    Completá los campos obligatorios: Tipo de prenda y Fecha de entrega.
 </div>
 <?php endif; ?>
 

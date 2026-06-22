@@ -179,8 +179,8 @@ function estadoBadge($estado) {
 <?php endif; ?>
 
 <?php if (isset($_GET['nuevo'])): ?>
-<div id="toast" class="toast show"> Encargo creado correctamente</div>
-<script>setTimeout(()=>document.getElementById('toast').style.display='none', 3000);</script>
+<div id="toast" class="toast show">✅ Encargo creado correctamente</div>
+<script>setTimeout(()=>document.getElementById('toast').classList.remove('show'), 3000);</script>
 <?php endif; ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/homeCliente.css">
