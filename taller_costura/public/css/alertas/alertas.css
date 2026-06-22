@@ -1,9 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+    --bg:           #FAF8F5;
+    --bg-card:      #FFFFFF;
+    --bg-hover:     #f5f0ea;
+
+    --acento:          #ff6f3c;
+    --acento-2:        #e91e8c;
+    --acento-gradient: linear-gradient(90deg, #ff6f3c 0%, #e91e8c 100%);
+
+    --oro:          #A98B76;
+    --oro-dark:     #8f7564;
+
+    --texto-pri:    #2C1810;
+    --texto-sec:    #7a7465;
+    --texto-ter:    #9c978a;
+    --texto-mute:   #b0ac9f;
+
+    --borde:        #E8E0D8;
+    --borde-hover:  #d4c4b4;
+
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans:  'DM Sans', system-ui, sans-serif;
+
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-xl: 18px;
+
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.05);
+    --ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
 /* ── ALERTAS WRAPPER ──────────────────────────────────────── */
 .alertas-wrapper {
-    padding: 2rem 2.5rem 3rem;
-    font-family: var(--sans);
+    padding: 0;
 }
-
 .alertas-header { margin-bottom: 2rem; }
 
 .alertas-header h1 {

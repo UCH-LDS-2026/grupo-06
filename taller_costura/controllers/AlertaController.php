@@ -66,7 +66,8 @@ class AlertaController {
      * Lista todas las alertas de un administrador
      */
     public function listar($administrador_id) {
-        return $this->alertaModel->listarPorAdmin($administrador_id);
+    $this->alertaModel->limpiarViejas($administrador_id);
+    return $this->alertaModel->listarPorAdmin($administrador_id);
     }
 
     /**
