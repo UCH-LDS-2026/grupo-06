@@ -12,6 +12,11 @@ $alertasNoLeidas = $alertaModel->contarNoLeidas($adminId);
 
 $paginaActual = $_GET['page'] ?? 'agenda';
 ?>
+
+<?php if ($paginaActual === 'alertas'): ?>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/alertas/alertas.css?v=<?= filemtime(BASE_PATH . '/public/css/alertas/alertas.css') ?>">
+<?php endif; ?>
+
 <button class="menu-toggle" onclick="toggleSidebar()">
     <span class="material-symbols-outlined">menu</span>
 </button>
