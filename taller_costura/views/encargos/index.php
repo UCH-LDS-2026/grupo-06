@@ -4,8 +4,15 @@ require_once BASE_PATH . '/controllers/AlertaController.php';
 
 $alertaController = new AlertaController();
 $alertaController->verificarClientasSinFicha(1);
+
 $encargoModel = new Encargo($db->getConnection());
-$todos = $encargoModel->getAll()->fetchAll(PDO::FETCH_ASSOC);
+
+$busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
+if ($busqueda !== '') {
+    $todos = $encargoModel->buscar($busqueda)->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $todos = $encargoModel->getAll()->fetchAll(PDO::FETCH_ASSOC);
+}
 
 $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 $dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
@@ -41,8 +48,22 @@ function estadoBadge($estado) {
     <h1>Agenda de Encargos</h1>
     <p>Hoy es <?= $fechaHoy ?></p>
   </div>
-  <a href="index.php?page=crear" class="btn-nuevo">+ Nuevo Encargo</a>
+  <div class="ag-header-actions">
+    <form method="GET" action="index.php" class="buscador-form">
+      <input type="hidden" name="page" value="agenda">
+      <input type="text" name="q" class="buscador-input" placeholder="Buscar encargo, cliente o teléfono..." value="<?= htmlspecialchars($busqueda) ?>">
+      <button type="submit" class="btn-buscar">🔍</button>
+      <?php if ($busqueda !== ''): ?>
+        <a href="index.php?page=agenda" class="btn-limpiar">✕</a>
+      <?php endif; ?>
+    </form>
+    <a href="index.php?page=crear" class="btn-nuevo">+ Nuevo Encargo</a>
+  </div>
 </div>
+
+<?php if ($busqueda !== '' && empty($todos)): ?>
+  <div class="empty-state">No se encontraron encargos para "<?= htmlspecialchars($busqueda) ?>".</div>
+<?php endif; ?>
 
 <div class="stats-grid">
   <div class="stat-card"><span class="stat-val"><?= $estadisticas['activos'] ?></span><p class="stat-lbl">Encargos Activos</p></div>

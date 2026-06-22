@@ -28,6 +28,23 @@ class Encargo {
         return $stmt;
     }
 
+    public function buscar($termino) {
+        $like = '%' . $termino . '%';
+        $query = "SELECT e.*, c.nombre AS cliente_nombre
+                FROM " . $this->table . " e
+                LEFT JOIN cliente c ON e.cliente_id = c.id
+                WHERE e.tipo LIKE ?
+                    OR c.nombre LIKE ?
+                    OR c.telefono LIKE ?
+                ORDER BY e.fecha_entrega ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $like);
+        $stmt->bindParam(2, $like);
+        $stmt->bindParam(3, $like);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function getByEstado($estado) {
         $query = "SELECT e.*, c.nombre AS cliente_nombre 
                   FROM " . $this->table . " e

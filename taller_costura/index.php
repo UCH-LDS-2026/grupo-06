@@ -67,6 +67,7 @@ $page = $_GET['page'] ?? 'agenda';
 
 $vistas = [
     'agenda'          => 'views/encargos/index.php',
+    'encargos'        => 'views/encargos/index.php',
     'crear'           => 'views/encargos/crear.php',
     'detalle-encargo' => 'views/encargos/detalle.php',
     'editar-encargo'  => 'views/encargos/editar.php',
