@@ -696,25 +696,26 @@
 /* ── TOAST ────────────────────────────────────────────────── */
 .toast {
     position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translate(-50%, 20px);
-    background: var(--texto-pri);
-    color: var(--bg);
-    padding: 12px 24px;
-    border-radius: 50px;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    left: auto;
+    transform: translateY(12px);
+    background: #ffffff;
+    color: #1f1f1f;
+    padding: 12px 20px;
+    border-radius: 14px;
     font-size: 0.85rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.14);
     opacity: 0;
     pointer-events: none;
-    transition: all 0.3s var(--ease);
+    transition: opacity 0.25s ease, transform 0.25s ease;
     z-index: 2000;
     letter-spacing: 0.02em;
     max-width: calc(100vw - 40px);
 }
 .toast.show {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
     pointer-events: auto;
 }
 .toast.toast-error {
