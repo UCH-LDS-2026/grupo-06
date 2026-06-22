@@ -1,46 +1,75 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
- 
+
 /* =====================================================
    VISTA: PAGOS
-   Estética unificada — Paleta Crema / Oro / Oliva
-   (usa las mismas variables que clientes.css)
+   Estética unificada con clientes.css
+   Paleta Crema / Naranja-Rosa / Dorado
 ===================================================== */
 
 :root {
-    --bg:           #F3E4C9;
-    --bg-card:      #ede5d6;
+    --bg:           #FAF8F5;
+    --bg-card:      #FFFFFF;
     --bg-input:     #ffffff;
-    --bg-hover:     #dcd3c2;
- 
+    --bg-hover:     #f5f0ea;
+
+    --acento:          #ff6f3c;
+    --acento-2:        #e91e8c;
+    --acento-gradient: linear-gradient(90deg, #ff6f3c 0%, #e91e8c 100%);
+
     --oro:          #A98B76;
     --oro-dark:     #8f7564;
     --oro-glow:     rgba(169, 139, 118, 0.2);
- 
-    --texto-pri:    #333a2e;
+
+    --texto-pri:    #2C1810;
     --texto-sec:    #7a7465;
     --texto-ter:    #9c978a;
     --texto-mute:   #b0ac9f;
- 
-    --borde:        #d4ccc0;
-    --borde-hover:  #bfa28c;
- 
+
+    --borde:        #E8E0D8;
+    --borde-hover:  #d4c4b4;
+
     --serif: 'Source Serif 4', Georgia, serif;
     --sans:  'DM Sans', system-ui, sans-serif;
- 
+
     --r-sm: 8px;
-    --r-md: 10px;
-    --r-xl: 16px;
- 
+    --r-md: 12px;
+    --r-xl: 18px;
+
     --pago-danger:  #b35d00;
- 
-    --shadow-card: 0 4px 12px rgba(0,0,0,0.05);
-    --shadow-btn:  0 4px 10px rgba(169, 139, 118, 0.2);
+
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.05);
+    --shadow-btn:  0 4px 18px rgba(233, 30, 100, 0.28);
     --ease: cubic-bezier(0.23, 1, 0.32, 1);
 }
- 
-*, *::before, *::after { box-sizing: border-box; }
- 
-/* ── FIX PRINCIPAL: evitar scroll horizontal ─────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--texto-pri);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.main-wrapper {
+    margin-left: 260px;
+    flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
+    max-width: calc(100vw - 260px);
+}
+
+.content-area {
+    padding: 32px;
+    flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+/* ── WRAPPER ─────────────────────────────────────────── */
 .pagos-wrapper {
     font-family: var(--sans);
     color: var(--texto-pri);
@@ -49,12 +78,12 @@
     overflow-x: hidden;
     box-sizing: border-box;
 }
- 
-/* ── ENCABEZADO ──────────────────────────────────────────── */
+
+/* ── ENCABEZADO ──────────────────────────────────────── */
 .pagos-header {
     margin-bottom: 28px;
 }
- 
+
 .pagos-header h1 {
     font-family: var(--serif);
     font-size: 2.4rem;
@@ -63,7 +92,7 @@
     line-height: 1.1;
     color: var(--texto-pri);
 }
- 
+
 .pagos-header p {
     font-size: 0.78rem;
     color: var(--texto-ter);
@@ -71,32 +100,42 @@
     letter-spacing: 3px;
     text-transform: uppercase;
 }
- 
-/* ── FLASH MESSAGE ───────────────────────────────────────── */
+.pagos-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Alineación horizontal al centro */
+    align-items: center;     /* Alineación vertical */
+    gap: 20px;               /* Un poco más de aire entre ellas */
+    margin: 0 auto 28px auto; /* Centra el bloque entero en la página */
+    max-width: 1000px;       /* Limita el ancho para que no se expandan hasta los bordes */
+    width: 100%;             /* Se adapta en móviles */
+}
+
+/* ── FLASH MESSAGE ───────────────────────────────────── */
 .flash-msg {
     padding: 13px 20px;
-    border-radius: 12px;
+    border-radius: var(--r-md);
     margin-bottom: 20px;
     font-size: 0.85rem;
     display: flex;
     align-items: center;
     gap: 8px;
 }
- 
+
 .flash-msg.flash-ok {
-    background: #eef5e6;
-    border: 1px solid #c8e09a;
-    color: #4a7a1e;
+    background: #eef8e6;
+    border: 1px solid #b8e090;
+    color: #3a7018;
 }
- 
+
 .flash-msg.flash-error {
-    background: #fff8f0;
-    border: 1px solid #e8c9a0;
-    border-left: 4px solid var(--oro);
-    color: #6b4f2e;
+    background: #fff8f5;
+    border: 1px solid #f5d0c0;
+    border-left: 4px solid #ff6f3c;
+    color: #7a3a20;
 }
- 
-/* ── TARJETAS DE RESUMEN ─────────────────────────────────── */
+
+/* ── TARJETAS DE RESUMEN ─────────────────────────────── */
 .pagos-stats {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -105,26 +144,26 @@
     width: 100%;
     min-width: 0;
 }
- 
+
 .stat-card {
-    background: #fcf9f5;
-    border: 1px solid #e0d8cc;
-    border-radius: 16px;
+    flex: 0 0 220px; /* Ancho fijo de 220px, no crecen ni se encogen */
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-xl);
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    min-width: 0;
-    overflow: hidden;
-    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), border-color 0.2s;
+    box-shadow: var(--shadow-card);
+    /* ... resto de tus estilos ... */
 }
- 
+
 .stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(169, 139, 118, 0.12);
-    border-color: #c8b49e;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    border-color: var(--borde-hover);
 }
- 
+
 .stat-card-top {
     display: flex;
     align-items: center;
@@ -135,25 +174,26 @@
     text-transform: uppercase;
     color: var(--texto-ter);
 }
- 
+
 .stat-icon {
     width: 38px;
     height: 38px;
     border-radius: 50%;
     background: var(--bg);
-    border: 1px solid var(--borde);
+    border: 2px solid #fce8e0;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--oro);
     flex-shrink: 0;
 }
- 
+
+/* Degradado en ícono SVG vía wrapper con gradiente */
 .stat-icon svg {
     width: 18px;
     height: 18px;
+    stroke: var(--acento);
 }
- 
+
 .stat-value {
     font-family: var(--serif);
     font-size: 1.9rem;
@@ -161,77 +201,84 @@
     color: var(--texto-pri);
     letter-spacing: 0.3px;
 }
- 
+
 .stat-value.highlight {
-    color: var(--oro-dark);
+    background: var(--acento-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
- 
-/* ── TABS ────────────────────────────────────────────────── */
+
+/* ── TABS ────────────────────────────────────────────── */
 .pagos-tabs {
     display: flex;
     gap: 8px;
     margin-bottom: 22px;
     flex-wrap: wrap;
 }
- 
+
 .tab-btn {
     padding: 8px 20px;
-    border-radius: 50px;
+    border-radius: 999px;
     font-family: var(--sans);
-    font-size: 0.85rem;
+    font-size: 0.83rem;
     color: var(--texto-sec);
-    background: #e6ded0;
-    border: 1px solid transparent;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
     cursor: pointer;
     transition: all 0.2s var(--ease);
+    box-shadow: var(--shadow-card);
 }
- 
+
 .tab-btn:hover {
     background: var(--bg-hover);
+    border-color: var(--borde-hover);
     color: var(--texto-pri);
 }
- 
+
 .tab-btn.active {
-    background: var(--oro);
-    color: #fff;
+    background: var(--acento-gradient);
+    color: #ffffff;
+    border-color: transparent;
     font-weight: 500;
-    box-shadow: 0 2px 8px rgba(201,169,110,0.22);
+    box-shadow: 0 3px 12px rgba(233, 30, 100, 0.25);
 }
- 
+
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
- 
-/* ── EMPTY STATE ─────────────────────────────────────────── */
+
+/* ── EMPTY STATE ─────────────────────────────────────── */
 .empty-state {
     text-align: center;
-    padding: 4rem 2rem;
+    padding: 5rem 2rem;
     color: var(--texto-ter);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 14px;
 }
- 
-.empty-state svg { opacity: 0.5; }
- 
+
+.empty-state svg { opacity: 0.4; }
+
 .empty-state p {
     font-size: 0.85rem;
     letter-spacing: 0.02em;
 }
- 
-/* ── LISTA DE ENCARGOS ───────────────────────────────────── */
+
+/* ── LISTA DE ENCARGOS ───────────────────────────────── */
 .encargo-list {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
     width: 100%;
     min-width: 0;
 }
- 
+
+/* ── CARD DE ENCARGO ─────────────────────────────────── */
 .encargo-card {
-    background: #fcf9f5;
-    border: 1px solid #e0d8cc;
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-xl);
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -240,15 +287,18 @@
     min-width: 0;
     overflow: hidden;
     box-sizing: border-box;
-    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), border-color 0.2s;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s ease, border-color 0.2s;
+    backface-visibility: hidden;
 }
- 
+
 .encargo-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(169, 139, 118, 0.12);
-    border-color: #c8b49e;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    border-color: var(--borde-hover);
 }
- 
+
+/* ── CARD TOP ────────────────────────────────────────── */
 .encargo-card-top {
     display: flex;
     align-items: center;
@@ -257,16 +307,16 @@
     width: 100%;
     min-width: 0;
 }
- 
+
 .encargo-card-top-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 13px;
     flex: 1;
     min-width: 0;
     overflow: hidden;
 }
- 
+
 .encargo-card-top-left > div {
     display: flex;
     flex-direction: column;
@@ -275,100 +325,112 @@
     flex: 1;
     overflow: hidden;
 }
- 
+
 .encargo-card-top-left > div * {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
- 
-.encargo-tipo {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #3a3028;
-    line-height: 1.3;
+
+.encargo-card-top-left::before,
+.encargo-card-top-left::after,
+.encargo-card-top::before,
+.encargo-card-top::after {
+    display: none !important;
+    content: none !important;
 }
- 
+
+.encargo-tipo {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--texto-pri);
+    line-height: 1.2;
+}
+
 .encargo-cliente {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--texto-sec);
     margin-top: 2px;
 }
- 
+
 .encargo-fecha {
     font-size: 0.78rem;
     color: var(--texto-ter);
     margin-top: 4px;
     letter-spacing: 0.02em;
 }
- 
-/* ── BADGES DE ESTADO ────────────────────────────────────── */
+
+/* ── BADGES ──────────────────────────────────────────── */
 .badge {
     display: inline-flex;
     align-items: center;
-    font-size: 0.73rem;
+    font-size: 0.72rem;
     font-weight: 500;
-    padding: 4px 13px;
+    padding: 4px 11px;
     border-radius: 20px;
     white-space: nowrap;
     flex-shrink: 0;
     align-self: center;
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
 }
- 
+
 .badge-pendiente {
-    background: #fff4e5;
-    color: #b35d00;
-    border: 1px solid #f0c87a;
+    background: #fff4ee;
+    color: #c04a00;
+    border: 1px solid #ffc5a0;
 }
- 
+
 .badge-proceso {
-    background: #f0ece4;
+    background: #f5f0ea;
     color: var(--texto-sec);
-    border: 1px solid #dcd3c2;
+    border: 1px solid var(--borde);
 }
- 
+
 .badge-listo {
-    background: #eef0e6;
-    color: #6f7a4a;
+    background: #f0f5e6;
+    color: #5a6e30;
     border: 1px solid #cfd6b3;
 }
- 
+
 .badge-entregado {
-    background: #eef5e6;
-    color: #4a7a1e;
-    border: 1px solid #c8e09a;
+    background: #eef8e6;
+    color: #3a7018;
+    border: 1px solid #b8e090;
 }
- 
-/* ── BOTÓN REGISTRAR PAGO ────────────────────────────────── */
+
+/* ── BOTÓN REGISTRAR PAGO ────────────────────────────── */
 .btn-registrar {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: var(--oro);
-    color: #fff;
+    background: var(--acento-gradient);
+    color: #ffffff;
     border: none;
-    padding: 0.6rem 1.3rem;
+    padding: 0.65rem 1.3rem;
     border-radius: 999px;
     font-family: var(--sans);
     font-size: 0.78rem;
     font-weight: 500;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
     box-shadow: var(--shadow-btn);
     transition: all 0.2s var(--ease);
 }
- 
+
 .btn-registrar:hover {
-    background: var(--oro-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(169, 139, 118, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(233, 30, 100, 0.38);
+    filter: brightness(1.05);
 }
- 
+
 .btn-registrar:active { transform: scale(0.98); }
- 
-/* ── BARRA DE PROGRESO ───────────────────────────────────── */
+
+/* ── BARRA DE PROGRESO ───────────────────────────────── */
 .progreso-row {
     display: flex;
     justify-content: space-between;
@@ -378,15 +440,18 @@
     width: 100%;
     min-width: 0;
 }
- 
+
 .progreso-label { color: var(--texto-sec); }
- 
+
 .progreso-pct {
     font-weight: 600;
-    color: var(--oro-dark);
+    background: var(--acento-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     flex-shrink: 0;
 }
- 
+
 .progreso-bar-bg {
     background: var(--borde);
     border-radius: 999px;
@@ -396,27 +461,27 @@
     min-width: 0;
     max-width: 100%;
 }
- 
+
 .progreso-bar-fill {
     height: 100%;
-    background: var(--oro);
+    background: var(--acento-gradient);
     border-radius: 999px;
     transition: width 0.4s var(--ease);
 }
- 
-/* ── PIE DE TARJETA ──────────────────────────────────────── */
+
+/* ── PIE DE TARJETA ──────────────────────────────────── */
 .encargo-card-footer {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    border-top: 1px solid #f0ece4;
+    border-top: 1px solid #f5f0ea;
     padding-top: 12px;
     flex-wrap: wrap;
     gap: 10px;
     width: 100%;
     min-width: 0;
 }
- 
+
 .encargo-footer-info {
     display: flex;
     flex-direction: row;
@@ -427,21 +492,21 @@
     min-width: 0;
     flex-wrap: wrap;
 }
- 
+
 .encargo-footer-info strong {
     color: var(--texto-pri);
     font-weight: 600;
 }
- 
+
 .saldo-pendiente-label {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.70rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--texto-ter);
     text-align: right;
 }
- 
+
 .saldo-pendiente-valor {
     display: block;
     font-family: var(--serif);
@@ -450,15 +515,15 @@
     color: var(--pago-danger);
     text-align: right;
 }
- 
-/* ══════════════════════════════════════════════════
+
+/* ══════════════════════════════════════════════════════
    MODAL — Registrar Pago
-══════════════════════════════════════════════════ */
+══════════════════════════════════════════════════════ */
 .modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(10,6,2,0.75);
+    background: rgba(10, 6, 2, 0.60);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     z-index: 1000;
@@ -467,9 +532,9 @@
     padding: 40px 20px;
     overflow-y: auto;
 }
- 
+
 .modal-overlay.open { display: flex; }
- 
+
 .modal-box {
     background: var(--bg-card);
     border: 1px solid var(--borde);
@@ -479,15 +544,15 @@
     padding: 32px;
     position: relative;
     margin: auto;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
     animation: modal-in 0.3s var(--ease) both;
 }
- 
+
 @keyframes modal-in {
     from { opacity: 0; transform: translateY(14px) scale(0.98); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
- 
+
 .modal-header {
     margin-bottom: 24px;
     padding-bottom: 18px;
@@ -497,7 +562,7 @@
     align-items: center;
     justify-content: space-between;
 }
- 
+
 .modal-header::after {
     content: '';
     position: absolute;
@@ -505,10 +570,10 @@
     left: 0;
     width: 48px;
     height: 2px;
-    background: var(--oro);
+    background: var(--acento-gradient);
     border-radius: 2px;
 }
- 
+
 .modal-header h2 {
     font-family: var(--serif);
     font-size: 1.65rem;
@@ -516,7 +581,7 @@
     color: var(--texto-pri);
     letter-spacing: 0.3px;
 }
- 
+
 .modal-close {
     background: none;
     border: 1px solid var(--borde);
@@ -531,60 +596,39 @@
     border-radius: var(--r-sm);
     transition: all 0.2s;
 }
- 
+
 .modal-close:hover {
-    background: var(--bg-hover);
-    border-color: var(--borde-hover);
-    color: var(--texto-pri);
-}
- body {
-    font-family: 'Inter', sans-serif;
-    background: #FAF8F5;
-    color: #2C1810;
-    display: flex;
-    min-height: 100vh;
-    overflow-x: hidden; /* ← agregá esto */
+    background: #fff0ee;
+    border-color: #e91e8c;
+    color: #e91e8c;
 }
 
-.main-wrapper {
-    margin-left: 260px;
-    flex: 1;
-    min-width: 0;
-    overflow-x: hidden;
-    max-width: calc(100vw - 260px); /* ← agregá esto */
-}
-
-.content-area {
-    padding: 32px;
-    flex: 1;
-    min-width: 0;
-    overflow-x: hidden;
-}
+/* ── CUERPO MODAL ────────────────────────────────────── */
 .modal-body { display: flex; flex-direction: column; gap: 18px; }
- 
+
 .modal-encargo-info {
-    background: #fcf9f5;
-    border: 1px solid #e0d8cc;
+    background: var(--bg);
+    border: 1px solid var(--borde);
     border-radius: var(--r-md);
     padding: 14px 16px;
     font-size: 0.86rem;
     color: var(--texto-sec);
     line-height: 1.7;
 }
- 
+
 .modal-encargo-info strong {
     color: var(--texto-pri);
     font-weight: 600;
 }
- 
+
 #modal-tipo {
     font-family: var(--serif);
     font-size: 1.05rem;
 }
- 
-/* ── FORMULARIO ──────────────────────────────────────────── */
+
+/* ── FORMULARIO MODAL ────────────────────────────────── */
 .form-group { margin-bottom: 0; }
- 
+
 .form-group label {
     display: block;
     font-size: 0.70rem;
@@ -594,39 +638,37 @@
     color: var(--texto-ter);
     margin-bottom: 6px;
 }
- 
+
 .form-group input {
     width: 100%;
-    padding: 0.65rem 0.95rem;
+    padding: 0.62rem 0.95rem;
     border: 1px solid var(--borde);
     border-radius: var(--r-md);
     background: var(--bg-input);
     font-family: var(--sans);
-    font-size: 0.9rem;
+    font-size: 0.86rem;
     color: var(--texto-pri);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
- 
+
 .form-group input:focus {
-    border-color: var(--oro-dark);
-    box-shadow: 0 0 0 3px var(--oro-glow);
+    border-color: #e91e8c;
+    box-shadow: 0 0 0 3px rgba(233, 30, 140, 0.10);
 }
- 
+
 .form-group input::placeholder { color: var(--texto-mute); }
- 
+
 .hint {
     font-size: 0.75rem;
     color: var(--texto-ter);
     margin-top: 6px;
     min-height: 1em;
 }
- 
-.hint.error {
-    color: #c0392b;
-}
- 
-/* ── FOOTER DEL MODAL ────────────────────────────────────── */
+
+.hint.error { color: #c0392b; }
+
+/* ── FOOTER MODAL ────────────────────────────────────── */
 .modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -635,7 +677,7 @@
     padding-top: 20px;
     border-top: 1px solid var(--borde);
 }
- 
+
 .btn-cancelar {
     padding: 0.62rem 1.3rem;
     background: transparent;
@@ -646,46 +688,46 @@
     color: var(--texto-ter);
     cursor: pointer;
     transition: all 0.2s;
-    letter-spacing: 0.02em;
 }
- 
+
 .btn-cancelar:hover {
     border-color: var(--borde-hover);
     background: var(--bg-hover);
     color: var(--texto-pri);
 }
- 
+
 .btn-confirmar {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--oro);
-    color: #fff;
+    background: var(--acento-gradient);
+    color: #ffffff;
     border: none;
-    padding: 0.62rem 1.5rem;
-    border-radius: var(--r-md);
+    padding: 0.65rem 1.6rem;
+    border-radius: 999px;
     font-family: var(--sans);
     font-size: 0.82rem;
     font-weight: 500;
-    letter-spacing: 0.5px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s var(--ease);
+    box-shadow: 0 4px 14px rgba(233, 30, 100, 0.28);
 }
- 
+
 .btn-confirmar:hover {
-    background: var(--oro-dark);
-    box-shadow: 0 6px 20px rgba(184,149,106,0.36);
     transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(233, 30, 100, 0.38);
+    filter: brightness(1.05);
 }
- 
+
 .btn-confirmar:disabled {
     opacity: 0.55;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+    filter: none;
 }
- 
-/* Spinner del botón confirmar */
+
+/* Spinner */
 .spinner {
     display: none;
     width: 14px;
@@ -695,14 +737,10 @@
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
 }
- 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
- 
-/* ══════════════════════════════════════════════════
-   TOAST
-══════════════════════════════════════════════════ */
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── TOAST ───────────────────────────────────────────── */
 .toast {
     position: fixed;
     bottom: 24px;
@@ -719,23 +757,25 @@
     transition: all 0.3s var(--ease);
     z-index: 2000;
 }
- 
+
 .toast.show {
     opacity: 1;
     transform: translate(-50%, 0);
 }
- 
+
 .toast.toast-error {
-    background: #b35d00;
-    color: #fff8f0;
+    background: var(--acento);
+    color: #ffffff;
 }
- .tarjeta-entrega {
+
+/* ── TARJETA DE ENTREGA (auxiliar) ───────────────────── */
+.tarjeta-entrega {
     display: grid;
-    grid-template-columns: 80px 1fr; /* Fecha fija, resto flexible */
+    grid-template-columns: 80px 1fr;
     gap: 16px;
     padding: 16px;
-    background: #fcf9f5;
-    border-radius: 12px;
+    background: var(--bg);
+    border-radius: var(--r-md);
 }
 
 .tarjeta-fecha {
@@ -743,7 +783,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-right: 1px solid #e0d8cc; /* La línea separadora */
+    border-right: 1px solid var(--borde);
 }
 
 .tarjeta-info {
@@ -751,85 +791,52 @@
     flex-direction: column;
     gap: 4px;
 }
-/* ── RESPONSIVE ──────────────────────────────────────────── */
-@media (max-width: 600px) {
-    .pagos-header h1 { font-size: 1.9rem; }
-    .pagos-stats { grid-template-columns: 1fr 1fr; }
- 
-    .encargo-card-top {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
- 
-    .encargo-card-top-left {
-        width: 100%;
-        justify-content: space-between;
-    }
- 
-    .btn-registrar {
-        width: 100%;
-        justify-content: center;
-    }
- 
-    .modal-box { padding: 22px 18px; }
- 
-    .saldo-pendiente-label,
-    .saldo-pendiente-valor { text-align: left; }
- 
-    .encargo-card-footer {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
- 
-@media (max-width: 420px) {
-    .pagos-stats { grid-template-columns: 1fr; }
-}
- 
-/* ── ELIMINAR pseudo-elementos fantasma ──────────── */
-.encargo-card-top-left::before,
-.encargo-card-top-left::after,
-.encargo-card-top::before,
-.encargo-card-top::after {
-    display: none !important;
-    content: none !important;
-}
- .encargo-card .badge {
-    position: static !important;
-    top: auto !important;
-    right: auto !important;
-    min-width: auto !important;
-    height: auto !important;
-    border: 1px solid;
-    border-radius: 20px;
-    padding: 4px 13px;
-    font-size: 0.73rem;
-    font-weight: 500;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
 
+/* ── RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 768px) {
-    /* Eliminamos el margen del sidebar para dispositivos móviles */
     .main-wrapper {
         margin-left: 0 !important;
-        max-width: 100vw !important; /* Fuerza a que no exceda el ancho de pantalla */
+        max-width: 100vw !important;
         width: 100% !important;
         padding-left: 10px;
         padding-right: 10px;
     }
 
-    /* Aseguramos que el cuerpo no desborde */
-    body {
-        overflow-x: hidden;
-        width: 100%;
-    }
+    body { overflow-x: hidden; width: 100%; }
 
-    /* Ajustamos el grid de las stats para que no se amontonen */
-    .pagos-stats {
-        display: grid;
-        grid-template-columns: 1fr; /* Una sola columna en móviles pequeños */
+    .pagos-stats { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+    .pagos-header h1 { font-size: 1.9rem; }
+
+    .encargo-card-top {
+        flex-direction: column;
+        align-items: flex-start;
         gap: 12px;
     }
+
+    .encargo-card-top-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-registrar {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-box { padding: 22px 18px; }
+
+    .saldo-pendiente-label,
+    .saldo-pendiente-valor { text-align: left; }
+
+    .encargo-card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 420px) {
+    .pagos-stats { grid-template-columns: 1fr; }
 }
