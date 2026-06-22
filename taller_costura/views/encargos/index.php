@@ -111,7 +111,7 @@ function estadoBadge($estado) {
         <input type="text" name="q" placeholder="Buscar encargo, cliente o teléfono..." value="<?= htmlspecialchars($busqueda) ?>">
       </div>
       <?php if ($busqueda !== ''): ?>
-        <a href="index.php?page=agenda" class="filtro-btn">✕ Limpiar</a>
+        <a href="index.php" class="filtro-btn">✕ Limpiar</a>
       <?php endif; ?>
     </div>
   </form>
