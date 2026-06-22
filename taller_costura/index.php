@@ -46,7 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $encargo->fecha_entrega         = $_POST['fecha_entrega'] ?? '';
         $encargo->monto_total           = !empty($_POST['monto_total']) ? (float)$_POST['monto_total'] : 0;
         $encargo->sena                  = !empty($_POST['sena']) ? (float)$_POST['sena'] : 0;
- 
+        $encargo->metodo_pago = $_POST['metodo_pago'] ?? 'efectivo';
+
         if ($encargo->tipo !== '' && $encargo->fecha_entrega !== '' && $encargo->create()) {
             header('Location: ' . BASE_URL . '/index.php?nuevo=1');
         } else {

@@ -143,13 +143,21 @@ function marcarTodas() {
     .catch(() => mostrarToast('Error al actualizar', true));
 }
 
-function mostrarToast(msg, error = false) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.style.background = error ? '#C0392B' : '#2C1810';
-    void t.offsetWidth;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
+function mostrarToast(msg, tipo) {
+    // Solo mostrar el toast de la campana
+    if (tipo !== 'error') {
+        mostrarToastCampana(msg);
+    } else {
+        // Solo para errores mostrar el toast local en rojo
+        const t = document.getElementById('toast');
+        if (t) {
+            t.textContent = msg;
+            t.className = 'toast toast-error';
+            void t.offsetWidth;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3200);
+        }
+    }
 }
 function actualizarBadge(cambio) {
     const badge = document.querySelector('.floating-alerts .badge');

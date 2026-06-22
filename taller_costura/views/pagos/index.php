@@ -51,20 +51,41 @@ function etiquetaEstado(string $estado): string {
     <?php endif; ?>
  
     <!-- ── Tarjetas de resumen ───────────────────────── -->
-    <div class="pagos-stats">
- 
+        <!-- ── Tarjetas de resumen ───────────────────────── -->
+        <div class="pagos-stats">
+            <div class="stat-card">
+            <div class="stat-card-top">
+            <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                    <polyline points="17 6 23 6 23 12"/>
+                </svg>
+            </div>
+            Este mes
+            </div>
+            <div class="stat-value"><?= formatPesos((float)($resumenMensual['cobrado_este_mes'] ?? 0)) ?></div>
+                <?php 
+                $diferencia = (float)($resumenMensual['cobrado_este_mes'] ?? 0) - (float)($resumenMensual['cobrado_mes_anterior'] ?? 0);
+                $positivo = $diferencia >= 0;
+                ?>
+                <div class="stat-diferencia <?= $positivo ? 'positivo' : 'negativo' ?>">
+                    <?= $positivo ? '↑' : '↓' ?>
+                    <?= formatPesos(abs($diferencia)) ?> vs mes anterior
+                </div>
+            </div>   
+        
         <div class="stat-card">
             <div class="stat-card-top">
                 <div class="stat-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                        <polyline points="17 6 23 6 23 12"/>
+                        <line x1="12" y1="1" x2="12" y2="23"/>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                     </svg>
                 </div>
-                Total Cobrado
+                Mes anterior
             </div>
-            <div class="stat-value"><?= formatPesos($totalCobrado) ?></div>
-        </div>
+            <div class="stat-value"><?= formatPesos((float)($resumenMensual['cobrado_mes_anterior'] ?? 0)) ?></div>
+         </div>
  
         <div class="stat-card">
             <div class="stat-card-top">
@@ -84,19 +105,6 @@ function etiquetaEstado(string $estado): string {
             <div class="stat-card-top">
                 <div class="stat-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                </div>
-                Total Señas
-            </div>
-            <div class="stat-value"><?= formatPesos($totalSenas) ?></div>
-        </div>
- 
-        <div class="stat-card">
-            <div class="stat-card-top">
-                <div class="stat-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <polyline points="12 6 12 12 16 14"/>
                     </svg>
@@ -107,7 +115,28 @@ function etiquetaEstado(string $estado): string {
         </div>
  
     </div><!-- /.pagos-stats -->
- 
+        <!-- ── Filtros ───────────────────────────────────── -->
+    <div class="historial-filtros">
+        <div class="filtro-busqueda">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="filtro-cliente" placeholder="Buscar por clienta..."
+                oninput="filtrarHistorial()">
+        </div>
+        <div class="filtro-fechas">
+            <label>Desde</label>
+            <input type="date" id="filtro-desde" onchange="filtrarHistorial()">
+            <label>Hasta</label>
+            <input type="date" id="filtro-hasta" onchange="filtrarHistorial()">
+        </div>
+        <button onclick="limpiarFiltros()" class="btn-limpiar-filtros">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+    Limpiar
+</button>
+    </div>
     <!-- ── Tabs ──────────────────────────────────────── -->
     <div class="pagos-tabs">
         <button class="tab-btn <?= $tabActiva === 'cuentas'   ? 'active' : '' ?>"
@@ -134,7 +163,9 @@ function etiquetaEstado(string $estado): string {
         <?php else: ?>
             <div class="encargo-list">
             <?php foreach ($cuentasPorCobrar as $e): ?>
-                <div class="encargo-card">
+                <div class="encargo-card historial-item"
+                    data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
+                    data-fecha="<?= $e['fecha_entrega'] ?>">
  
                     <!-- Fila superior -->
                     <div class="encargo-card-top">
@@ -202,7 +233,7 @@ function etiquetaEstado(string $estado): string {
     </div><!-- /#tab-cuentas -->
  
     <!-- ── Tab: Historial ───────────────────────────── -->
-    <div id="tab-historial" class="tab-panel <?= $tabActiva === 'historial' ? 'active' : '' ?>">
+        <div id="tab-historial" class="tab-panel <?= $tabActiva === 'historial' ? 'active' : '' ?>">
         <?php if (empty($historialPagos)): ?>
             <div class="empty-state">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
@@ -215,7 +246,9 @@ function etiquetaEstado(string $estado): string {
         <?php else: ?>
             <div class="encargo-list">
             <?php foreach ($historialPagos as $e): ?>
-                <div class="encargo-card">
+                <div class="encargo-card historial-item"
+                        data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
+                        data-fecha="<?= $e['fecha_entrega'] ?>">
                     <div class="encargo-card-top">
                         <div class="encargo-card-top-left">
                             <div>
@@ -233,9 +266,18 @@ function etiquetaEstado(string $estado): string {
                         </div>
                     </div>
                     <div class="encargo-card-footer">
-                        <div class="encargo-footer-info">
-                            <span>Total: <strong><?= formatPesos((float)$e['monto_total']) ?></strong></span>
-                            <span>Seña cobrada: <strong><?= formatPesos((float)$e['sena']) ?></strong></span>
+                    <div class="encargo-footer-info">
+                        <span>Total: <strong><?= formatPesos((float)$e['monto_total']) ?></strong></span>
+                        <?php if (!empty($e['metodo_pago'])): ?>
+                        <span class="badge-metodo">
+                            <?= ucfirst($e['metodo_pago']) ?>
+                        </span>
+                        <?php endif; ?>
+                            <?php if ((float)$e['sena'] >= (float)$e['monto_total']): ?>
+                                <span class="badge-pagado-completo">✓ Pagado completo</span>
+                            <?php else: ?>
+                                <span class="badge-seniado">◑ Señado: <?= formatPesos((float)$e['sena']) ?></span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -276,6 +318,23 @@ function etiquetaEstado(string $estado): string {
                        placeholder="Ej: 3000"
                        oninput="validarMonto(this)">
                 <div id="modal-monto-hint" class="hint"></div>
+                <div class="form-group">
+    <label>Método de pago</label>
+    <div class="metodo-pago-opciones">
+                <label class="metodo-opcion">
+                <input type="radio" name="metodo_pago" value="efectivo" checked>
+                <span>Efectivo</span>
+            </label>
+            <label class="metodo-opcion">
+                <input type="radio" name="metodo_pago" value="transferencia">
+                <span>Transferencia</span>
+            </label>
+            <label class="metodo-opcion">
+                <input type="radio" name="metodo_pago" value="tarjeta">
+                <span>Tarjeta</span>
+            </label>   
+    </div>
+</div>
             </div>
         </div>
  
@@ -372,6 +431,8 @@ function enviarPago() {
     const fd = new FormData();
     fd.append('encargo_id', modalData.encargoId);
     fd.append('monto',      monto);
+    const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
+    fd.append('metodo_pago', metodoPago);
  
     fetch('index.php?page=pagos&accion=registrar', {
         method:  'POST',
@@ -399,19 +460,17 @@ function enviarPago() {
 }
  
 function mostrarToast(msg, tipo) {
-    // Toast local de pagos
-    const t = document.getElementById('toast');
-    if (t) {
-        t.textContent = msg;
-        t.className = 'toast' + (tipo === 'error' ? ' toast-error' : '');
-        void t.offsetWidth;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3200);
-    }
-
-    // Toast campana (solo si es éxito)
     if (tipo !== 'error') {
         mostrarToastCampana(msg);
+    } else {
+        const t = document.getElementById('toast');
+        if (t) {
+            t.textContent = msg;
+            t.className = 'toast toast-error';
+            void t.offsetWidth;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3200);
+        }
     }
 }
 
@@ -440,5 +499,40 @@ function formatPesos(n) {
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') cerrarModal();
 });
+function limpiarFiltros() {
+    document.getElementById('filtro-cliente').value = '';
+    document.getElementById('filtro-desde').value = '';
+    document.getElementById('filtro-hasta').value = '';
+    filtrarHistorial();
+}
+
+function filtrarHistorial() {
+    const inputCliente = document.getElementById('filtro-cliente');
+    const inputDesde = document.getElementById('filtro-desde');
+    const inputHasta = document.getElementById('filtro-hasta');
+    
+    if (!inputCliente) return;
+    
+    const textoBusqueda = inputCliente.value.toLowerCase();
+    const desde = inputDesde ? inputDesde.value : '';
+    const hasta = inputHasta ? inputHasta.value : '';
+
+    const items = document.querySelectorAll('.historial-item');
+    
+    if (items.length === 0) return;
+
+    items.forEach(card => {
+        const cliente = card.dataset.cliente || '';
+        const fecha = card.dataset.fecha || '';
+
+        const coincideCliente = cliente.includes(textoBusqueda);
+
+        let coincideFecha = true;
+        if (desde && fecha < desde) coincideFecha = false;
+        if (hasta && fecha > hasta) coincideFecha = false;
+
+        card.style.display = coincideCliente && coincideFecha ? 'block' : 'none';
+    });
+}
 </script>
  

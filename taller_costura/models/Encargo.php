@@ -69,24 +69,25 @@ class Encargo {
     }
 
     public function create() {
-        $query = "INSERT INTO " . $this->table . " 
-                  (administrador_id, cliente_id, tipo, descripcion, observaciones_encargo, fecha_entrega, monto_total, sena, estado)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendiente')";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->administrador_id);
-        $stmt->bindParam(2, $this->cliente_id);
-        $stmt->bindParam(3, $this->tipo);
-        $stmt->bindParam(4, $this->descripcion);
-        $stmt->bindParam(5, $this->observaciones_encargo);
-        $stmt->bindParam(6, $this->fecha_entrega);
-        $stmt->bindParam(7, $this->monto_total);
-        $stmt->bindParam(8, $this->sena);
-        if ($stmt->execute()) {
-            $this->id = $this->conn->lastInsertId();
-            return true;
-        }
-        return false;
+    $query = "INSERT INTO " . $this->table . " 
+              (administrador_id, cliente_id, tipo, descripcion, observaciones_encargo, fecha_entrega, monto_total, sena, estado, metodo_pago)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?)";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(1, $this->administrador_id);
+    $stmt->bindParam(2, $this->cliente_id);
+    $stmt->bindParam(3, $this->tipo);
+    $stmt->bindParam(4, $this->descripcion);
+    $stmt->bindParam(5, $this->observaciones_encargo);
+    $stmt->bindParam(6, $this->fecha_entrega);
+    $stmt->bindParam(7, $this->monto_total);
+    $stmt->bindParam(8, $this->sena);
+    $stmt->bindParam(9, $this->metodo_pago);
+    if ($stmt->execute()) {
+        $this->id = $this->conn->lastInsertId();
+        return true;
     }
+    return false;
+}
 
     public function update() {
         $query = "UPDATE " . $this->table . " 

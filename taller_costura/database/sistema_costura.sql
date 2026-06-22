@@ -95,6 +95,7 @@ CREATE TABLE `encargo` (
   `monto_total` decimal(10,2) DEFAULT '0.00',
   `sena` decimal(10,2) DEFAULT '0.00',
   `estado` enum('pendiente','en_proceso','listo','entregado') COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
+  `metodo_pago` enum('efectivo','transferencia','tarjeta') COLLATE utf8mb4_unicode_ci DEFAULT 'efectivo',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_encargo_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`),
@@ -156,5 +157,24 @@ INSERT INTO `alerta` (`administrador_id`, `encargo_id`, `mensaje`, `tipo`, `leid
 (1, 4, 'Camisa de Agostina Ruiz tiene saldo pendiente.',                   'pago',        1);
 
 -- --------------------------------------------------------
+-- --------------------------------------------------------
+-- Tabla: pago
+-- --------------------------------------------------------
+
+DROP TABLE IF EXISTS `pago`;
+CREATE TABLE `pago` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `encargo_id` int NOT NULL,
+  `administrador_id` int NOT NULL,
+  `monto` decimal(10,2) NOT NULL,
+  `metodo` enum('efectivo','transferencia','tarjeta') NOT NULL DEFAULT 'efectivo',
+  `nota` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `encargo_id` (`encargo_id`),
+  KEY `administrador_id` (`administrador_id`),
+  CONSTRAINT `fk_pago_encargo` FOREIGN KEY (`encargo_id`) REFERENCES `encargo` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pago_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 COMMIT;
