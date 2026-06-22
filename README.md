@@ -128,7 +128,7 @@ http://localhost/grupo-06/taller_costura/views/auth/login.php
 ![Pagos](docs/screenshots/pagos.png)
 
 ### Registro de pagos
-![Pagos](docs/screenshots/registrar-pagos.png)
+![Pagos](docs/screenshots/registrar-pago.png)
 
 ### Alertas
 <!-- ![Alertas](docs/screenshots/alertas.png) -->
