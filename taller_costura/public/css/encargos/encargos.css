@@ -556,8 +556,8 @@
 /* ── CARD GENÉRICA ────────────────────────────────────────── */
 .card {
     background: var(--bg-card);
-    border: 1px solid var(--borde);
-    border-radius: var(--r-xl);
+    border: none;
+    border-radius: 22px;
     padding: 28px 32px;
     margin-bottom: 20px;
     box-shadow: var(--shadow-card);
@@ -763,17 +763,17 @@
 
 .form-control {
     width: 100%;
-    padding: 0.62rem 0.95rem;
-    border: 0.5px solid var(--borde);
-    border-radius: var(--r-md);
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
     background: var(--bg-input);
     color: var(--texto-pri);
-    font-size: 0.86rem;
+    font-size: 0.88rem;
     font-family: var(--sans);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
-.form-control:focus { border-color: var(--oro-dark); box-shadow: 0 0 0 3px var(--oro-glow); }
+.form-control:focus { border-color: var(--acento-2); box-shadow: 0 0 0 3px rgba(233, 30, 140, 0.1); }
 .form-control::placeholder { color: var(--texto-mute); }
 textarea.form-control { resize: vertical; min-height: 100px; }
 
@@ -800,10 +800,10 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: var(--oro);
+    background: var(--acento-gradient);
     color: #fff;
-    border: 1px solid var(--oro);
-    padding: 0.65rem 1.6rem;
+    border: none;
+    padding: 0.7rem 1.8rem;
     border-radius: 999px;
     font-family: var(--sans);
     font-size: 0.82rem;
@@ -815,17 +815,15 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     transition: all 0.2s var(--ease);
 }
 .btn-submit:hover {
-    background: var(--oro-dark);
-    border-color: var(--oro-dark);
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(169, 139, 118, 0.38);
+    box-shadow: 0 6px 20px rgba(233, 30, 100, 0.38);
 }
 
 .btn-cancel {
-    padding: 0.62rem 1.3rem;
+    padding: 0.7rem 1.4rem;
     background: transparent;
-    border: 0.5px solid var(--borde);
-    border-radius: var(--r-md);
+    border: 1px solid var(--borde);
+    border-radius: 999px;
     font-family: var(--sans);
     font-size: 0.82rem;
     color: var(--texto-ter);
@@ -1046,4 +1044,25 @@ textarea.form-control { resize: vertical; min-height: 100px; }
 
 @media (max-width: 420px) {
     .stats-grid { grid-template-columns: 1fr; }
+}
+
+/* ── MODAL NUEVO ENCARGO (dos columnas, más ancho) ───────── */
+.modal-encargo {
+    max-width: 880px;
+    max-height: 88vh;
+    overflow-y: auto;
+}
+
+.modal-encargo-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+.modal-encargo-col .divider { margin: 18px 0; }
+
+@media (max-width: 720px) {
+    .modal-encargo { max-width: 92vw; }
+    .modal-encargo-grid { grid-template-columns: 1fr; gap: 0; }
 }

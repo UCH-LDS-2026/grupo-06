@@ -7,6 +7,11 @@ $alertaController->verificarClientasSinFicha(1);
 
 $encargoModel = new Encargo($db->getConnection());
 
+$stmtClientes = $db->getConnection()->query("SELECT id, nombre FROM cliente ORDER BY nombre");
+$clientesModal = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
+
+$errorCrear = isset($_GET['error']);
+
 $busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
 
 // Para estadísticas siempre se usan TODOS los encargos.
@@ -55,7 +60,7 @@ function estadoBadge($estado) {
         <h1>Agenda de Encargos</h1>
         <p>Hoy es <?= $fechaHoy ?></p>
     </div>
-    <a href="index.php?page=crear" class="btn-nuevo">+ Nuevo Encargo</a>
+    <a href="#" class="btn-nuevo" onclick="abrirModalEncargo(); return false;">+ Nuevo Encargo</a>
 </div>
 
 <div class="stats-grid">
@@ -177,3 +182,160 @@ function estadoBadge($estado) {
 <div id="toast" class="toast show"> Encargo creado correctamente</div>
 <script>setTimeout(()=>document.getElementById('toast').style.display='none', 3000);</script>
 <?php endif; ?>
+
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/homeCliente.css">
+
+<div class="modal-overlay" id="modalEncargo">
+    <div class="modal modal-encargo">
+        <button class="modal-close" type="button" onclick="cerrarModalEncargo()">✕</button>
+        <div class="modal-header">
+            <h2>Nuevo Encargo</h2>
+            <p>Completá los datos para registrar un nuevo encargo</p>
+        </div>
+
+        <?php if ($errorCrear): ?>
+          <div class="alerta alerta-err" style="margin-bottom:16px;">
+            Completá los campos obligatorios: Tipo de prenda, Fecha de entrega y Seña inicial (mayor a $0).
+          </div>
+        <?php endif; ?>
+
+        <form method="POST" action="index.php?page=crear">
+          <div class="modal-encargo-grid">
+
+            <div class="modal-encargo-col">
+                <div class="seccion-label" style="display:flex; justify-content:space-between; align-items:center;">
+                    Cliente
+                    <a href="index.php?page=clientes" target="_blank" title="Agregar nuevo cliente"
+                       style="text-transform:none; letter-spacing:0; font-weight:700; font-size:1rem; color:var(--acento-2); text-decoration:none; line-height:1;">+</a>
+                </div>
+                <div class="form-group">
+                    <div class="cliente-autocomplete" style="position:relative;">
+                        <input type="text" id="clienteBusqueda" autocomplete="off"
+                               placeholder="Escribí para buscar un cliente..." value="">
+                        <input type="hidden" name="cliente_id" id="cliente_id" value="">
+                        <div id="clienteLista" class="cliente-lista"
+                             style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid var(--borde); border-radius:var(--r-md); max-height:200px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="seccion-label">Detalles del Encargo</div>
+                <div class="form-group">
+                    <label>Tipo de Prenda <span class="req">*</span></label>
+                    <input type="text" name="tipo" required placeholder="Ej: Vestido de fiesta, Pantalón, Camisa...">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <input type="text" name="descripcion" placeholder="Descripción detallada del encargo...">
+                </div>
+                <div class="form-group">
+                    <label>Observaciones Especiales</label>
+                    <input type="text" name="observaciones_encargo" placeholder="Detalles importantes, preferencias del cliente...">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Fecha de Entrega <span class="req">*</span></label>
+                    <input type="date" name="fecha_entrega" required>
+                </div>
+            </div>
+
+            <div class="modal-encargo-col">
+                <div class="seccion-label">Información de Pago</div>
+                <div class="form-group">
+                    <label>Precio Total</label>
+                    <div class="input-cm" style="text-align:left;">
+                        <input type="number" name="monto_total" placeholder="0" min="0" step="0.01" style="padding-left:24px;">
+                        <span style="left:12px; right:auto;">$</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Seña Inicial <span class="req">*</span></label>
+                    <div class="input-cm" style="text-align:left;">
+                        <input type="number" name="sena" required placeholder="0" min="0.01" step="0.01" style="padding-left:24px;">
+                        <span style="left:12px; right:auto;">$</span>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Método de Pago</label>
+                    <select name="metodo_pago" style="width:100%; padding:0.62rem 0.95rem; border:1px solid var(--borde); border-radius:var(--r-md); background:var(--bg-input); font-family:var(--sans); font-size:0.86rem; color:var(--texto-pri);">
+                        <option value="efectivo">Efectivo</option>
+                        <option value="transferencia">Transferencia</option>
+                        <option value="tarjeta">Tarjeta</option>
+                    </select>
+                </div>
+            </div>
+
+          </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancelar" onclick="cerrarModalEncargo()">Cancelar</button>
+                <button type="submit" class="btn-guardar">+ Guardar Encargo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const CLIENTES_MODAL = <?= json_encode($clientesModal, JSON_UNESCAPED_UNICODE) ?>;
+
+function abrirModalEncargo() {
+    document.getElementById('modalEncargo').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+}
+function cerrarModalEncargo() {
+    document.getElementById('modalEncargo').classList.remove('visible');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModalEncargo(); });
+document.getElementById('modalEncargo').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalEncargo();
+});
+
+<?php if ($errorCrear): ?>
+document.addEventListener('DOMContentLoaded', abrirModalEncargo);
+<?php endif; ?>
+
+const inputBusquedaEnc = document.getElementById('clienteBusqueda');
+const inputHiddenEnc   = document.getElementById('cliente_id');
+const listaElEnc       = document.getElementById('clienteLista');
+
+function renderListaClientesEnc(filtro) {
+    const texto = filtro.trim().toLowerCase();
+    const filtrados = texto === '' ? CLIENTES_MODAL : CLIENTES_MODAL.filter(c => c.nombre.toLowerCase().includes(texto));
+    let html = '<div class="cliente-opcion vacia" data-id="">Sin cliente...</div>';
+    html += filtrados.length
+        ? filtrados.map(c => `<div class="cliente-opcion" data-id="${c.id}" data-nombre="${c.nombre.replace(/"/g,'&quot;')}">${c.nombre}</div>`).join('')
+        : '<div class="cliente-opcion vacia">Sin resultados</div>';
+    listaElEnc.innerHTML = html;
+    listaElEnc.style.display = 'block';
+}
+
+inputBusquedaEnc.addEventListener('input', () => {
+    inputHiddenEnc.value = '';
+    renderListaClientesEnc(inputBusquedaEnc.value);
+});
+inputBusquedaEnc.addEventListener('focus', () => renderListaClientesEnc(inputBusquedaEnc.value));
+
+listaElEnc.addEventListener('click', (e) => {
+    const opcion = e.target.closest('.cliente-opcion');
+    if (!opcion) return;
+    if (opcion.dataset.id) {
+        inputHiddenEnc.value = opcion.dataset.id;
+        inputBusquedaEnc.value = opcion.dataset.nombre;
+    } else {
+        inputHiddenEnc.value = '';
+        inputBusquedaEnc.value = '';
+    }
+    listaElEnc.style.display = 'none';
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.cliente-autocomplete')) listaElEnc.style.display = 'none';
+});
+</script>
+
+<style>
+  .cliente-opcion { padding: 10px 12px; cursor: pointer; font-size: 0.92rem; }
+  .cliente-opcion:hover { background: var(--bg-hover); }
+  .cliente-opcion.vacia { color: var(--texto-ter); cursor: default; }
+</style>

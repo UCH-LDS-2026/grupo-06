@@ -59,7 +59,6 @@ $error   = isset($_GET['error']);
       </div>
 
       <div class="form-group" style="margin-top:20px; margin-bottom:0;">
-        <label style="display:block; margin-bottom:8px;">Cliente <span style="color:#8B7355;font-weight:300">(opcional)</span></label>
         <div class="cliente-autocomplete" style="position:relative;">
           <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
                  placeholder="Escribí para buscar un cliente..."
