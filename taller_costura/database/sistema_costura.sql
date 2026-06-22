@@ -95,6 +95,7 @@ CREATE TABLE `encargo` (
   `monto_total` decimal(10,2) DEFAULT '0.00',
   `sena` decimal(10,2) DEFAULT '0.00',
   `estado` enum('pendiente','en_proceso','listo','entregado') COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
+  `metodo_pago` enum('efectivo','transferencia','otro') COLLATE utf8mb4_unicode_ci DEFAULT 'efectivo',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_encargo_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`),

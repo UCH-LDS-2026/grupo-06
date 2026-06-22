@@ -83,6 +83,9 @@ class PagoController {
         $historialPagos      = $this->pagoModel->getHistorialPagos($this->adminId);
         $tabActiva           = $_GET['tab'] ?? 'cuentas';
         $flash               = $_SESSION['flash'] ?? null;
+        $resumenMensual = $this->pagoModel->getResumenMensual($this->adminId);
+        $GLOBALS['resumenMensual'] = $resumenMensual;
+        $GLOBALS['pagoModel'] = $this->pagoModel;
         unset($_SESSION['flash']);
  
         foreach (get_defined_vars() as $key => $value) {
@@ -92,8 +95,9 @@ class PagoController {
  
     public function manejar(): void {
         $encargoId = (int)($_POST['encargo_id'] ?? 0);
-        $monto     = (float)str_replace(',', '.', $_POST['monto'] ?? 0);
-        $resultado = $this->pagoModel->registrarPago($encargoId, $this->adminId, $monto);
+        $monto      = (float)str_replace(',', '.', $_POST['monto'] ?? 0);
+        $metodoPago = $_POST['metodo_pago'] ?? 'efectivo';
+        $resultado  = $this->pagoModel->registrarPago($encargoId, $this->adminId, $monto, $metodoPago);
  
         header('Content-Type: application/json');
         echo json_encode($resultado);
