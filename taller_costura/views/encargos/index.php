@@ -80,7 +80,7 @@ function estadoBadge($estado) {
     <input type="text" name="q" class="buscador-input" placeholder="Buscar encargo, cliente o teléfono..." value="<?= htmlspecialchars($busqueda) ?>">
     <button type="submit" class="btn-buscar">🔍</button>
     <?php if ($busqueda !== ''): ?>
-      <a href="index.php?page=agenda" class="btn-limpiar">✕</a>
+      <a href="index.php" class="btn-limpiar">✕</a>
     <?php endif; ?>
   </form>
 </div>
