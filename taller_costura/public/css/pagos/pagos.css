@@ -137,65 +137,99 @@ body {
 
 .stat-card {
     background: var(--bg-card);
-    border: 1px solid var(--borde);
-    border-radius: var(--r-xl);
-    padding: 20px;
+    border: none;
+    border-radius: 22px;
+    padding: 20px 18px;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
     box-shadow: var(--shadow-card);
-    transition: transform 0.3s var(--ease), box-shadow 0.3s ease, border-color 0.2s;
+    min-width: 0;
+    overflow: hidden;
+    transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-    border-color: var(--borde-hover);
-}
-
-.stat-card-top {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--texto-ter);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.1);
 }
 
 .stat-icon {
-    width: 38px;
-    height: 38px;
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: var(--bg);
-    border: 2px solid #fce8e0;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
 }
 
 .stat-icon svg {
-    width: 18px;
-    height: 18px;
-    stroke: var(--acento);
+    width: 22px;
+    height: 22px;
 }
 
-.stat-value {
+/* Colores por tipo de card */
+.stat-card--estemes   .stat-icon { background: rgba(255, 111, 60, 0.12); }
+.stat-card--estemes   .stat-icon svg { stroke: #ff6f3c; }
+
+.stat-card--anterior  .stat-icon { background: rgba(169, 139, 118, 0.15); }
+.stat-card--anterior  .stat-icon svg { stroke: var(--oro-dark); }
+
+.stat-card--pendiente .stat-icon { background: rgba(179, 93, 0, 0.12); }
+.stat-card--pendiente .stat-icon svg { stroke: var(--pago-danger); }
+
+.stat-card--cuentas   .stat-icon { background: rgba(233, 30, 140, 0.10); }
+.stat-card--cuentas   .stat-icon svg { stroke: var(--acento-2); }
+
+.stat-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 4px;
+}
+
+.stat-lbl {
+    font-size: 0.68rem;
+    color: var(--texto-ter);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.stat-val {
     font-family: var(--serif);
-    font-size: 1.9rem;
+    font-size: 1.6rem;
     font-weight: 400;
     color: var(--texto-pri);
     letter-spacing: 0.3px;
+    line-height: 1.1;
 }
 
-.stat-value.highlight {
-    background: var(--acento-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.stat-val--danger {
+    color: var(--pago-danger);
 }
+
+.stat-diferencia {
+    font-size: .72rem;
+    font-weight: 500;
+    padding: .15rem .5rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+.stat-diferencia.positivo {
+    background: #eef5e6;
+    color: #4a7a1e;
+}
+
+.stat-diferencia.negativo {
+    background: #fff8f0;
+    color: #b35d00;
+}
+
 
 /* ── TABS ────────────────────────────────────────────── */
 .pagos-tabs {
@@ -264,6 +298,7 @@ body {
 
 /* ── CARD DE ENCARGO ─────────────────────────────────── */
 .encargo-card {
+    position: relative;
     background: var(--bg-card);
     border: 1px solid var(--borde);
     border-radius: var(--r-xl);
@@ -278,6 +313,13 @@ body {
     box-shadow: var(--shadow-card);
     transition: transform 0.3s var(--ease), box-shadow 0.3s ease, border-color 0.2s;
     backface-visibility: hidden;
+    
+}
+
+.encargo-card-top-left .badge {
+    position: static;
+    align-self: center;
+    flex-shrink: 0;
 }
 
 .encargo-card:hover {
@@ -302,7 +344,7 @@ body {
     gap: 13px;
     flex: 1;
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .encargo-card-top-left > div {
@@ -784,102 +826,123 @@ body {
     gap: 4px;
 }
 
-/* ── FILTROS ─────────────────────────────────────── */
-.historial-filtros {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    margin-bottom: 1.2rem;
-    background: var(--bg-card);
-    padding: .7rem 1rem;
-    border-radius: var(--r-xl);
-    flex-wrap: wrap;
+/* ── BUSCADOR (igual que encargos) ───────────────── */
+.ag-buscador-bar {
+    margin-bottom: 24px;
 }
 
-.filtro-busqueda {
+.toolbar {
     display: flex;
     align-items: center;
-    gap: .5rem;
-    background: var(--bg-input);
-    border: 1px solid var(--borde);
-    border-radius: var(--r-md);
-    padding: .5rem .9rem;
+    gap: 16px;
+}
+
+.search-wrap {
+    position: relative;
     flex: 1;
-    min-width: 200px;
+    max-width: 480px;
 }
 
-.filtro-busqueda svg {
-    width: 16px;
-    height: 16px;
-    stroke: var(--oro);
-    flex-shrink: 0;
-}
-
-.filtro-busqueda input {
-    border: none;
-    outline: none;
-    font-family: var(--sans);
-    font-size: .85rem;
-    color: var(--texto-pri);
-    background: transparent;
+.search-wrap input {
     width: 100%;
+    padding: 11px 16px 11px 42px;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    background: #ffffff;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    color: var(--texto-pri);
+    outline: none;
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow-card);
+    padding-right: 42px;
 }
 
-.filtro-busqueda input::placeholder { color: var(--texto-mute); }
+.search-wrap input:focus {
+    border-color: #e91e8c;
+    box-shadow: 0 0 0 3px rgba(233, 30, 140, 0.1);
+}
 
-.filtro-fechas {
+.search-wrap input::placeholder { color: var(--texto-mute); }
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--texto-ter);
+    font-size: 20px;
+}
+
+.search-cal-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--texto-ter);
     display: flex;
     align-items: center;
-    gap: .5rem;
-    flex-wrap: wrap;
+    padding: 0;
+    transition: color 0.2s;
 }
 
-.filtro-fechas label {
-    font-family: var(--sans);
-    font-size: .8rem;
-    color: var(--texto-ter);
-    white-space: nowrap;
-}
+.search-cal-btn:hover { color: #e91e8c; }
 
-.filtro-fechas input[type="date"] {
-    padding: .5rem .7rem;
+.enc-date-picker {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    background: #ffffff;
     border: 1px solid var(--borde);
     border-radius: var(--r-md);
-    font-family: var(--sans);
-    font-size: .82rem;
-    color: var(--texto-pri);
-    background: var(--bg-input);
-    cursor: pointer;
-}
-
-.filtro-fechas input[type="date"]:focus {
-    outline: none;
-    border-color: var(--oro-dark);
-    box-shadow: 0 0 0 3px var(--oro-glow);
-}
-
-.btn-limpiar-filtros {
-    display: inline-flex;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    padding: 14px 16px;
+    z-index: 100;
+    white-space: nowrap;
     align-items: center;
-    gap: .4rem;
-    padding: .5rem .9rem;
-    border: 1px solid var(--borde);
-    border-radius: var(--r-md);
-    background: transparent;
-    font-family: var(--sans);
-    font-size: .82rem;
-    color: var(--texto-ter);
-    cursor: pointer;
-    transition: all .2s;
-    white-space: nowrap;
-    flex-shrink: 0;
-    width: auto;
+    gap: 8px;
+    font-size: 0.84rem;
+    color: var(--texto-sec);
+    display: none;
 }
 
-.btn-limpiar-filtros:hover {
-    background: var(--bg-hover);
+.enc-date-picker.visible { display: flex; }
+
+.enc-date-picker input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid var(--borde);
+    border-radius: var(--r-sm);
+    font-size: 0.84rem;
     color: var(--texto-pri);
+    font-family: var(--sans);
+    background: var(--bg-input);
+    outline: none;
+}
+
+.enc-date-picker input[type="date"]:focus {
+    border-color: #e91e8c;
+}
+
+.filtro-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 0.83rem;
+    color: var(--texto-sec);
+    background: #ffffff;
+    border: 1px solid var(--borde);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-card);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.filtro-btn:hover {
+    background: var(--bg-hover);
     border-color: var(--borde-hover);
+    color: var(--texto-pri);
 }
 
 /* ── BADGES EXTRA ────────────────────────────────── */
