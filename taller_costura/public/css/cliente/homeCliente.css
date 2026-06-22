@@ -631,9 +631,46 @@ background: #fff0ee;
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 600px) {
-    .page-top h1 { font-size: 1.9rem; }
-    .form-row, .form-row-3 { grid-template-columns: 1fr; }
-    .modal { padding: 22px 18px; }
-    .clientes-grid { grid-template-columns: 1fr; }
-    .filtros { flex-wrap: wrap; }
+    .page-top {
+        margin-top: 50px; 
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    /* 2. Centrar el botón nuevo */
+    .btn-nuevo {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* 3. Toolbar: Hacer que la búsqueda sea más cómoda */
+    .toolbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .search-wrap {
+        width: 100%;
+        max-width: none;
+    }
+
+    /* 4. Filtros: Centrados y ocupando mejor el espacio */
+    .filtros {
+        justify-content: center;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .filtro-btn {
+        flex-shrink: 0; /* Evita que los botones se aplasten */
+    }
+
+    /* 5. Tarjetas */
+    .clientes-grid {
+        grid-template-columns: 1fr;
+        padding-top: 10px;
+    }
 }
