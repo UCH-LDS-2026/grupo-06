@@ -792,6 +792,7 @@ body {
     gap: 4px;
 }
 
+
 /* ── RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 768px) {
     .main-wrapper {
@@ -809,6 +810,16 @@ body {
 
 @media (max-width: 600px) {
     .pagos-header h1 { font-size: 1.9rem; }
+    .pagos-header {
+        margin-top: 60px; /* Más espacio en móvil para evitar el menú */
+        text-align: center;
+    }
+    
+    .pagos-tabs {
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+    }
 
     .encargo-card-top {
         flex-direction: column;
@@ -834,6 +845,16 @@ body {
     .encargo-card-footer {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+  
+
+    /* Ajustamos el tamaño de los botones para que quepan */
+    .tab-btn {
+        flex: 1; 
+        padding: 8px 12px;
+        font-size: 0.75rem; /* Un poco más pequeño para móviles */
+        white-space: nowrap;
     }
 }
 
