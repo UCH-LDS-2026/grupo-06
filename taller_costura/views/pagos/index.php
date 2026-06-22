@@ -296,7 +296,12 @@ function etiquetaEstado(string $estado): string {
             </div>
         <?php endif; ?>
     </div><!-- /#tab-historial -->
- 
+
+ <div id="toast-campana" class="toast-campana" style="display:none;">
+    <span class="material-symbols-outlined">check_circle</span>
+    <span id="toast-campana-msg"></span>
+</div>
+
 </div><!-- /.pagos-wrapper -->
  
 <!-- ══════════════════════════════════════════════════

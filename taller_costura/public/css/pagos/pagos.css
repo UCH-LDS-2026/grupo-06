@@ -1156,3 +1156,34 @@ body {
 @media (max-width: 420px) {
     .pagos-stats { grid-template-columns: 1fr; }
 }
+/* ── TOAST CAMPANA ───────────────────────────────── */
+.toast-campana {
+    position: fixed;
+    bottom: 30px;
+    right: 88px;
+    background: white;
+    color: var(--texto-pri);
+    padding: 14px 18px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(20px);
+    transition: all 0.3s var(--ease);
+    white-space: nowrap;
+    z-index: 9998;
+}
+
+.toast-campana.visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.toast-campana .material-symbols-outlined {
+    color: #e91e8c;
+    font-size: 22px;
+}
