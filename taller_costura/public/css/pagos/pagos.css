@@ -191,7 +191,7 @@ body {
 
 .stat-val {
     font-family: var(--sans);
-    font-size: 2.1rem;
+    font-size: 1.5rem;
     display: block;
     font-weight: 700;
     line-height: 1.15;
