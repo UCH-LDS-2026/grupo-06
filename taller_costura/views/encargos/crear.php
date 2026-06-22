@@ -154,44 +154,8 @@ if (!empty($_POST['cliente_id'])) {
   .cliente-opcion.vacia { color: #8B7355; cursor: default; }
 </style>
 
+<script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
 <script>
 const CLIENTES = <?= json_encode($clientes, JSON_UNESCAPED_UNICODE) ?>;
-
-const inputBusqueda = document.getElementById('clienteBusqueda');
-const inputHidden    = document.getElementById('cliente_id');
-const listaEl        = document.getElementById('clienteLista');
-
-function renderListaClientes(filtro) {
-  const texto = filtro.trim().toLowerCase();
-  const filtrados = texto === '' ? CLIENTES : CLIENTES.filter(c => c.nombre.toLowerCase().includes(texto));
-  let html = '<div class="cliente-opcion vacia" data-id="">Sin cliente...</div>';
-  html += filtrados.length
-    ? filtrados.map(c => `<div class="cliente-opcion" data-id="${c.id}" data-nombre="${c.nombre.replace(/"/g,'&quot;')}">${c.nombre}</div>`).join('')
-    : '<div class="cliente-opcion vacia">Sin resultados</div>';
-  listaEl.innerHTML = html;
-  listaEl.style.display = 'block';
-}
-
-inputBusqueda.addEventListener('input', () => {
-  inputHidden.value = '';
-  renderListaClientes(inputBusqueda.value);
-});
-inputBusqueda.addEventListener('focus', () => renderListaClientes(inputBusqueda.value));
-
-listaEl.addEventListener('click', (e) => {
-  const opcion = e.target.closest('.cliente-opcion');
-  if (!opcion) return;
-  if (opcion.dataset.id) {
-    inputHidden.value = opcion.dataset.id;
-    inputBusqueda.value = opcion.dataset.nombre;
-  } else {
-    inputHidden.value = '';
-    inputBusqueda.value = '';
-  }
-  listaEl.style.display = 'none';
-});
-
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.cliente-autocomplete')) listaEl.style.display = 'none';
-});
+document.addEventListener('DOMContentLoaded', () => initClienteAutocomplete(CLIENTES));
 </script>
