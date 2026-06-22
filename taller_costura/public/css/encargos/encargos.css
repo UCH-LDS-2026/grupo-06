@@ -1,40 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap');
-
 :root {
-    --bg:           #f5f0ff;
-    --bg-card:      #ffffff;
+    --bg:           #FAF8F5;
+    --bg-card:      #FFFFFF;
     --bg-input:     #ffffff;
-    --bg-hover:     #ede8f8;
+    --bg-hover:     #f5f0ea;
 
-    --primario:     #7c5cbf;
-    --primario-dark:#6344a8;
-    --primario-glow: rgba(124, 92, 191, 0.2);
+    --acento:          #ff6f3c;
+    --acento-2:        #e91e8c;
+    --acento-gradient: linear-gradient(90deg, #ff6f3c 0%, #e91e8c 100%);
 
-    --acento:       #f76b8a;
-    --acento-dark:  #e0506f;
+    --oro:          #A98B76;
+    --oro-dark:     #8f7564;
+    --oro-glow:     rgba(169, 139, 118, 0.2);
 
-    --texto-pri:    #2d2250;
-    --texto-sec:    #6b5f8a;
-    --texto-ter:    #9b93b5;
-    --texto-mute:   #c4bdd8;
+    --texto-pri:    #2C1810;
+    --texto-sec:    #7a7465;
+    --texto-ter:    #9c978a;
+    --texto-mute:   #b0ac9f;
 
-    --borde:        #e0d8f0;
-    --borde-hover:  #b8a8e0;
+    --borde:        #E8E0D8;
+    --borde-hover:  #d4c4b4;
 
-    --alerta-ok:    #56d19a;
-    --alerta-warn:  #ffb347;
-
-    --serif: 'Nunito', system-ui, sans-serif;
+    --serif: 'Source Serif 4', Georgia, serif;
     --sans:  'DM Sans', system-ui, sans-serif;
 
-    --r-sm: 6px;
+    --r-sm: 8px;
     --r-md: 12px;
-    --r-lg: 16px;
-    --r-xl: 20px;
-    --shadow-card: 0 4px 16px rgba(100, 80, 180, 0.08);
-    --shadow-btn:  0 4px 14px rgba(124, 92, 191, 0.3);
+    --r-xl: 18px;
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.05);
+    --shadow-btn:  0 4px 18px rgba(233, 30, 100, 0.28);
     --ease: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
@@ -51,6 +46,32 @@
     transition: color 0.2s var(--ease);
 }
 .content-area .nav-back:hover { color: var(--texto-pri); }
+
+/* ── ENCABEZADO ─────────────────────────────────────────── */
+.page-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 16px;
+}
+
+.page-top h1 {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+    color: var(--texto-pri);
+}
+
+.page-top p {
+    font-size: 0.78rem;
+    color: var(--texto-ter);
+    margin-top: 5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
 
 /* ── HEADER ───────────────────────────────────────────────── */
 .det-top,
@@ -79,7 +100,7 @@
     margin-bottom: 6px;
 }
 
-.ag-header h1 { font-size: 2rem; margin: 0; }
+.ag-header h1 { font-size: 2.4rem; margin: 0; }
 .ag-header p {
     color: var(--texto-ter);
     font-size: 0.78rem;
@@ -159,34 +180,34 @@
     transition: all 0.2s var(--ease);
 }
 
-.btn-nuevo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    background: linear-gradient(135deg, var(--acento), var(--primario));
-    color: #fff;
-    border: none;
-    padding: 0.7rem 1.6rem;
-    border-radius: 999px;
-    font-family: var(--sans);
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    text-decoration: none;
-    white-space: nowrap;
-    flex-shrink: 0;
-    box-shadow: 0 4px 14px rgba(247, 107, 138, 0.4);
-    transition: all 0.2s var(--ease);
-}
-.btn-nuevo:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(247, 107, 138, 0.5);
-    filter: brightness(1.06);
-}
-.btn-nuevo:active { transform: scale(0.98); }
+    .btn-nuevo {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        background: var(--acento-gradient);
+        color: #ffffff;
+        border: none;
+        padding: 0.70rem 1.6rem;
+        border-radius: 999px;
+        font-family: var(--sans);
+        font-size: 0.78rem;
+        font-weight: 500;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-btn);
+        transition: all 0.2s var(--ease);
+    }
+    .btn-nuevo:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 26px rgba(233, 30, 100, 0.38);
+        filter: brightness(1.05);
+    }
+    .btn-nuevo:active { transform: scale(0.98); }
 
 /* ── STATS ────────────────────────────────────────────────── */
 /* ── STATS CARDS ──────────────────────────────────────────── */

@@ -43,14 +43,12 @@ function estadoBadge($estado) {
 }
 ?>
 
-<div class="ag-header">
-  <div>
-    <h1>Agenda de Encargos</h1>
-    <p>Hoy es <?= $fechaHoy ?></p>
-  </div>
-  <div class="ag-header-actions">
+<div class="page-top">
+    <div>
+        <h1>Agenda de Encargos</h1>
+        <p>Hoy es <?= $fechaHoy ?></p>
+    </div>
     <a href="index.php?page=crear" class="btn-nuevo">+ Nuevo Encargo</a>
-  </div>
 </div>
 
 <div class="stats-grid">
