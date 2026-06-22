@@ -74,21 +74,6 @@ function estadoBadge($estado) {
   </div>
 </div>
 
-<div class="stats-money-grid">
-  <div class="stat-money-card">
-    <p class="stat-money-lbl">Total Señas Recibidas</p>
-    <span class="stat-money-val val-senas"><?= fmtMonto($estadisticas['senas']) ?></span>
-  </div>
-  <div class="stat-money-card">
-    <p class="stat-money-lbl">Total Cobrado</p>
-    <span class="stat-money-val val-cobrado"><?= fmtMonto($estadisticas['cobrado']) ?></span>
-  </div>
-  <div class="stat-money-card">
-    <p class="stat-money-lbl">Saldo Pendiente</p>
-    <span class="stat-money-val val-pendiente"><?= fmtMonto($estadisticas['pendiente_pago']) ?></span>
-  </div>
-</div>
-
 <div class="ag-buscador-bar">
   <form method="GET" action="index.php" class="buscador-form">
     <input type="hidden" name="page" value="agenda">
