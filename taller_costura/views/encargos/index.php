@@ -35,6 +35,7 @@ if ($busqueda !== '') {
 
 $estadisticas = [
     'activos'    => count(array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']))),
+    'pendiente' => count(array_filter($todos, fn($e) => $e['estado'] === 'pendiente')),
     'en_proceso' => count(array_filter($todos, fn($e) => $e['estado'] === 'en_proceso')),
     'listos'     => count(array_filter($todos, fn($e) => $e['estado'] === 'listo')),
     'senas'      => array_sum(array_column($todos, 'sena')),
@@ -73,13 +74,13 @@ function estadoBadge($estado) {
       <p class="stat-lbl">Encargos Activos</p>
     </div>
   </div>
-  <div class="stat-card stat-card--proceso" onclick="filtrarPorEstadoCard(['en_proceso'])" style="cursor:pointer;" title="Filtrar en proceso">
+  <div class="stat-card stat-card--proceso" onclick="filtrarPorEstadoCard(['pendiente'])" style="cursor:pointer;" title="Filtrar en proceso">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
     </div>
     <div class="stat-text">
-      <span class="stat-val"><?= $estadisticas['en_proceso'] ?></span>
-      <p class="stat-lbl">En Proceso</p>
+      <span class="stat-val"><?= $estadisticas['pendiente'] ?></span>
+      <p class="stat-lbl">Pendientes</p>
     </div>
   </div>
   <div class="stat-card stat-card--proceso2" onclick="filtrarPorEstadoCard(['en_proceso'])" style="cursor:pointer;" title="Filtrar en proceso">
