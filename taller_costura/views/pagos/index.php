@@ -174,7 +174,7 @@ function etiquetaEstado(string $estado): string {
             <?php foreach ($cuentasPorCobrar as $e): ?>
                <div class="encargo-card historial-item"
                     data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
-                    data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
+                     data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
                     data-fecha="<?= $e['fecha_entrega'] ?>"> 
  
                     <!-- Fila superior -->
@@ -258,6 +258,7 @@ function etiquetaEstado(string $estado): string {
             <?php foreach ($historialPagos as $e): ?>
                 <div class="encargo-card historial-item"
                         data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
+                         data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
                         data-fecha="<?= $e['fecha_entrega'] ?>">
                     <div class="encargo-card-top">
                         <div class="encargo-card-top-left">
