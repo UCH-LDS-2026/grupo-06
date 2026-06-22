@@ -24,13 +24,13 @@ $dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 $fechaHoy = $dias[date('w')] . ', ' . date('d') . ' de ' . $meses[date('n')-1] . ' de ' . date('Y');
 
 if ($busqueda !== '') {
-    // Si hay búsqueda, se mantiene el comportamiento de mostrar coincidencias filtradas en PHP.
-    $activos    = array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']));
-    $entregados = array_filter($todos, fn($e) => $e['estado'] === 'entregado');
+    $activos           = array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']));
+    $entregados        = array_filter($todos, fn($e) => $e['estado'] === 'entregado');
+    $todosEntregados   = $entregados; // en búsqueda, el modal muestra los mismos
 } else {
-    // Sin búsqueda: solo los últimos 5 activos y los últimos 2 entregados, ya limitados por SQL.
-    $activos    = $encargoModel->getUltimosActivos(5)->fetchAll(PDO::FETCH_ASSOC);
-    $entregados = $encargoModel->getUltimosEntregados(2)->fetchAll(PDO::FETCH_ASSOC);
+    $activos           = $encargoModel->getUltimosActivos()->fetchAll(PDO::FETCH_ASSOC);
+    $todosEntregados   = $encargoModel->getTodosEntregados()->fetchAll(PDO::FETCH_ASSOC);
+    $entregados        = array_slice($todosEntregados, 0, 2); // últimos 2 para mostrar siempre
 }
 
 $estadisticas = [
@@ -122,8 +122,9 @@ function estadoBadge($estado) {
   </div>
 </div>
 
-<h2 class="section-title">Próximas Entregas</h2>
+<h2 class="section-title" id="enc-section-title">Próximas Entregas</h2>
 
+<div id="enc-cards-container">
 <?php if (!empty($activos)): ?>
   <?php foreach ($activos as $enc):
     $fecha = new DateTime($enc['fecha_entrega']);
@@ -159,8 +160,16 @@ function estadoBadge($estado) {
   </a>
   <?php endforeach; ?>
 <?php else: ?>
-  <div class="empty-state"> No hay encargos activos.</div>
+  <div class="empty-state">No hay encargos activos.</div>
 <?php endif; ?>
+
+</div>
+
+<div class="enc-paginacion" id="enc-paginacion">
+  <button class="enc-pag-btn" id="enc-pag-prev" onclick="cambiarPaginaEnc(-1)">&#8592;</button>
+  <span class="enc-pag-info" id="enc-pag-info"></span>
+  <button class="enc-pag-btn" id="enc-pag-next" onclick="cambiarPaginaEnc(1)">&#8594;</button>
+</div>
 
 <?php if (!empty($entregados)): ?>
   <h2 class="section-title section-title-alt">Últimos Entregados</h2>
@@ -169,7 +178,7 @@ function estadoBadge($estado) {
     $dia   = $fecha->format('d');
     $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
   ?>
-  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado card-bloqueada" data-estado="<?= $enc['estado'] ?>" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>">
+  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado card-bloqueada" data-estado="entregado" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>">
     <div class="card-fecha">
       <span class="dia"><?= $dia ?></span>
       <span class="mes"><?= $mes ?></span>
@@ -181,6 +190,50 @@ function estadoBadge($estado) {
     <div><?= estadoBadge($enc['estado']) ?></div>
   </a>
   <?php endforeach; ?>
+<?php endif; ?>
+
+<?php if (!empty($todosEntregados)): ?>
+<div style="text-align:center; margin: 1rem 0 1.5rem;">
+  <button type="button" class="btn-nuevo" onclick="abrirModalEntregados()">Ver todos los entregados</button>
+</div>
+
+<div class="modal-overlay" id="modalEntregados">
+  <div class="modal" style="max-width:700px; width:95%; max-height:85vh; overflow-y:auto;">
+    <button class="modal-close" type="button" onclick="cerrarModalEntregados()">✕</button>
+    <div class="modal-header">
+      <h2>Todos los Encargos Entregados</h2>
+      <p><?= count($todosEntregados) ?> encargo<?= count($todosEntregados) !== 1 ? 's' : '' ?> entregado<?= count($todosEntregados) !== 1 ? 's' : '' ?></p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:0.75rem; padding: 0 0.25rem 1rem;">
+    <?php foreach ($todosEntregados as $enc):
+      $fecha = new DateTime($enc['fecha_entrega']);
+      $dia   = $fecha->format('d');
+      $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
+      $saldo = $enc['monto_total'] - $enc['sena'];
+    ?>
+      <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado card-bloqueada" style="text-decoration:none;">
+        <div class="card-fecha">
+          <span class="dia"><?= $dia ?></span>
+          <span class="mes"><?= $mes ?></span>
+        </div>
+        <div class="card-info">
+          <h3><?= htmlspecialchars($enc['tipo']) ?></h3>
+          <p class="cliente"><?= htmlspecialchars($enc['cliente_nombre'] ?? 'Sin cliente') ?></p>
+          <?php if (!empty($enc['descripcion'])): ?>
+            <p class="desc"><?= htmlspecialchars($enc['descripcion']) ?></p>
+          <?php endif; ?>
+          <p class="card-montos">
+            Total: <strong><?= fmtMonto($enc['monto_total']) ?></strong>
+            &nbsp;·&nbsp; Seña: <strong><?= fmtMonto($enc['sena']) ?></strong>
+            &nbsp;·&nbsp; Pendiente: <span class="pend"><?= fmtMonto($saldo) ?></span>
+          </p>
+        </div>
+        <div><?= estadoBadge($enc['estado']) ?></div>
+      </a>
+    <?php endforeach; ?>
+    </div>
+  </div>
+</div>
 <?php endif; ?>
 
 <?php if (isset($_GET['nuevo'])): ?>
@@ -350,6 +403,43 @@ document.addEventListener('click', (e) => {
 
 // ── Filtros encargos ─────────────────────────────────
 let encFiltroEstados = [];
+let encPaginaActual  = 1;
+const ENC_POR_PAG    = 5;
+let encTodasVisibles = [];
+
+function renderPaginaEnc() {
+    const total   = encTodasVisibles.length;
+    const totPags = Math.max(1, Math.ceil(total / ENC_POR_PAG));
+    if (encPaginaActual > totPags) encPaginaActual = totPags;
+
+    const inicio = (encPaginaActual - 1) * ENC_POR_PAG;
+    const fin    = inicio + ENC_POR_PAG;
+
+    document.querySelectorAll('#enc-cards-container .card-encargo').forEach(c => c.style.display = 'none');
+    
+    encTodasVisibles.slice(inicio, fin).forEach(c => c.style.display = '');
+
+    document.getElementById('enc-pag-info').textContent =
+        total === 0 ? 'Sin resultados' : `Página ${encPaginaActual} de ${totPags}`;
+        
+    document.getElementById('enc-pag-prev').disabled = encPaginaActual <= 1;
+    document.getElementById('enc-pag-next').disabled = encPaginaActual >= totPags;
+    
+
+    document.getElementById('enc-paginacion').style.display = total <= ENC_POR_PAG ? 'none' : 'flex';
+}
+
+function cambiarPaginaEnc(dir) {
+    encPaginaActual += dir;
+    renderPaginaEnc();
+    document.getElementById('enc-section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Inicializar paginación al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    encTodasVisibles = Array.from(document.querySelectorAll('#enc-cards-container .card-encargo'));
+    renderPaginaEnc();
+});
 
 function toggleCalendarioEnc() {
     document.getElementById('enc-date-picker').classList.toggle('visible');
@@ -366,7 +456,7 @@ function filtrarEncargos() {
     const desde    = document.getElementById('enc-desde').value;
     const hasta    = document.getElementById('enc-hasta').value;
 
-    document.querySelectorAll('.card-encargo').forEach(card => {
+    encTodasVisibles = Array.from(document.querySelectorAll('#enc-cards-container .card-encargo')).filter(card => {
         const cliente = (card.dataset.cliente || '').toLowerCase();
         const tipo    = (card.querySelector('h3')?.textContent || '').toLowerCase();
         const fecha   = card.dataset.fecha  || '';
@@ -378,8 +468,11 @@ function filtrarEncargos() {
         if (desde && fecha < desde) okFecha = false;
         if (hasta  && fecha > hasta) okFecha = false;
 
-        card.style.display = (okTexto && okEstado && okFecha) ? '' : 'none';
+        return okTexto && okEstado && okFecha;
     });
+
+    encPaginaActual = 1;
+    renderPaginaEnc();
 
     const activo = textoVal || desde || hasta || encFiltroEstados.length > 0;
     document.getElementById('enc-limpiar-btn').style.display = activo ? '' : 'none';
@@ -391,9 +484,26 @@ function limpiarFiltrosEnc() {
     document.getElementById('enc-desde').value = '';
     document.getElementById('enc-hasta').value  = '';
     document.getElementById('enc-date-picker').classList.remove('visible');
-    document.querySelectorAll('.card-encargo').forEach(c => c.style.display = '');
     document.getElementById('enc-limpiar-btn').style.display = 'none';
+    encTodasVisibles = Array.from(document.querySelectorAll('#enc-cards-container .card-encargo'));
+    encPaginaActual  = 1;
+    renderPaginaEnc();
 }
+
+// ── Modal todos los entregados ───────────────────────
+function abrirModalEntregados() {
+    document.getElementById('modalEntregados').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+}
+function cerrarModalEntregados() {
+    document.getElementById('modalEntregados').classList.remove('visible');
+    document.body.style.overflow = '';
+}
+document.getElementById('modalEntregados')?.addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalEntregados();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModalEntregados(); });
+
 </script>
 
 <style>
