@@ -69,4 +69,27 @@ public function getClientasSinMedidas() {
 
     return $this->db->fetchAll($sql);
 }
+/**
+ * Limpia alertas viejas: máximo 50 y no más de 30 días
+ */
+public function limpiarViejas($administrador_id) {
+    // Borrar alertas de más de 30 días
+    $sql = "DELETE FROM alerta 
+            WHERE administrador_id = ? 
+            AND fecha < DATE_SUB(NOW(), INTERVAL 30 DAY)";
+    $this->db->query($sql, [$administrador_id]);
+
+    // Si quedan más de 50, borrar las más viejas
+    $sql = "DELETE FROM alerta 
+            WHERE administrador_id = ? 
+            AND id NOT IN (
+                SELECT id FROM (
+                    SELECT id FROM alerta 
+                    WHERE administrador_id = ?
+                    ORDER BY fecha DESC 
+                    LIMIT 50
+                ) tmp
+            )";
+    $this->db->query($sql, [$administrador_id, $administrador_id]);
+}
 }
