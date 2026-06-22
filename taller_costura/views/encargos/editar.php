@@ -35,9 +35,8 @@ $error   = isset($_GET['error']);
 </div>
 
 <?php if ($error): ?>
-<div class="alert-error">
-    <span>⚠️</span>
-    <span>Completá los campos obligatorios: Tipo de prenda y Fecha de entrega.</span>
+<div class="alerta alerta-err">
+    Completá los campos obligatorios: Tipo de prenda y Fecha de entrega.
 </div>
 <?php endif; ?>
 
@@ -59,7 +58,6 @@ $error   = isset($_GET['error']);
       </div>
 
       <div class="form-group" style="margin-top:20px; margin-bottom:0;">
-        <label style="display:block; margin-bottom:8px;">Cliente <span style="color:#8B7355;font-weight:300">(opcional)</span></label>
         <div class="cliente-autocomplete" style="position:relative;">
           <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
                  placeholder="Escribí para buscar un cliente..."

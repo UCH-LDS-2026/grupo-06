@@ -48,10 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $encargo->sena                  = !empty($_POST['sena']) ? (float)$_POST['sena'] : 0;
         $encargo->metodo_pago = $_POST['metodo_pago'] ?? 'efectivo';
 
-        if ($encargo->tipo !== '' && $encargo->fecha_entrega !== '' && $encargo->create()) {
+        if ($encargo->tipo !== '' && $encargo->fecha_entrega !== '' && $encargo->sena > 0 && $encargo->create()) {
             header('Location: ' . BASE_URL . '/index.php?nuevo=1');
         } else {
-            header('Location: ' . BASE_URL . '/index.php?page=crear&error=1');
+            header('Location: ' . BASE_URL . '/index.php?page=agenda&error=1');
         }
         exit;
     }
