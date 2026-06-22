@@ -45,7 +45,7 @@ if (!empty($_POST['cliente_id'])) {
           </h3>
           <a href="<?= $baseUrl ?>/index.php?page=clientes" class="btn-ficha"
              style="margin-top:0; text-decoration:none; font-size:1.2rem; font-weight:700; color: var(--accent); line-height:1;"
-             title="Agregar nuevo cliente">+!!!!!!!</a>
+             title="Agregar nuevo cliente">+</a>
         </div>
 
         <div class="form-group" style="margin-top:20px; margin-bottom:0;">
