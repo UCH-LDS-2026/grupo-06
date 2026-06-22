@@ -49,93 +49,103 @@ function etiquetaEstado(string $estado): string {
         </div>
     <?php endif; ?>
  
-    <!-- ── Tarjetas de resumen ───────────────────────── -->
-        <!-- ── Tarjetas de resumen ───────────────────────── -->
-        <div class="pagos-stats">
-            <div class="stat-card">
-            <div class="stat-card-top">
-            <div class="stat-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                    <polyline points="17 6 23 6 23 12"/>
-                </svg>
-            </div>
-            Este mes
-            </div>
-            <div class="stat-value"><?= formatPesos((float)($resumenMensual['cobrado_este_mes'] ?? 0)) ?></div>
-                <?php 
-                $diferencia = (float)($resumenMensual['cobrado_este_mes'] ?? 0) - (float)($resumenMensual['cobrado_mes_anterior'] ?? 0);
-                $positivo = $diferencia >= 0;
-                ?>
-                <div class="stat-diferencia <?= $positivo ? 'positivo' : 'negativo' ?>">
-                    <?= $positivo ? '↑' : '↓' ?>
-                    <?= formatPesos(abs($diferencia)) ?> vs mes anterior
-                </div>
-            </div>   
-        
-        <div class="stat-card">
-            <div class="stat-card-top">
-                <div class="stat-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                </div>
-                Mes anterior
-            </div>
-            <div class="stat-value"><?= formatPesos((float)($resumenMensual['cobrado_mes_anterior'] ?? 0)) ?></div>
-         </div>
- 
-        <div class="stat-card">
-            <div class="stat-card-top">
-                <div class="stat-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                </div>
-                Saldo Pendiente
-            </div>
-            <div class="stat-value highlight"><?= formatPesos($saldoPendienteTotal) ?></div>
-        </div>
- 
-        <div class="stat-card">
-            <div class="stat-card-top">
-                <div class="stat-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                </div>
-                Cuentas por Cobrar
-            </div>
-            <div class="stat-value"><?= $cuentasCount ?></div>
-        </div>
- 
-    </div><!-- /.pagos-stats -->
-        <!-- ── Filtros ───────────────────────────────────── -->
-    <div class="historial-filtros">
-        <div class="filtro-busqueda">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+   <!-- ── Tarjetas de resumen ───────────────────────── -->
+<div class="pagos-stats">
+
+    <div class="stat-card stat-card--estemes">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                <polyline points="17 6 23 6 23 12"/>
             </svg>
-            <input type="text" id="filtro-cliente" placeholder="Buscar por clienta..."
-                oninput="filtrarHistorial()">
         </div>
-        <div class="filtro-fechas">
-            <label>Desde</label>
-            <input type="date" id="filtro-desde" onchange="filtrarHistorial()">
-            <label>Hasta</label>
-            <input type="date" id="filtro-hasta" onchange="filtrarHistorial()">
+        <div class="stat-text">
+            <span class="stat-lbl">Este mes</span>
+            <span class="stat-val"><?= formatPesos((float)($resumenMensual['cobrado_este_mes'] ?? 0)) ?></span>
+            <?php
+            $diferencia = (float)($resumenMensual['cobrado_este_mes'] ?? 0) - (float)($resumenMensual['cobrado_mes_anterior'] ?? 0);
+            $positivo = $diferencia >= 0;
+            ?>
+            <span class="stat-diferencia <?= $positivo ? 'positivo' : 'negativo' ?>">
+                <?= $positivo ? '↑' : '↓' ?> <?= formatPesos(abs($diferencia)) ?> vs mes anterior
+            </span>
         </div>
-        <button onclick="limpiarFiltros()" class="btn-limpiar-filtros">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-    Limpiar
-</button>
     </div>
+
+    <div class="stat-card stat-card--anterior">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+        </div>
+        <div class="stat-text">
+            <span class="stat-lbl">Mes anterior</span>
+            <span class="stat-val"><?= formatPesos((float)($resumenMensual['cobrado_mes_anterior'] ?? 0)) ?></span>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--pendiente">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+        </div>
+        <div class="stat-text">
+            <span class="stat-lbl">Saldo Pendiente</span>
+            <span class="stat-val stat-val--danger"><?= formatPesos($saldoPendienteTotal) ?></span>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--cuentas">
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </div>
+        <div class="stat-text">
+            <span class="stat-lbl">Cuentas por Cobrar</span>
+            <span class="stat-val"><?= $cuentasCount ?></span>
+        </div>
+    </div>
+
+</div><!-- /.pagos-stats -->
+
+        <!-- ── Filtros ───────────────────────────────────── -->
+    <!-- ── Filtros ───────────────────────────────────── -->
+<div class="ag-buscador-bar">
+    <div class="toolbar">
+        <div class="search-wrap">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input type="text" id="filtro-cliente" placeholder="Buscar por encargo, cliente o fecha ..."
+                oninput="filtrarHistorial()">
+            <button type="button" class="search-cal-btn" id="pago-cal-btn"
+                title="Filtrar por rango de fechas"
+                onclick="toggleCalendarioPago()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+            </button>
+            <div class="enc-date-picker" id="pago-date-picker">
+                <label>Desde</label>
+                <input type="date" id="filtro-desde" onchange="filtrarHistorial()">
+                <label>Hasta</label>
+                <input type="date" id="filtro-hasta" onchange="filtrarHistorial()">
+            </div>
+        </div>
+        <button type="button" class="filtro-btn" id="pago-limpiar-btn"
+            style="display:none;" onclick="limpiarFiltros()">
+            ✕ Limpiar
+        </button>
+    </div>
+</div>
+
     <!-- ── Tabs ──────────────────────────────────────── -->
     <div class="pagos-tabs">
         <button class="tab-btn <?= $tabActiva === 'cuentas'   ? 'active' : '' ?>"
@@ -162,9 +172,10 @@ function etiquetaEstado(string $estado): string {
         <?php else: ?>
             <div class="encargo-list">
             <?php foreach ($cuentasPorCobrar as $e): ?>
-                <div class="encargo-card historial-item"
+               <div class="encargo-card historial-item"
                     data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
-                    data-fecha="<?= $e['fecha_entrega'] ?>">
+                    data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
+                    data-fecha="<?= $e['fecha_entrega'] ?>"> 
  
                     <!-- Fila superior -->
                     <div class="encargo-card-top">
@@ -494,43 +505,61 @@ function formatPesos(n) {
     return '$' + Number(n).toLocaleString('es-AR');
 }
  
-/* ── Cerrar modal con Escape ─────────────────────── */
-document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') cerrarModal();
+function toggleCalendarioPago() {
+    const picker = document.getElementById('pago-date-picker');
+    picker.classList.toggle('visible');
+}
+
+// Cerrar el calendario si se clickea afuera
+document.addEventListener('click', function(e) {
+    const picker = document.getElementById('pago-date-picker');
+    const btn = document.getElementById('pago-cal-btn');
+    if (picker && !picker.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+        picker.classList.remove('visible');
+    }
 });
+
 function limpiarFiltros() {
     document.getElementById('filtro-cliente').value = '';
     document.getElementById('filtro-desde').value = '';
     document.getElementById('filtro-hasta').value = '';
+    document.getElementById('pago-limpiar-btn').style.display = 'none';
+    document.getElementById('pago-date-picker').classList.remove('visible');
     filtrarHistorial();
 }
 
 function filtrarHistorial() {
     const inputCliente = document.getElementById('filtro-cliente');
-    const inputDesde = document.getElementById('filtro-desde');
-    const inputHasta = document.getElementById('filtro-hasta');
-    
+    const inputDesde   = document.getElementById('filtro-desde');
+    const inputHasta   = document.getElementById('filtro-hasta');
+
     if (!inputCliente) return;
-    
+
     const textoBusqueda = inputCliente.value.toLowerCase();
     const desde = inputDesde ? inputDesde.value : '';
     const hasta = inputHasta ? inputHasta.value : '';
 
+    // Mostrar botón limpiar si hay algún filtro activo
+    const limpiarBtn = document.getElementById('pago-limpiar-btn');
+    if (limpiarBtn) {
+        limpiarBtn.style.display = (textoBusqueda || desde || hasta) ? 'inline-flex' : 'none';
+    }
+
     const items = document.querySelectorAll('.historial-item');
-    
     if (items.length === 0) return;
 
     items.forEach(card => {
         const cliente = card.dataset.cliente || '';
-        const fecha = card.dataset.fecha || '';
+        const tipo    = card.dataset.tipo    || '';
+        const fecha   = card.dataset.fecha   || '';
 
-        const coincideCliente = cliente.includes(textoBusqueda);
+        const coincideCliente = cliente.includes(textoBusqueda) || tipo.includes(textoBusqueda);
 
         let coincideFecha = true;
         if (desde && fecha < desde) coincideFecha = false;
         if (hasta && fecha > hasta) coincideFecha = false;
 
-        card.style.display = coincideCliente && coincideFecha ? 'block' : 'none';
+        card.style.display = coincideCliente && coincideFecha ? 'flex' : 'none';
     });
 }
 </script>
