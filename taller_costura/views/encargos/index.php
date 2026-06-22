@@ -8,21 +8,28 @@ $alertaController->verificarClientasSinFicha(1);
 $encargoModel = new Encargo($db->getConnection());
 
 $busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
-if ($busqueda !== '') {
-    $todos = $encargoModel->buscar($busqueda)->fetchAll(PDO::FETCH_ASSOC);
-} else {
-    $todos = $encargoModel->getAll()->fetchAll(PDO::FETCH_ASSOC);
-}
+
+// Para estadísticas siempre se usan TODOS los encargos.
+$todos = ($busqueda !== '')
+    ? $encargoModel->buscar($busqueda)->fetchAll(PDO::FETCH_ASSOC)
+    : $encargoModel->getAll()->fetchAll(PDO::FETCH_ASSOC);
 
 $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 $dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 $fechaHoy = $dias[date('w')] . ', ' . date('d') . ' de ' . $meses[date('n')-1] . ' de ' . date('Y');
 
-$activos    = array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']));
-$entregados = array_filter($todos, fn($e) => $e['estado'] === 'entregado');
+if ($busqueda !== '') {
+    // Si hay búsqueda, se mantiene el comportamiento de mostrar coincidencias filtradas en PHP.
+    $activos    = array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']));
+    $entregados = array_filter($todos, fn($e) => $e['estado'] === 'entregado');
+} else {
+    // Sin búsqueda: solo los últimos 5 activos y los últimos 2 entregados, ya limitados por SQL.
+    $activos    = $encargoModel->getUltimosActivos(5)->fetchAll(PDO::FETCH_ASSOC);
+    $entregados = $encargoModel->getUltimosEntregados(2)->fetchAll(PDO::FETCH_ASSOC);
+}
 
 $estadisticas = [
-    'activos'    => count($activos),
+    'activos'    => count(array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']))),
     'en_proceso' => count(array_filter($todos, fn($e) => $e['estado'] === 'en_proceso')),
     'listos'     => count(array_filter($todos, fn($e) => $e['estado'] === 'listo')),
     'senas'      => array_sum(array_column($todos, 'sena')),
@@ -126,13 +133,13 @@ function estadoBadge($estado) {
 <?php endif; ?>
 
 <?php if (!empty($entregados)): ?>
-  <h2 class="section-title section-title-alt">Entregados Recientemente</h2>
+  <h2 class="section-title section-title-alt">Últimos Entregados</h2>
   <?php foreach ($entregados as $enc):
     $fecha = new DateTime($enc['fecha_entrega']);
     $dia   = $fecha->format('d');
     $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
   ?>
-  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado">
+  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado card-bloqueada">
     <div class="card-fecha">
       <span class="dia"><?= $dia ?></span>
       <span class="mes"><?= $mes ?></span>

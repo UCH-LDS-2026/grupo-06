@@ -45,6 +45,32 @@ class Encargo {
         return $stmt;
     }
 
+    public function getUltimosActivos($limite = 5) {
+        $query = "SELECT e.*, c.nombre AS cliente_nombre
+                  FROM " . $this->table . " e
+                  LEFT JOIN cliente c ON e.cliente_id = c.id
+                  WHERE e.estado IN ('pendiente','en_proceso','listo')
+                  ORDER BY e.fecha_entrega ASC
+                  LIMIT ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(1, (int)$limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    public function getUltimosEntregados($limite = 2) {
+        $query = "SELECT e.*, c.nombre AS cliente_nombre
+                  FROM " . $this->table . " e
+                  LEFT JOIN cliente c ON e.cliente_id = c.id
+                  WHERE e.estado = 'entregado'
+                  ORDER BY e.fecha_entrega DESC
+                  LIMIT ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(1, (int)$limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function getByEstado($estado) {
         $query = "SELECT e.*, c.nombre AS cliente_nombre 
                   FROM " . $this->table . " e

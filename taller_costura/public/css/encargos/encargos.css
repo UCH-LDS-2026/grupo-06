@@ -349,6 +349,13 @@
 }
 .card-encargo.card-entregado { opacity: 0.72; }
 
+.card-encargo.card-bloqueada {
+    opacity: 0.55;
+    filter: grayscale(40%);
+    cursor: default;
+}
+.card-encargo.card-bloqueada:hover { opacity: 0.65; }
+
 .card-fecha {
     border-right: 1px solid var(--borde);
     display: flex;
