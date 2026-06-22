@@ -880,6 +880,20 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     border-top: 0.5px solid var(--borde);
 }
 
+/* ── BUSCADOR BAR (debajo del header, sobre la lista) ───── */
+.ag-buscador-bar {
+    margin-bottom: 24px;
+}
+
+.ag-buscador-bar .buscador-form {
+    width: 100%;
+}
+
+.ag-buscador-bar .buscador-input {
+    width: 100%;
+    max-width: 480px;
+}
+
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 768px) {
     .stats-grid  { grid-template-columns: 1fr 1fr; gap: 10px; }

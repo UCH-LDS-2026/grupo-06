@@ -100,29 +100,29 @@ class Pago {
      * Historial: encargos entregados o con saldo saldado
      */
     public function getHistorialPagos(int $adminId): array {
-        $stmt = $this->pdo->prepare(
-                "SELECT 
-                    e.id,
-                    e.tipo,
-                    e.descripcion,
-                    e.fecha_entrega,
-                    e.monto_total,
-                    e.sena,
-                    e.metodo_pago,
-                    (e.monto_total - e.sena) AS saldo_pendiente,
-                    e.estado,
-                    c.nombre AS cliente_nombre,
-                    (SELECT COUNT(*) FROM pago p WHERE p.encargo_id = e.id) AS cantidad_pagos
-                FROM encargo e
-                LEFT JOIN cliente c ON e.cliente_id = c.id
-                WHERE e.administrador_id = :admin_id
-                AND e.sena > 0
-                ORDER BY e.fecha_entrega DESC"
-        );
-        $stmt->execute([':admin_id' => $adminId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
- 
+    $stmt = $this->pdo->prepare(
+        "SELECT 
+            e.id,
+            e.tipo,
+            e.descripcion,
+            e.fecha_entrega,
+            e.monto_total,
+            e.sena,
+            e.metodo_pago,
+            (e.monto_total - e.sena) AS saldo_pendiente,
+            e.estado,
+            c.nombre AS cliente_nombre,
+            (SELECT COUNT(*) FROM pago p WHERE p.encargo_id = e.id) AS cantidad_pagos
+        FROM encargo e
+        LEFT JOIN cliente c ON e.cliente_id = c.id
+        WHERE e.administrador_id = :admin_id
+        AND e.sena > 0
+        ORDER BY (SELECT MAX(p2.fecha) FROM pago p2 WHERE p2.encargo_id = e.id) DESC"
+    );
+    $stmt->execute([':admin_id' => $adminId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+    
     /**
      * Obtener un encargo por ID (para validar antes de registrar pago)
      */
