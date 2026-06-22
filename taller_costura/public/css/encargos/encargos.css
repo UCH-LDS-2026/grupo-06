@@ -1074,3 +1074,136 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     .modal-encargo { max-width: 92vw; }
     .modal-encargo-grid { grid-template-columns: 1fr; gap: 0; }
 }
+
+/* ── Filtros barra encargos ─────────────────────── */
+.ag-buscador-bar .toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filtro-fechas-enc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--texto-sec);
+  white-space: nowrap;
+}
+
+.filtro-fechas-enc input[type="date"] {
+  padding: 0.42rem 0.7rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--r-md);
+  background: var(--bg-input);
+  font-size: 0.85rem;
+  color: var(--texto-pri);
+  font-family: var(--sans);
+}
+
+.filtro-estado-enc select {
+  padding: 0.42rem 0.7rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--r-md);
+  background: var(--bg-input);
+  font-size: 0.85rem;
+  color: var(--texto-pri);
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+.btn-limpiar-filtros-enc {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.42rem 0.85rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--r-md);
+  background: transparent;
+  font-size: 0.83rem;
+  color: var(--texto-sec);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btn-limpiar-filtros-enc:hover {
+  background: var(--bg-hover);
+}
+
+/* ── Botón calendario dentro del buscador ─────────── */
+.search-wrap {
+    position: relative;
+}
+
+.search-cal-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--texto-ter);
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.search-cal-btn:hover {
+    color: #e91e8c;
+}
+
+.search-wrap input {
+    padding-right: 42px;
+}
+
+/* ── Dropdown de rango de fechas ───────────────────── */
+.enc-date-picker {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    background: #ffffff;
+    border: 1px solid var(--borde);
+    border-radius: var(--r-md);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    padding: 14px 16px;
+    z-index: 100;
+    white-space: nowrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+    color: var(--texto-sec);
+    display: none;
+}
+
+.enc-date-picker.visible {
+    display: flex;
+}
+
+.enc-date-picker input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid var(--borde);
+    border-radius: var(--r-sm, 6px);
+    font-size: 0.84rem;
+    color: var(--texto-pri);
+    font-family: var(--sans);
+    background: var(--bg-input, #f9f9f9);
+    outline: none;
+}
+
+.enc-date-picker input[type="date"]:focus {
+    border-color: #e91e8c;
+}
+
+/* ── Stat-cards con hover al ser clickeables ───────── */
+.stat-card[onclick] {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card[onclick]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}

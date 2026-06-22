@@ -64,7 +64,7 @@ function estadoBadge($estado) {
 </div>
 
 <div class="stats-grid">
-  <div class="stat-card stat-card--activos">
+  <div class="stat-card stat-card--activos" onclick="filtrarPorEstadoCard(['pendiente','en_proceso','listo'])" style="cursor:pointer;" title="Filtrar encargos activos">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
     </div>
@@ -73,7 +73,7 @@ function estadoBadge($estado) {
       <p class="stat-lbl">Encargos Activos</p>
     </div>
   </div>
-  <div class="stat-card stat-card--proceso">
+  <div class="stat-card stat-card--proceso" onclick="filtrarPorEstadoCard(['en_proceso'])" style="cursor:pointer;" title="Filtrar en proceso">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
     </div>
@@ -82,7 +82,7 @@ function estadoBadge($estado) {
       <p class="stat-lbl">En Proceso</p>
     </div>
   </div>
-  <div class="stat-card stat-card--proceso2">
+  <div class="stat-card stat-card--proceso2" onclick="filtrarPorEstadoCard(['en_proceso'])" style="cursor:pointer;" title="Filtrar en proceso">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
     </div>
@@ -91,7 +91,7 @@ function estadoBadge($estado) {
       <p class="stat-lbl">En Proceso</p>
     </div>
   </div>
-  <div class="stat-card stat-card--listos">
+  <div class="stat-card stat-card--listos" onclick="filtrarPorEstadoCard(['listo'])" style="cursor:pointer;" title="Filtrar listos">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
     </div>
@@ -103,18 +103,22 @@ function estadoBadge($estado) {
 </div>
 
 <div class="ag-buscador-bar">
-  <form method="GET" action="index.php" class="toolbar-form">
-    <input type="hidden" name="page" value="agenda">
-    <div class="toolbar">
-      <div class="search-wrap">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text" name="q" placeholder="Buscar encargo, cliente o teléfono..." value="<?= htmlspecialchars($busqueda) ?>">
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input type="text" id="enc-q" placeholder="Buscar encargo, cliente o fecha..." oninput="filtrarEncargos()">
+      <button type="button" class="search-cal-btn" id="enc-cal-btn" title="Filtrar por rango de fechas" onclick="toggleCalendarioEnc()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </button>
+      <div class="enc-date-picker" id="enc-date-picker">
+        <label>Desde</label>
+        <input type="date" id="enc-desde" onchange="filtrarEncargos()">
+        <label>Hasta</label>
+        <input type="date" id="enc-hasta" onchange="filtrarEncargos()">
       </div>
-      <?php if ($busqueda !== ''): ?>
-        <a href="index.php" class="filtro-btn">✕ Limpiar</a>
-      <?php endif; ?>
     </div>
-  </form>
+    <button type="button" class="filtro-btn" id="enc-limpiar-btn" style="display:none;" onclick="limpiarFiltrosEnc()">✕ Limpiar</button>
+  </div>
 </div>
 
 <h2 class="section-title">Próximas Entregas</h2>
@@ -128,7 +132,7 @@ function estadoBadge($estado) {
     $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
     $saldo = $enc['monto_total'] - $enc['sena'];
   ?>
-  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo">
+  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo" data-estado="<?= $enc['estado'] ?>" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>">
     <div class="card-fecha">
       <span class="dia"><?= $dia ?></span>
       <span class="mes"><?= $mes ?></span>
@@ -164,7 +168,7 @@ function estadoBadge($estado) {
     $dia   = $fecha->format('d');
     $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
   ?>
-  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado card-bloqueada">
+  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado card-bloqueada" data-estado="<?= $enc['estado'] ?>" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>">
     <div class="card-fecha">
       <span class="dia"><?= $dia ?></span>
       <span class="mes"><?= $mes ?></span>
@@ -278,6 +282,7 @@ function estadoBadge($estado) {
 <script>
 const CLIENTES_MODAL = <?= json_encode($clientesModal, JSON_UNESCAPED_UNICODE) ?>;
 
+// ── Modal nuevo encargo ──────────────────────────────
 function abrirModalEncargo() {
     document.getElementById('modalEncargo').classList.add('visible');
     document.body.style.overflow = 'hidden';
@@ -295,6 +300,7 @@ document.getElementById('modalEncargo').addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', abrirModalEncargo);
 <?php endif; ?>
 
+// ── Autocomplete clientes (modal) ────────────────────
 const inputBusquedaEnc = document.getElementById('clienteBusqueda');
 const inputHiddenEnc   = document.getElementById('cliente_id');
 const listaElEnc       = document.getElementById('clienteLista');
@@ -329,9 +335,64 @@ listaElEnc.addEventListener('click', (e) => {
     listaElEnc.style.display = 'none';
 });
 
+// ── Cerrar dropdowns al hacer click afuera ───────────
 document.addEventListener('click', (e) => {
-    if (!e.target.closest('.cliente-autocomplete')) listaElEnc.style.display = 'none';
+    if (!e.target.closest('.cliente-autocomplete')) {
+        listaElEnc.style.display = 'none';
+    }
+    const picker = document.getElementById('enc-date-picker');
+    const calBtn = document.getElementById('enc-cal-btn');
+    if (picker && !picker.contains(e.target) && !calBtn.contains(e.target)) {
+        picker.classList.remove('visible');
+    }
 });
+
+// ── Filtros encargos ─────────────────────────────────
+let encFiltroEstados = [];
+
+function toggleCalendarioEnc() {
+    document.getElementById('enc-date-picker').classList.toggle('visible');
+}
+
+function filtrarPorEstadoCard(estados) {
+    encFiltroEstados = estados;
+    filtrarEncargos();
+}
+
+function filtrarEncargos() {
+    const textoVal = document.getElementById('enc-q').value || '';
+    const texto    = textoVal.toLowerCase();
+    const desde    = document.getElementById('enc-desde').value;
+    const hasta    = document.getElementById('enc-hasta').value;
+
+    document.querySelectorAll('.card-encargo').forEach(card => {
+        const cliente = (card.dataset.cliente || '').toLowerCase();
+        const tipo    = (card.querySelector('h3')?.textContent || '').toLowerCase();
+        const fecha   = card.dataset.fecha  || '';
+        const estado  = card.dataset.estado || '';
+
+        const okTexto  = !texto || cliente.includes(texto) || tipo.includes(texto);
+        const okEstado = encFiltroEstados.length === 0 || encFiltroEstados.includes(estado);
+        let   okFecha  = true;
+        if (desde && fecha < desde) okFecha = false;
+        if (hasta  && fecha > hasta) okFecha = false;
+
+        card.style.display = (okTexto && okEstado && okFecha) ? '' : 'none';
+    });
+
+    const activo = textoVal || desde || hasta || encFiltroEstados.length > 0;
+    document.getElementById('enc-limpiar-btn').style.display = activo ? '' : 'none';
+}
+
+function limpiarFiltrosEnc() {
+    encFiltroEstados = [];
+    document.getElementById('enc-q').value     = '';
+    document.getElementById('enc-desde').value = '';
+    document.getElementById('enc-hasta').value  = '';
+    document.getElementById('enc-date-picker').classList.remove('visible');
+    document.querySelectorAll('.card-encargo').forEach(c => c.style.display = '');
+    document.getElementById('enc-limpiar-btn').style.display = 'none';
+}
 </script>
 
 <style>
