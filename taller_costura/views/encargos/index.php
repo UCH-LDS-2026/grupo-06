@@ -60,35 +60,55 @@ function estadoBadge($estado) {
 
 <div class="stats-grid">
   <div class="stat-card stat-card--activos">
-    <div class="stat-icon">📋</div>
-    <span class="stat-val"><?= $estadisticas['activos'] ?></span>
-    <p class="stat-lbl">Encargos Activos</p>
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
+    <div class="stat-text">
+      <span class="stat-val"><?= $estadisticas['activos'] ?></span>
+      <p class="stat-lbl">Encargos Activos</p>
+    </div>
   </div>
   <div class="stat-card stat-card--proceso">
-    <div class="stat-icon">🕐</div>
-    <span class="stat-val"><?= $estadisticas['en_proceso'] ?></span>
-    <p class="stat-lbl">En Proceso</p>
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    </div>
+    <div class="stat-text">
+      <span class="stat-val"><?= $estadisticas['en_proceso'] ?></span>
+      <p class="stat-lbl">En Proceso</p>
+    </div>
   </div>
   <div class="stat-card stat-card--proceso2">
-    <div class="stat-icon">🔄</div>
-    <span class="stat-val"><?= $estadisticas['en_proceso'] ?></span>
-    <p class="stat-lbl">En Proceso</p>
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+    </div>
+    <div class="stat-text">
+      <span class="stat-val"><?= $estadisticas['en_proceso'] ?></span>
+      <p class="stat-lbl">En Proceso</p>
+    </div>
   </div>
   <div class="stat-card stat-card--listos">
-    <div class="stat-icon">✅</div>
-    <span class="stat-val"><?= $estadisticas['listos'] ?></span>
-    <p class="stat-lbl">Listos</p>
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+    </div>
+    <div class="stat-text">
+      <span class="stat-val"><?= $estadisticas['listos'] ?></span>
+      <p class="stat-lbl">Listos</p>
+    </div>
   </div>
 </div>
 
 <div class="ag-buscador-bar">
-  <form method="GET" action="index.php" class="buscador-form">
+  <form method="GET" action="index.php" class="toolbar-form">
     <input type="hidden" name="page" value="agenda">
-    <input type="text" name="q" class="buscador-input" placeholder="Buscar encargo, cliente o teléfono..." value="<?= htmlspecialchars($busqueda) ?>">
-    <button type="submit" class="btn-buscar">🔍</button>
-    <?php if ($busqueda !== ''): ?>
-      <a href="index.php" class="btn-limpiar">✕</a>
-    <?php endif; ?>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input type="text" name="q" placeholder="Buscar encargo, cliente o teléfono..." value="<?= htmlspecialchars($busqueda) ?>">
+      </div>
+      <?php if ($busqueda !== ''): ?>
+        <a href="index.php?page=agenda" class="filtro-btn">✕ Limpiar</a>
+      <?php endif; ?>
+    </div>
   </form>
 </div>
 
