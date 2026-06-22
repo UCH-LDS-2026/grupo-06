@@ -42,9 +42,9 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 <div class="page-top">
     <div>
         <h1>Clientes</h1>
-        <p>Gestión de clientas y fichas de medidas</p>
+        <p>Gestión de clientes y fichas de medidas</p>
     </div>
-    <a href="#" class="btn-nuevo" onclick="abrirModal()">+ Nueva Cliente</a>
+    <a href="#" class="btn-nuevo" onclick="abrirModal()">+ Nuevo Cliente</a>
 </div>
 
 <?php if (count($sinFicha) > 0): ?>
@@ -53,7 +53,7 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
         <span class="material-symbols-outlined" style="font-size:25px; vertical-align:-4px; color:#A98B76; margin-right:6px;">warning</span>
         <strong><?= count($sinFicha) ?> clienta<?= count($sinFicha) === 1 ? '' : 's' ?> sin ficha de medidas.</strong>
     </span>
-    <a href="?page=clientes&filtro=sin_ficha">Ver las clientas</a>
+    <a href="?page=clientes&filtro=sin_ficha">Ver los clientes</a>
 </div>
 <?php endif; ?>
 
