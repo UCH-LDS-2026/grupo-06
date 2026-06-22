@@ -32,7 +32,6 @@ function etiquetaEstado(string $estado): string {
     return '<span class="badge ' . $info['class'] . '">' . $info['label'] . '</span>';
 }
 ?>
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/homeCliente.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <div class="pagos-wrapper">
  

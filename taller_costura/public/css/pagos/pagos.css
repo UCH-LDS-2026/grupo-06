@@ -359,11 +359,15 @@ body {
     white-space: nowrap;
     flex-shrink: 0;
     align-self: center;
-    position: static !important;
-    top: auto !important;
-    right: auto !important;
 }
-
+.floating-alerts .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    align-self: auto;
+    white-space: normal;
+    flex-shrink: 1;
+}
 .badge-pendiente {
     background: #fff4ee;
     color: #c04a00;
