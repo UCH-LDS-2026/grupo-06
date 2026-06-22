@@ -25,15 +25,6 @@ function iconoTipo(string $tipo): string {
         default       => 'notifications'
     };
 }
-
-function colorTipo(string $tipo): string {
-    return match($tipo) {
-        'vencimiento' => '#C0392B',
-        'pago'        => '#BABF94',
-        'estado'      => '#8B7355',
-        default       => '#BFA28C'
-    };
-}
 ?>
 
 <div class="alertas-wrapper">
@@ -46,26 +37,31 @@ function colorTipo(string $tipo): string {
     <?php if (!empty($alertas)): ?>
         <div class="alertas-acciones">
             <button class="btn-marcar-todas" onclick="marcarTodas()">
-                <span class="material-symbols-outlined" style="font-size:16px">done_all</span>
+                <span class="material-symbols-outlined" style="font-size:17px;color:var(--acento-2)">done_all</span>
                 Marcar todas como leídas
             </button>
         </div>
     <?php endif; ?>
 
     <div class="alertas-lista" id="lista-alertas">
+
         <?php if (empty($alertas)): ?>
             <div class="empty-state">
                 <span class="material-symbols-outlined">notifications_off</span>
                 <p>No hay alertas por el momento.</p>
             </div>
+
         <?php else: ?>
             <?php foreach ($alertas as $alerta): ?>
                 <div class="alerta-card <?= $alerta['leida'] ? 'leida' : 'no-leida' ?>"
                      id="alerta-<?= $alerta['id'] ?>">
 
-                    <div class="alerta-icono">
-                        <span class="material-symbols-outlined"
-                              style="color: <?= colorTipo($alerta['tipo']) ?>">
+                    <?php if (!$alerta['leida']): ?>
+                        <div class="dot-unread"></div>
+                    <?php endif; ?>
+
+                    <div class="alerta-icono icono-<?= htmlspecialchars($alerta['tipo']) ?>">
+                        <span class="material-symbols-outlined">
                             <?= iconoTipo($alerta['tipo']) ?>
                         </span>
                     </div>
@@ -73,16 +69,24 @@ function colorTipo(string $tipo): string {
                     <div class="alerta-contenido">
                         <p class="alerta-mensaje"><?= htmlspecialchars($alerta['mensaje']) ?></p>
                         <div class="alerta-meta">
-                            <span class="alerta-tipo"><?= ucfirst($alerta['tipo']) ?></span>
-                            <span class="alerta-tiempo"><?= tiempoTranscurrido($alerta['fecha']) ?></span>
-                            <?php if ($alerta['tipo_encargo']): ?>
+
+                            <span class="alerta-tipo tipo-<?= htmlspecialchars($alerta['tipo']) ?>">
+                                <?= ucfirst($alerta['tipo']) ?>
+                            </span>
+
+                            <span class="alerta-tiempo">
+                                <?= tiempoTranscurrido($alerta['fecha']) ?>
+                            </span>
+
+                            <?php if (!empty($alerta['tipo_encargo'])): ?>
                                 <span class="alerta-encargo">
                                     <?= htmlspecialchars($alerta['tipo_encargo']) ?>
-                                    <?php if ($alerta['nombre_cliente']): ?>
+                                    <?php if (!empty($alerta['nombre_cliente'])): ?>
                                         — <?= htmlspecialchars($alerta['nombre_cliente']) ?>
                                     <?php endif; ?>
                                 </span>
                             <?php endif; ?>
+
                         </div>
                     </div>
 
@@ -96,8 +100,8 @@ function colorTipo(string $tipo): string {
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
-    </div>
 
+    </div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -114,6 +118,8 @@ function marcarLeida(id, btn) {
             const card = document.getElementById('alerta-' + id);
             card.classList.remove('no-leida');
             card.classList.add('leida');
+            const dot = card.querySelector('.dot-unread');
+            if (dot) dot.remove();
             btn.remove();
             actualizarBadge(-1);
             mostrarToast('Alerta marcada como leída');
@@ -130,50 +136,41 @@ function marcarTodas() {
     .then(r => r.json())
     .then(data => {
         if (data.ok) {
-            document.querySelectorAll('.alerta-card').forEach(c => {
-                c.classList.remove('no-leida');
-                c.classList.add('leida');
-                const btn = c.querySelector('.btn-marcar');
+            document.querySelectorAll('.alerta-card').forEach(card => {
+                card.classList.remove('no-leida');
+                card.classList.add('leida');
+                const dot = card.querySelector('.dot-unread');
+                if (dot) dot.remove();
+                const btn = card.querySelector('.btn-marcar');
                 if (btn) btn.remove();
             });
-            mostrarToast('Todas las alertas marcadas como leídas');
             actualizarBadge(0);
+            mostrarToast('Todas las alertas marcadas como leídas');
         }
     })
     .catch(() => mostrarToast('Error al actualizar', true));
 }
 
-function mostrarToast(msg, tipo) {
-    // Solo mostrar el toast de la campana
-    if (tipo !== 'error') {
+function mostrarToast(msg, esError = false) {
+    if (!esError) {
         mostrarToastCampana(msg);
     } else {
-        // Solo para errores mostrar el toast local en rojo
         const t = document.getElementById('toast');
-        if (t) {
-            t.textContent = msg;
-            t.className = 'toast toast-error';
-            void t.offsetWidth;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3200);
-        }
+        if (!t) return;
+        t.textContent = msg;
+        t.className = 'toast toast-error';
+        void t.offsetWidth;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3200);
     }
 }
+
 function actualizarBadge(cambio) {
     const badge = document.querySelector('.floating-alerts .badge');
     if (!badge) return;
-
-    if (cambio === 0) {
-        badge.remove();
-        return;
-    }
-
-    const actual = parseInt(badge.textContent) || 0;
-    const nuevo = actual + cambio;
-    if (nuevo <= 0) {
-        badge.remove();
-    } else {
-        badge.textContent = nuevo;
-    }
+    if (cambio === 0) { badge.remove(); return; }
+    const nuevo = (parseInt(badge.textContent) || 0) + cambio;
+    if (nuevo <= 0) badge.remove();
+    else badge.textContent = nuevo;
 }
 </script>

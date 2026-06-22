@@ -1,28 +1,30 @@
+/* ── ALERTAS WRAPPER ──────────────────────────────────────── */
 .alertas-wrapper {
     padding: 2rem 2.5rem 3rem;
-    font-family: 'Inter', sans-serif;
-    color: #2C1810;
-    min-height: 100vh;
+    font-family: var(--sans);
 }
 
-.alertas-header {
-    margin-bottom: 2rem;
-}
+.alertas-header { margin-bottom: 2rem; }
 
 .alertas-header h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: var(--serif);
     font-size: 2.4rem;
-    font-weight: 500;
-    color: #2C1810;
-    margin: 0 0 .3rem;
+    font-weight: 400;
+    color: var(--texto-pri);
+    letter-spacing: .5px;
+    line-height: 1.1;
+    margin: 0 0 5px;
 }
 
 .alertas-header p {
-    font-size: .88rem;
-    color: #8B7355;
+    font-size: .72rem;
+    color: var(--texto-ter);
+    letter-spacing: 3px;
+    text-transform: uppercase;
     margin: 0;
 }
 
+/* ── ACCIONES ─────────────────────────────────────────────── */
 .alertas-acciones {
     display: flex;
     justify-content: flex-end;
@@ -32,145 +34,170 @@
 .btn-marcar-todas {
     display: inline-flex;
     align-items: center;
-    gap: .5rem;
-    padding: .55rem 1.1rem;
-    background: #F3E4C9;
-    border: 1px solid #E8D8BC;
-    border-radius: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: .82rem;
-    color: #5C4A3A;
+    gap: 6px;
+    padding: .55rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    font-family: var(--sans);
+    font-size: .78rem;
+    font-weight: 500;
+    color: var(--texto-sec);
     cursor: pointer;
-    transition: background .2s;
-    text-decoration: none;
+    box-shadow: var(--shadow-card);
+    transition: all .2s var(--ease);
 }
-.btn-marcar-todas:hover { background: #E8D8BC; }
+.btn-marcar-todas:hover {
+    background: var(--bg-hover);
+    border-color: var(--borde-hover);
+    color: var(--texto-pri);
+}
+.btn-marcar-todas .material-symbols-outlined {
+    color: var(--acento-2);
+    font-size: 17px;
+}
 
+/* ── LISTA ────────────────────────────────────────────────── */
 .alertas-lista {
     display: flex;
     flex-direction: column;
-    gap: .75rem;
+    gap: 10px;
 }
 
+/* ── CARD ─────────────────────────────────────────────────── */
 .alerta-card {
-    background: #FFFFFF;
-    border: 1px solid #E8D8BC;
-    border-radius: 14px;
-    padding: 1.1rem 1.4rem;
+    background: var(--bg-card);          /* ← blanco visible */
+    border: 1px solid var(--borde);
+    border-radius: var(--r-xl);
+    padding: 16px 20px;
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
-    transition: box-shadow .2s, opacity .2s;
-    position: relative;
+    gap: 14px;
+    box-shadow: var(--shadow-card);
+    transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s;
 }
-
+.alerta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(169,139,118,.14);
+    border-color: var(--borde-hover);
+}
 .alerta-card.no-leida {
-    border-left: 3px solid #C0392B;
+    border-left: 3px solid var(--acento);
     background: #FFFAF7;
 }
+.alerta-card.leida { opacity: .65; }
 
-.alerta-card.leida {
-    opacity: .7;
+/* ── PUNTO INDICADOR ──────────────────────────────────────── */
+.dot-unread {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--acento-gradient);
+    flex-shrink: 0;
+    margin-top: 7px;
 }
 
+/* ── ÍCONO CIRCULAR ───────────────────────────────────────── */
 .alerta-icono {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: #F3E4C9;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-}
-
-.alerta-icono .material-symbols-outlined {
     font-size: 20px;
 }
+/* Colores de fondo e ícono por tipo */
+.icono-vencimiento { background: rgba(192,57,43,.12);  color: #C0392B; }
+.icono-pago        { background: rgba(169,139,118,.18); color: var(--oro-dark); }
+.icono-estado      { background: rgba(13,158,110,.14);  color: #0d9e6e; }
+.icono-default     { background: rgba(169,139,118,.1);  color: var(--texto-ter); }
 
-.alerta-contenido {
-    flex: 1;
-}
+/* ── CONTENIDO ────────────────────────────────────────────── */
+.alerta-contenido { flex: 1; min-width: 0; }
 
 .alerta-mensaje {
     font-size: .92rem;
-    color: #2C1810;
-    margin: 0 0 .3rem;
+    color: var(--texto-pri);
+    margin: 0 0 7px;
     line-height: 1.5;
 }
 
 .alerta-meta {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
+/* ── BADGE TIPO ───────────────────────────────────────────── */
 .alerta-tipo {
-    display: inline-block;
-    padding: .2rem .7rem;
-    border-radius: 20px;
-    font-size: .72rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: .65rem;
     font-weight: 500;
-    background: #F3E4C9;
-    color: #8B7355;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
 }
+.tipo-vencimiento { background: #fff0ee; color: #b05040; border: 1px solid #ffc5a0; }
+.tipo-pago        { background: #fdf6ed; color: var(--oro-dark); border: 1px solid #e8d4b4; }
+.tipo-estado      { background: #e6faf2; color: #0d9e6e; border: 1px solid #80e0bc; }
+.tipo-default     { background: var(--bg); color: var(--texto-sec); border: 1px solid var(--borde); }
 
-.alerta-tiempo {
-    font-size: .75rem;
-    color: #BFA28C;
-}
+.alerta-tiempo { font-size: .72rem; color: var(--texto-mute); }
 
+/* ── TAG ENCARGO ──────────────────────────────────────────── */
 .alerta-encargo {
-    font-size: .75rem;
-    color: #8B7355;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .72rem;
+    color: var(--texto-sec);
+    background: var(--bg);
+    border: 0.5px solid var(--borde);
+    border-left: 2px solid var(--oro);
+    border-radius: 0 6px 6px 0;
+    padding: 2px 9px;
 }
 
+/* ── BOTÓN MARCAR ─────────────────────────────────────────── */
 .btn-marcar {
     background: none;
-    border: 1px solid #E8D8BC;
-    border-radius: 8px;
-    padding: .35rem .75rem;
-    font-size: .75rem;
-    color: #8B7355;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-family: var(--sans);
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--texto-sec);
     cursor: pointer;
-    transition: background .15s;
     white-space: nowrap;
     flex-shrink: 0;
+    align-self: flex-start;
+    transition: all .2s var(--ease);
 }
-.btn-marcar:hover { background: #F3E4C9; }
+.btn-marcar:hover {
+    background: var(--bg-hover);
+    border-color: var(--borde-hover);
+    color: var(--texto-pri);
+}
 
+/* ── EMPTY STATE ──────────────────────────────────────────── */
 .empty-state {
+    background: var(--bg-card);
+    border: 1px dashed var(--borde);
+    border-radius: var(--r-xl);
+    padding: 48px 40px;
     text-align: center;
-    padding: 4rem 1rem;
-    color: #8B7355;
-    background: #FFFFFF;
-    border: 1px dashed #E8D8BC;
-    border-radius: 14px;
+    color: var(--texto-ter);
+    font-size: .85rem;
 }
 .empty-state .material-symbols-outlined {
     font-size: 48px;
-    color: #E8D8BC;
+    color: var(--borde);
     display: block;
     margin-bottom: 1rem;
 }
-.empty-state p {
-    font-size: .9rem;
-}
-
-.toast {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    background: #2C1810;
-    color: #FAF8F5;
-    padding: .85rem 1.3rem;
-    border-radius: 10px;
-    font-size: .82rem;
-    z-index: 2000;
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity .25s, transform .25s;
-    pointer-events: none;
-}
-.toast.show { opacity: 1; transform: translateY(0); }
