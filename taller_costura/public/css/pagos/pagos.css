@@ -100,16 +100,6 @@ body {
     letter-spacing: 3px;
     text-transform: uppercase;
 }
-.pagos-stats {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* Alineación horizontal al centro */
-    align-items: center;     /* Alineación vertical */
-    gap: 20px;               /* Un poco más de aire entre ellas */
-    margin: 0 auto 28px auto; /* Centra el bloque entero en la página */
-    max-width: 1000px;       /* Limita el ancho para que no se expandan hasta los bordes */
-    width: 100%;             /* Se adapta en móviles */
-}
 
 /* ── FLASH MESSAGE ───────────────────────────────────── */
 .flash-msg {
@@ -138,7 +128,7 @@ body {
 /* ── TARJETAS DE RESUMEN ─────────────────────────────── */
 .pagos-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
     margin-bottom: 28px;
     width: 100%;
@@ -146,7 +136,6 @@ body {
 }
 
 .stat-card {
-    flex: 0 0 220px; /* Ancho fijo de 220px, no crecen ni se encogen */
     background: var(--bg-card);
     border: 1px solid var(--borde);
     border-radius: var(--r-xl);
@@ -155,7 +144,7 @@ body {
     flex-direction: column;
     gap: 12px;
     box-shadow: var(--shadow-card);
-    /* ... resto de tus estilos ... */
+    transition: transform 0.3s var(--ease), box-shadow 0.3s ease, border-color 0.2s;
 }
 
 .stat-card:hover {
@@ -187,7 +176,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Degradado en ícono SVG vía wrapper con gradiente */
 .stat-icon svg {
     width: 18px;
     height: 18px;
@@ -371,11 +359,15 @@ body {
     white-space: nowrap;
     flex-shrink: 0;
     align-self: center;
-    position: static !important;
-    top: auto !important;
-    right: auto !important;
 }
-
+.floating-alerts .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    align-self: auto;
+    white-space: normal;
+    flex-shrink: 1;
+}
 .badge-pendiente {
     background: #fff4ee;
     color: #c04a00;
@@ -792,79 +784,6 @@ body {
     gap: 4px;
 }
 
-
-/* ── RESPONSIVE ──────────────────────────────────────── */
-@media (max-width: 768px) {
-    .main-wrapper {
-        margin-left: 0 !important;
-        max-width: 100vw !important;
-        width: 100% !important;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    body { overflow-x: hidden; width: 100%; }
-
-    .pagos-stats { grid-template-columns: 1fr 1fr; }
-}
-
-@media (max-width: 600px) {
-    .pagos-header h1 { font-size: 1.9rem; }
-    .pagos-header {
-        margin-top: 60px; /* Más espacio en móvil para evitar el menú */
-        text-align: center;
-    }
-    
-    .pagos-tabs {
-        flex-direction: row;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .encargo-card-top {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .encargo-card-top-left {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .btn-registrar {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .modal-box { padding: 22px 18px; }
-
-    .saldo-pendiente-label,
-    .saldo-pendiente-valor { text-align: left; }
-
-    .encargo-card-footer {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-  
-
-    /* Ajustamos el tamaño de los botones para que quepan */
-    .tab-btn {
-        flex: 1; 
-        padding: 8px 12px;
-        font-size: 0.75rem; /* Un poco más pequeño para móviles */
-        white-space: nowrap;
-    }
-    }
-
-    /* Ajustamos el grid de las stats para que no se amontonen */
-    .pagos-stats {
-        display: grid;
-        grid-template-columns: 1fr; /* Una sola columna en móviles pequeños */
-        gap: 12px;
-    }
-
 /* ── FILTROS ─────────────────────────────────────── */
 .historial-filtros {
     display: flex;
@@ -985,19 +904,6 @@ body {
     background: #fff4e5;
     color: #b35d00;
     border: 1px solid #f0c87a;
-     border-radius: 20px;
-    font-size: .73rem;
-    font-weight: 500;
-}
-
-.badge-seniado {
-    display: inline-flex;
-    align-items: center;
-    gap: .3rem;
-    padding: 4px 13px;
-    background: #fff4e5;
-    color: #b35d00;
-    border: 1px solid #f0c87a;
     border-radius: 20px;
     font-size: .73rem;
     font-weight: 500;
@@ -1085,6 +991,8 @@ body {
     background: #fff8f0;
     color: #b35d00;
 }
+
+/* ── PAGOS INDIVIDUALES ──────────────────────────── */
 .pagos-individuales {
     border-top: 1px solid var(--borde);
     padding-top: 10px;
@@ -1117,6 +1025,69 @@ body {
     font-style: italic;
     color: var(--texto-mute);
     font-size: .75rem;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 768px) {
+    .main-wrapper {
+        margin-left: 0 !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    body { overflow-x: hidden; width: 100%; }
+
+    .pagos-stats { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+    .pagos-header h1 { font-size: 1.9rem; }
+
+    .pagos-header {
+        margin-top: 60px;
+        text-align: center;
+    }
+
+    .pagos-tabs {
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .encargo-card-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .encargo-card-top-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-registrar {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-box { padding: 22px 18px; }
+
+    .saldo-pendiente-label,
+    .saldo-pendiente-valor { text-align: left; }
+
+    .encargo-card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 8px 12px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
 }
 
 @media (max-width: 420px) {
