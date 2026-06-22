@@ -49,26 +49,25 @@ function estadoBadge($estado) {
     <p>Hoy es <?= $fechaHoy ?></p>
   </div>
   <div class="ag-header-actions">
-    <form method="GET" action="index.php" class="buscador-form">
-      <input type="hidden" name="page" value="agenda">
-      <input type="text" name="q" class="buscador-input" placeholder="Buscar encargo, cliente o teléfono..." value="<?= htmlspecialchars($busqueda) ?>">
-      <button type="submit" class="btn-buscar">🔍</button>
-      <?php if ($busqueda !== ''): ?>
-        <a href="index.php?page=agenda" class="btn-limpiar">✕</a>
-      <?php endif; ?>
-    </form>
     <a href="index.php?page=crear" class="btn-nuevo">+ Nuevo Encargo</a>
   </div>
 </div>
-
-<?php if ($busqueda !== '' && empty($todos)): ?>
-  <div class="empty-state">No se encontraron encargos para "<?= htmlspecialchars($busqueda) ?>".</div>
-<?php endif; ?>
 
 <div class="stats-grid">
   <div class="stat-card"><span class="stat-val"><?= $estadisticas['activos'] ?></span><p class="stat-lbl">Encargos Activos</p></div>
   <div class="stat-card"><span class="stat-val"><?= $estadisticas['en_proceso'] ?></span><p class="stat-lbl">En Proceso</p></div>
   <div class="stat-card"><span class="stat-val"><?= $estadisticas['listos'] ?></span><p class="stat-lbl">Listos</p></div>
+</div>
+
+<div class="ag-buscador-bar">
+  <form method="GET" action="index.php" class="buscador-form">
+    <input type="hidden" name="page" value="agenda">
+    <input type="text" name="q" class="buscador-input" placeholder="Buscar encargo, cliente o teléfono..." value="<?= htmlspecialchars($busqueda) ?>">
+    <button type="submit" class="btn-buscar">🔍</button>
+    <?php if ($busqueda !== ''): ?>
+      <a href="index.php?page=agenda" class="btn-limpiar">✕</a>
+    <?php endif; ?>
+  </form>
 </div>
 
 <h2 class="section-title">Próximas Entregas</h2>
