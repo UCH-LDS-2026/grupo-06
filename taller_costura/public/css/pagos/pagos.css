@@ -856,16 +856,15 @@ body {
         font-size: 0.75rem; /* Un poco más pequeño para móviles */
         white-space: nowrap;
     }
-}
+    }
 
-<<<<<<< HEAD
     /* Ajustamos el grid de las stats para que no se amontonen */
     .pagos-stats {
         display: grid;
         grid-template-columns: 1fr; /* Una sola columna en móviles pequeños */
         gap: 12px;
     }
-}
+
 /* ── FILTROS ─────────────────────────────────────── */
 .historial-filtros {
     display: flex;
@@ -1118,8 +1117,8 @@ body {
     font-style: italic;
     color: var(--texto-mute);
     font-size: .75rem;
-=======
+}
+
 @media (max-width: 420px) {
     .pagos-stats { grid-template-columns: 1fr; }
->>>>>>> feature/responsive
 }
