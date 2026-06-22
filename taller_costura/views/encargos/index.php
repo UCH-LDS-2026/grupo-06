@@ -70,11 +70,6 @@ function estadoBadge($estado) {
   <div class="stat-card"><span class="stat-val"><?= $estadisticas['en_proceso'] ?></span><p class="stat-lbl">En Proceso</p></div>
   <div class="stat-card"><span class="stat-val"><?= $estadisticas['listos'] ?></span><p class="stat-lbl">Listos</p></div>
 </div>
-<div class="stats-grid">
-  <div class="stat-card"><p class="stat-lbl">Total Señas Recibidas</p><span class="stat-val stat-money"><?= fmtMonto($estadisticas['senas']) ?></span></div>
-  <div class="stat-card"><p class="stat-lbl">Total Cobrado</p><span class="stat-val stat-money"><?= fmtMonto($estadisticas['cobrado']) ?></span></div>
-  <div class="stat-card"><p class="stat-lbl">Saldo Pendiente</p><span class="stat-val stat-warn"><?= fmtMonto($estadisticas['pendiente_pago']) ?></span></div>
-</div>
 
 <h2 class="section-title">Próximas Entregas</h2>
 
