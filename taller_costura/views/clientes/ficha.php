@@ -36,9 +36,162 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 
 $modoEdicion      = isset($_GET['editar'])         && $_GET['editar']         === '1';
 $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] === '1';
+
+// ── Helper WhatsApp ────────────────────────────────────────────────────────
+function waLink(string $telefono, string $mensaje): string {
+    // Limpia el número: solo dígitos
+    $tel = preg_replace('/[^0-9]/', '', $telefono);
+    // Quita 0 inicial si existe (ej: 0351... → 351...)
+    $tel = ltrim($tel, '0');
+    // Agrega código de país Argentina si no está
+    if (!str_starts_with($tel, '54')) {
+        $tel = '54' . $tel;
+    }
+    return 'https://wa.me/' . $tel . '?text=' . rawurlencode($mensaje);
+}
+
+$telefono    = $cliente->getTelefono();
+$nombre      = $cliente->getNombre();
+$tieneTel    = $telefono !== '';
+
+// Mensajes predefinidos
+$msgSaludo   = "Hola {$nombre}! 👋 Te escribimos desde el taller. ¿Cómo estás?";
+$msgEncargo  = "Hola {$nombre}! 🎉 Te avisamos que tu encargo está listo para retirar. ¡Podés pasar cuando quieras en nuestro horario habitual!";
+$msgPago     = "Hola {$nombre}! 💳 Te recordamos que tenés un saldo pendiente de $" . number_format($saldoPendiente, 0, ',', '.') . ". Coordinamos el pago cuando quieras.";
+$msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueba o medición? Avisanos y buscamos el horario que mejor te quede.";
 ?>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/fichaCliente.css">
+
+<style>
+/* ── WHATSAPP ─────────────────────────────────────────────── */
+.wa-section {
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-xl);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+.wa-section-titulo {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--texto-pri);
+    letter-spacing: .3px;
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.wa-section-titulo .wa-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(37, 211, 102, 0.13);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wa-section-titulo .wa-icon-wrap svg {
+    width: 16px;
+    height: 16px;
+    fill: #25D366;
+}
+
+.wa-botones {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--bg);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-md);
+    font-family: var(--sans);
+    font-size: .83rem;
+    color: var(--texto-sec);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all .2s var(--ease);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-wa:hover {
+    background: var(--bg-hover);
+    border-color: var(--borde-hover);
+    color: var(--texto-pri);
+    transform: translateX(2px);
+}
+
+.btn-wa .wa-emoji {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.btn-wa .wa-texto {
+    flex: 1;
+    text-align: left;
+}
+
+.btn-wa .wa-arrow {
+    color: var(--texto-mute);
+    font-size: .75rem;
+    flex-shrink: 0;
+    transition: transform .2s var(--ease);
+}
+
+.btn-wa:hover .wa-arrow {
+    transform: translateX(3px);
+    color: #25D366;
+}
+
+.wa-sin-tel {
+    font-size: .8rem;
+    color: var(--texto-ter);
+    background: var(--bg);
+    border: 1px dashed var(--borde);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wa-sin-tel a {
+    color: var(--acento-2);
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: .5px solid var(--acento-2);
+}
+
+/* Botón principal verde solo en "Enviar mensaje" */
+.btn-wa-principal {
+    background: #25D366;
+    border-color: #25D366;
+    color: #ffffff;
+    font-weight: 500;
+    box-shadow: 0 3px 12px rgba(37,211,102,.3);
+}
+.btn-wa-principal:hover {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #ffffff;
+    box-shadow: 0 5px 16px rgba(37,211,102,.4);
+}
+.btn-wa-principal .wa-arrow { color: rgba(255,255,255,.7); }
+.btn-wa-principal:hover .wa-arrow { color: #ffffff; }
+</style>
 
 <?php if ($exito): ?>
     <div class="alerta alerta-ok"><?= htmlspecialchars($exito) ?></div>
@@ -85,7 +238,6 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
             <?php else: ?>
                 <div class="contacto-lista">
 
-                    <!-- Teléfono -->
                     <div class="contacto-item">
                         <div class="contacto-icono">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +250,6 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                         </div>
                     </div>
 
-                    <!-- Email -->
                     <div class="contacto-item">
                         <div class="contacto-icono">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -112,7 +263,6 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
                         </div>
                     </div>
 
-                    <!-- Fecha -->
                     <div class="contacto-item">
                         <div class="contacto-icono">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -130,7 +280,6 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
 
                 </div>
 
-                <!-- Botones editar / eliminar -->
                 <div class="acciones-cliente" style="margin-top:20px; margin-bottom:0">
                     <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar_cliente=1"
                        class="btn-accion btn-accion-editar">
@@ -159,11 +308,69 @@ $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] ==
             <?php endif; ?>
         </div>
 
+        <!-- ── WHATSAPP ── -->
+        <div class="wa-section">
+            <div class="wa-section-titulo">
+                <div class="wa-icon-wrap">
+                    <!-- Logo WhatsApp SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+                    </svg>
+                </div>
+                WhatsApp
+            </div>
+
+            <?php if ($tieneTel): ?>
+                <div class="wa-botones">
+
+                    <a href="<?= waLink($telefono, $msgSaludo) ?>"
+                       target="_blank" rel="noopener"
+                       class="btn-wa btn-wa-principal">
+                        <span class="wa-emoji">💬</span>
+                        <span class="wa-texto">Enviar mensaje</span>
+                        <span class="wa-arrow">→</span>
+                    </a>
+
+                    <a href="<?= waLink($telefono, $msgEncargo) ?>"
+                       target="_blank" rel="noopener"
+                       class="btn-wa">
+                        <span class="wa-emoji">🎉</span>
+                        <span class="wa-texto">Encargo listo para retirar</span>
+                        <span class="wa-arrow">→</span>
+                    </a>
+
+                    <a href="<?= waLink($telefono, $msgPago) ?>"
+                       target="_blank" rel="noopener"
+                       class="btn-wa">
+                        <span class="wa-emoji">💳</span>
+                        <span class="wa-texto">Recordar saldo pendiente</span>
+                        <span class="wa-arrow">→</span>
+                    </a>
+
+                    <a href="<?= waLink($telefono, $msgTurno) ?>"
+                       target="_blank" rel="noopener"
+                       class="btn-wa">
+                        <span class="wa-emoji">📅</span>
+                        <span class="wa-texto">Coordinar turno / prueba</span>
+                        <span class="wa-arrow">→</span>
+                    </a>
+
+                </div>
+            <?php else: ?>
+                <div class="wa-sin-tel">
+                    <span>⚠️</span>
+                    Esta clienta no tiene teléfono registrado.
+                    <a href="<?= BASE_URL ?>/index.php?page=ficha-cliente&id=<?= $cliente->getId() ?>&editar_cliente=1">
+                        Agregar ahora
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+
         <!-- Medidas -->
         <div class="card">
             <div class="medidas-header">
                 <div class="medidas-titulo">
-                    <!-- Burbuja circular pastel igual al dashboard -->
                     <div class="medidas-icono-wrap">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M3 6h18M3 12h18M3 18h18"/>
