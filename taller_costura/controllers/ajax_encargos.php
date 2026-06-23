@@ -24,7 +24,18 @@ if ($ajaxPage === 'actualizar-estado-encargo' && $_SERVER['REQUEST_METHOD'] === 
     $estado = $data['estado'] ?? '';
     $validos = ['pendiente','en_proceso','listo','entregado'];
     if ($id && in_array($estado, $validos)) {
-        $db   = Database::getInstance()->getConnection();
+        $db = Database::getInstance()->getConnection();
+
+        if ($estado === 'entregado') {
+            $chk = $db->prepare("SELECT monto_total, sena FROM encargo WHERE id = ?");
+            $chk->execute([$id]);
+            $enc = $chk->fetch(PDO::FETCH_ASSOC);
+            if ($enc && (float)$enc['monto_total'] > 0 && (float)$enc['sena'] < (float)$enc['monto_total']) {
+                echo json_encode(['ok' => false, 'mensaje' => 'No se puede cambiar el estado: el encargo tiene un saldo pendiente de pago.']);
+                exit;
+            }
+        }
+
         $stmt = $db->prepare("UPDATE encargo SET estado = ? WHERE id = ?");
         $ok   = $stmt->execute([$estado, $id]);
         echo json_encode(['ok' => $ok]);

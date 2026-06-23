@@ -332,13 +332,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!btn) return;
       const nuevoEstado = btn.dataset.estado;
       const id = this.dataset.id;
+      const estadoAnterior = this.dataset.current;
 
       document.querySelectorAll('.estado-btn').forEach(b => b.classList.remove('activo'));
       btn.classList.add('activo');
-
-      const badge = document.getElementById('badgeEstado');
-      badge.className = 'badge ' + (badgeClasses[nuevoEstado] || '');
-      badge.textContent = badgeLabels[nuevoEstado] || nuevoEstado;
 
       fetch('index.php?page=actualizar-estado-encargo', {
         method: 'POST',
@@ -346,7 +343,21 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({id, estado: nuevoEstado})
       })
       .then(r => r.json())
-      .then(d => showToast(d.ok ? '✅ Estado actualizado' : '❌ Error al actualizar', d.ok))
+      .then(d => {
+        if (d.ok) {
+          estadoGrid.dataset.current = nuevoEstado;
+          const badge = document.getElementById('badgeEstado');
+          badge.className = 'badge ' + (badgeClasses[nuevoEstado] || '');
+          badge.textContent = badgeLabels[nuevoEstado] || nuevoEstado;
+          showToast('✅ Estado actualizado');
+        } else {
+          document.querySelectorAll('.estado-btn').forEach(b => b.classList.remove('activo'));
+          document.querySelectorAll('.estado-btn').forEach(b => {
+            if (b.dataset.estado === estadoAnterior) b.classList.add('activo');
+          });
+          showToast('❌ ' + (d.mensaje || 'Error al actualizar'), false);
+        }
+      })
       .catch(() => showToast('❌ Error de red', false));
     });
   }

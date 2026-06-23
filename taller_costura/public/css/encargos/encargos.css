@@ -719,8 +719,9 @@
     pointer-events: auto;
 }
 .toast.toast-error {
-    background: var(--acento);
-    color: #ffffff;
+    background: #fff3f3;
+    color: #b05040;
+    border: 1px solid rgba(176, 80, 64, 0.25);
 }
 
 /* ── FORMULARIOS ──────────────────────────────────────────── */
