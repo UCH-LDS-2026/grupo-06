@@ -379,7 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnConfirmar.addEventListener('click', () => {
       const monto  = parseFloat(document.getElementById('inputMonto').value);
-      const metodo = document.getElementById('selectMetodo').value;
+      const metodoRadio = document.querySelector('input[name="detalle_metodo_pago"]:checked');
+      const metodo = metodoRadio ? metodoRadio.value : 'efectivo';
       const nota   = document.getElementById('inputNota').value.trim();
 
       if (!monto || monto <= 0) { showToast('❌ Ingresá un monto válido', false); return; }
