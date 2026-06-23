@@ -8,6 +8,32 @@ require_once __DIR__ . '/../controllers/AuthController.php';
 
 class ClienteController {
 
+    // =========================================================================
+    // HELPER — Validar medidas
+    // =========================================================================
+    private static function validarMedidas(array $post): ?string {
+        $campos = [
+            'contorno_pecho'   => 'Contorno de Busto',
+            'contorno_cintura' => 'Contorno de Cintura',
+            'contorno_cadera'  => 'Contorno de Cadera',
+            'largo_espalda'    => 'Largo de Espalda',
+            'largo_manga'      => 'Largo de Manga',
+            'largo_pantalon'   => 'Largo de Pantalón',
+        ];
+        foreach ($campos as $key => $label) {
+            $val = $post[$key] ?? '';
+            if ($val === '') continue;
+            $num = (float)$val;
+            if ($num < 1 || $num > 300) {
+                return "{$label} debe estar entre 1 y 300 cm.";
+            }
+        }
+        return null; // todo ok
+    }
+
+    // =========================================================================
+    // REGISTRAR
+    // =========================================================================
     public static function registrar(): void {
         AuthController::requiereLogin();
 
@@ -17,6 +43,24 @@ class ClienteController {
 
         if ($nombre === '') {
             $_SESSION['error_cliente'] = 'El nombre es obligatorio.';
+            header('Location: ' . BASE_URL . '/index.php?page=clientes');
+            exit;
+        }
+
+        // Validar teléfono duplicado
+        if ($telefono !== '') {
+            $existeTel = Cliente::getByTelefono($telefono);
+            if ($existeTel !== null) {
+                $_SESSION['error_cliente'] = 'El teléfono ya está registrado para ' . $existeTel->getNombre() . '.';
+                header('Location: ' . BASE_URL . '/index.php?page=clientes');
+                exit;
+            }
+        }
+
+        // Validar medidas
+        $errorMedidas = self::validarMedidas($_POST);
+        if ($errorMedidas !== null) {
+            $_SESSION['error_cliente'] = $errorMedidas;
             header('Location: ' . BASE_URL . '/index.php?page=clientes');
             exit;
         }
@@ -85,6 +129,16 @@ class ClienteController {
             exit;
         }
 
+        // Validar teléfono duplicado (excluyendo la clienta actual)
+        if ($telefono !== '') {
+            $existeTel = Cliente::getByTelefono($telefono);
+            if ($existeTel !== null && $existeTel->getId() !== $id) {
+                $_SESSION['error_cliente'] = 'El teléfono ya está registrado para ' . $existeTel->getNombre() . '.';
+                header('Location: ' . BASE_URL . '/index.php?page=ficha-cliente&id=' . $id);
+                exit;
+            }
+        }
+
         $cliente->setNombre($nombre);
         $cliente->setTelefono($telefono);
         $cliente->setEmail($email);
@@ -131,6 +185,14 @@ class ClienteController {
             exit;
         }
 
+        // Validar medidas
+        $errorMedidas = self::validarMedidas($_POST);
+        if ($errorMedidas !== null) {
+            $_SESSION['error_cliente'] = $errorMedidas;
+            header('Location: ' . BASE_URL . '/index.php?page=ficha-cliente&id=' . $clienteId);
+            exit;
+        }
+
         $ficha = new FichaCliente(
             0,
             $clienteId,
@@ -167,5 +229,3 @@ class ClienteController {
         exit;
     }
 }
-
-// ClienteController se ejecuta desde index.php con dispatch() cuando es necesario
