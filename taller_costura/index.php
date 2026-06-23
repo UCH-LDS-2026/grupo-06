@@ -11,6 +11,7 @@ if (isset($_SESSION['admin_id'])) {
     require_once 'controllers/AlertaController.php';
     $alertaCtrl = new AlertaController();
     $alertaCtrl->verificarVencimientos($_SESSION['admin_id']);
+    $alertaCtrl->verificarMorosos($_SESSION['admin_id']);
 }
 
 // Rutas AJAX de encargos (estado, pago-detalle, observaciones, editar) — salen antes de cualquier output
