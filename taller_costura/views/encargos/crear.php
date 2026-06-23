@@ -9,11 +9,19 @@ $db   = Database::getInstance()->getConnection();
 $stmt = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
 $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$clienteSeleccionado = null;
-$clienteIdInicial = $_POST['cliente_id'] ?? $_GET['cliente_id'] ?? null;
-if (!empty($clienteIdInicial)) {
+$clienteSeleccionado      = null;
+$clienteIdPreseleccionado = '';
+
+// Prioridad: POST (resubmit con error) → GET (viene de ficha cliente)
+$clienteIdBuscar = $_POST['cliente_id'] ?? $_GET['cliente_id'] ?? '';
+
+if (!empty($clienteIdBuscar)) {
     foreach ($clientes as $c) {
-        if ($c['id'] == $clienteIdInicial) { $clienteSeleccionado = $c['nombre']; break; }
+        if ($c['id'] == $clienteIdBuscar) {
+            $clienteSeleccionado      = $c['nombre'];
+            $clienteIdPreseleccionado = $c['id'];
+            break;
+        }
     }
 }
 ?>
@@ -54,7 +62,7 @@ if (!empty($clienteIdInicial)) {
             <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
                    placeholder="Escribí para buscar un cliente..."
                    value="<?= htmlspecialchars($clienteSeleccionado ?? '') ?>">
-            <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($clienteIdInicial ?? '') ?>">
+            <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($clienteIdPreseleccionado) ?>">
             <div id="clienteLista" class="cliente-lista"
                  style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #e3d8cc; border-radius:var(--r-m); max-height:220px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
           </div>
