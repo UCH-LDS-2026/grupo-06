@@ -205,8 +205,6 @@ body {
     box-shadow: 0 24px 50px -28px rgba(36, 18, 70, 0.35);
 }
 
-.card + .card { margin-top: 1.25rem; }
-
 .card-titulo {
     font-family: 'Source Serif 4', Georgia, serif;
     font-weight: 600;
@@ -228,7 +226,7 @@ body {
 }
 
 .alerta-error { background: var(--error-bg); border: .5px solid var(--error-bd); color: var(--error-tx); }
-.alerta-exito { background: var(--exito-bg); border: .5px solid var(--exito-bd); color: var(--exito-tx); }
+.alerta-ok    { background: var(--exito-bg); border: .5px solid var(--exito-bd); color: var(--exito-tx); }
 
 /* ───────────────── Campos ───────────────── */
 .campo { margin-bottom: 1.15rem; }
@@ -352,23 +350,8 @@ body {
 .separador::before { left: 0; }
 .separador::after { right: 0; }
 
-/* ───────────────── Sección cambio de contraseña ───────────────── */
-#seccion-cambio {
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    margin-top: 0;
-    padding: 0 2rem;
-    transition: max-height .4s ease, opacity .3s ease, margin-top .3s ease, padding .3s ease;
-    border-radius: 22px;
-}
-
-#seccion-cambio.visible {
-    max-height: 760px;
-    opacity: 1;
-    margin-top: 1.25rem;
-    padding: 2.25rem 2rem;
-}
+/* ───────────────── Sección cambio — oculta por defecto ───────────────── */
+#seccion-cambio { display: none; }
 
 /* ───────────────── Accesibilidad ───────────────── */
 .btn:focus-visible,
