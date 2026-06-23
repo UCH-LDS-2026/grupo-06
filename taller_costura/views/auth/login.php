@@ -117,9 +117,10 @@ unset($_SESSION['exito_cambio']);
                 <p class="eyebrow">Sistema de gestión</p>
             </div>
 
-            <div class="card">
+            <!-- Card login -->
+            <div class="card" id="seccion-login">
                 <h2 class="card-titulo">Ingresar al sistema</h2>
-                <?php if ($error): ?> <div class="alerta alerta-error"><?= htmlspecialchars($error) ?></div> <?php endif; ?>
+                <?php if ($error): ?><div class="alerta alerta-error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
                 <form action="<?= BASE_URL ?>/index.php" method="POST">
                     <input type="hidden" name="accion" value="login">
                     <div class="campo">
@@ -156,15 +157,18 @@ unset($_SESSION['exito_cambio']);
                     <button type="submit" class="btn btn--primary">Ingresar</button>
                 </form>
                 <div class="separador">¿Olvidaste tu contraseña?</div>
-                <button class="btn btn--secondary" onclick="toggleCambio()">Cambiar contraseña</button>
+                <button class="btn btn--secondary" onclick="mostrarCambio()">Cambiar contraseña</button>
             </div>
 
+            <!-- Card cambio de contraseña -->
             <div class="card" id="seccion-cambio">
                 <h2 class="card-titulo">Cambiar contraseña</h2>
+                <?php if ($errorCambio): ?><div class="alerta alerta-error"><?= htmlspecialchars($errorCambio) ?></div><?php endif; ?>
+                <?php if ($exitoCambio): ?><div class="alerta alerta-ok"><?= htmlspecialchars($exitoCambio) ?></div><?php endif; ?>
                 <form action="<?= BASE_URL ?>/index.php" method="POST">
                     <input type="hidden" name="accion" value="cambiar_contrasena">
                     <div class="campo">
-                        <label for="email_cambio">Email del administrador</label>
+                        <label for="email_cambio">Email</label>
                         <div class="input-wrap">
                             <svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <circle cx="12" cy="8" r="3.4"/>
@@ -239,6 +243,8 @@ unset($_SESSION['exito_cambio']);
                     </div>
                     <button type="submit" class="btn btn--primary">Guardar</button>
                 </form>
+                <div class="separador"></div>
+                <button class="btn btn--secondary" onclick="mostrarLogin()">← Volver al inicio de sesión</button>
             </div>
 
         </div>
@@ -246,8 +252,14 @@ unset($_SESSION['exito_cambio']);
 </div>
 
 <script>
-    function toggleCambio() {
-        document.getElementById('seccion-cambio').classList.toggle('visible');
+    function mostrarCambio() {
+        document.getElementById('seccion-login').style.display = 'none';
+        document.getElementById('seccion-cambio').style.display = 'block';
+    }
+
+    function mostrarLogin() {
+        document.getElementById('seccion-cambio').style.display = 'none';
+        document.getElementById('seccion-login').style.display = 'block';
     }
 
     function toggleOjo(btn) {
@@ -262,8 +274,9 @@ unset($_SESSION['exito_cambio']);
         btn.setAttribute('aria-label', esOculta ? 'Ocultar contraseña' : 'Mostrar contraseña');
     }
 
+    // Si hay error o éxito tras cambiar contraseña, mostrar ese card directamente
     <?php if ($errorCambio || $exitoCambio): ?>
-        document.getElementById('seccion-cambio').classList.add('visible');
+        mostrarCambio();
     <?php endif; ?>
 </script>
 </body>
