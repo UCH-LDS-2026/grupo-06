@@ -310,6 +310,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function cerrarModalPago() {
   document.getElementById('modalPago').style.display = 'none';
+  document.getElementById('inputMonto').value = '';
+  document.getElementById('inputNota').value  = '';
+  document.getElementById('inputMontoHint').textContent = '';
+  document.getElementById('btnConfirmarPago').disabled = false;
+  const efectivo = document.querySelector('input[name="detalle_metodo_pago"][value="efectivo"]');
+  if (efectivo) efectivo.checked = true;
 }
 
 function validarMontoDetalle(input) {

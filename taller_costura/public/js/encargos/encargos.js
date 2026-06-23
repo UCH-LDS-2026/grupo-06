@@ -74,8 +74,17 @@ function abrirModalEncargo() {
   document.body.style.overflow = 'hidden';
 }
 function cerrarModalEncargo() {
-  document.getElementById('modalEncargo').classList.remove('visible');
+  const modal = document.getElementById('modalEncargo');
+  modal.classList.remove('visible');
   document.body.style.overflow = '';
+  modal.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], textarea').forEach(el => el.value = '');
+  modal.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  const clienteHidden = document.getElementById('cliente_id');
+  const clienteBusqueda = document.getElementById('clienteBusqueda');
+  if (clienteHidden) clienteHidden.value = '';
+  if (clienteBusqueda) clienteBusqueda.value = '';
+  const errorDiv = document.getElementById('modal-error-encargo');
+  if (errorDiv) errorDiv.style.display = 'none';
 }
 
 // ── index.php: modal todos los entregados ───────────────
