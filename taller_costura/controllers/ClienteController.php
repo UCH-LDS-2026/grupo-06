@@ -4,6 +4,8 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/Cliente.php';
 require_once __DIR__ . '/../models/FichaCliente.php';
+require_once __DIR__ . '/../models/Encargo.php';
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 
 class ClienteController {
@@ -28,7 +30,7 @@ class ClienteController {
                 return "{$label} debe estar entre 1 y 300 cm.";
             }
         }
-        return null; // todo ok
+        return null;
     }
 
     // =========================================================================
@@ -161,6 +163,20 @@ class ClienteController {
         if ($cliente === null) {
             $_SESSION['error_cliente'] = 'Clienta no encontrada.';
             header('Location: ' . BASE_URL . '/index.php?page=clientes');
+            exit;
+        }
+
+        // Verificar encargos activos
+        $db      = Database::getInstance()->getConnection();
+        $encargo = new Encargo($db);
+        $stmt    = $encargo->getByClienteId($id);
+        $todos   = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $activos = array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente', 'en_proceso', 'listo']));
+
+        if (count($activos) > 0) {
+            $cant = count($activos);
+            $_SESSION['error_cliente'] = "No se puede eliminar a {$cliente->getNombre()} porque tiene {$cant} encargo" . ($cant === 1 ? '' : 's') . " activo" . ($cant === 1 ? '' : 's') . ". Finalizalos antes de eliminar la clienta.";
+            header('Location: ' . BASE_URL . '/index.php?page=ficha-cliente&id=' . $id);
             exit;
         }
 
