@@ -56,6 +56,29 @@ class AlertaController {
     }
 
     /**
+ * Verifica encargos vencidos con saldo pendiente y genera alertas de morosos
+ * Se llama al hacer login
+ */
+    public function verificarMorosos($administrador_id) {
+        $encargos = $this->alertaModel->getEncargosVencidosConSaldo($administrador_id);
+
+        foreach ($encargos as $encargo) {
+            $diasVencido = (strtotime('today') - strtotime($encargo['fecha_entrega'])) / 86400;
+            $cliente = $encargo['nombre_cliente'] ? " de {$encargo['nombre_cliente']}" : '';
+            $saldo = '$' . number_format($encargo['saldo_pendiente'], 0, ',', '.');
+
+            $mensaje = "{$encargo['tipo']}{$cliente} venció hace {$diasVencido} día/s y tiene saldo pendiente de {$saldo}.";
+
+            $this->alertaModel->generarAlerta(
+                $administrador_id,
+                $encargo['id'],
+                $mensaje,
+                'pago'
+            );
+        }
+    }
+
+    /**
      * Marca una alerta como leída
      */
     public function marcarLeida($alerta_id) {

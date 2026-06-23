@@ -92,4 +92,25 @@ public function limpiarViejas($administrador_id) {
             )";
     $this->db->query($sql, [$administrador_id, $administrador_id]);
 }
+/**
+ * Busca encargos vencidos con saldo pendiente (morosos)
+ */
+public function getEncargosVencidosConSaldo($administrador_id) {
+    $sql = "SELECT e.id, e.tipo, e.fecha_entrega, 
+                   (e.monto_total - e.sena) AS saldo_pendiente,
+                   c.nombre as nombre_cliente
+            FROM encargo e
+            LEFT JOIN cliente c ON e.cliente_id = c.id
+            WHERE e.administrador_id = ?
+            AND e.estado NOT IN ('entregado')
+            AND e.fecha_entrega < CURDATE()
+            AND (e.monto_total - e.sena) > 0
+            AND e.id NOT IN (
+                SELECT encargo_id FROM alerta
+                WHERE administrador_id = ?
+                AND tipo = 'pago'
+                AND DATE(fecha) = CURDATE()
+            )";
+    return $this->db->fetchAll($sql, [$administrador_id, $administrador_id]);
+}
 }
