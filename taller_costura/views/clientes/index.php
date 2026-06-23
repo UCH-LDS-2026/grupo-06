@@ -153,29 +153,29 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
             <div class="form-row-3" style="margin-bottom:12px">
                 <div class="form-group">
                     <label>Contorno de Busto</label>
-                    <div class="input-cm"><input type="number" name="contorno_pecho" placeholder="—" step="0.5" min="0"><span>cm</span></div>
+                    <div class="input-cm"><input type="number" name="contorno_pecho" placeholder="—" step="0.5" min="1" max="300"><span>cm</span></div>
                 </div>
                 <div class="form-group">
                     <label>Contorno de Cintura</label>
-                    <div class="input-cm"><input type="number" name="contorno_cintura" placeholder="—" step="0.5" min="0"><span>cm</span></div>
+                    <div class="input-cm"><input type="number" name="contorno_cintura" placeholder="—" step="0.5" min="1" max="300"><span>cm</span></div>
                 </div>
                 <div class="form-group">
                     <label>Contorno de Cadera</label>
-                    <div class="input-cm"><input type="number" name="contorno_cadera" placeholder="—" step="0.5" min="0"><span>cm</span></div>
+                    <div class="input-cm"><input type="number" name="contorno_cadera" placeholder="—" step="0.5" min="1" max="300"><span>cm</span></div>
                 </div>
             </div>
             <div class="form-row-3">
                 <div class="form-group">
                     <label>Largo de Espalda</label>
-                    <div class="input-cm"><input type="number" name="largo_espalda" placeholder="—" step="0.5" min="0"><span>cm</span></div>
+                    <div class="input-cm"><input type="number" name="largo_espalda" placeholder="—" step="0.5" min="1" max="300"><span>cm</span></div>
                 </div>
                 <div class="form-group">
                     <label>Largo de Manga</label>
-                    <div class="input-cm"><input type="number" name="largo_manga" placeholder="—" step="0.5" min="0"><span>cm</span></div>
+                    <div class="input-cm"><input type="number" name="largo_manga" placeholder="—" step="0.5" min="1" max="300"><span>cm</span></div>
                 </div>
                 <div class="form-group">
                     <label>Largo de Pantalón</label>
-                    <div class="input-cm"><input type="number" name="largo_pantalon" placeholder="—" step="0.5" min="0"><span>cm</span></div>
+                    <div class="input-cm"><input type="number" name="largo_pantalon" placeholder="—" step="0.5" min="1" max="300"><span>cm</span></div>
                 </div>
             </div>
             <div class="modal-footer">
