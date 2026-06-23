@@ -28,7 +28,12 @@ $encargos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $totalEncargos  = count($encargos);
 $activos        = count(array_filter($encargos, fn($e) => in_array($e['estado'], ['pendiente', 'en_proceso'])));
-$saldoPendiente = array_sum(array_map(fn($e) => $e['monto_total'] - $e['sena'], $encargos));
+$saldoPendiente = array_sum(array_map(
+    fn($e) => in_array($e['estado'], ['pendiente', 'en_proceso', 'listo'])
+        ? $e['monto_total'] - $e['sena']
+        : 0,
+    $encargos
+));
 
 $exito = $_SESSION['exito_cliente'] ?? null;
 $error = $_SESSION['error_cliente'] ?? null;
