@@ -1007,73 +1007,109 @@ textarea.form-control { resize: vertical; min-height: 100px; }
 }
 
 /* ── RESPONSIVE ───────────────────────────────────────────── */
+/* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 768px) {
-    .stats-grid  { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .main-wrapper {
+        margin-left: 0 !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+        padding-left: 10px;
+        padding-right: 10px;
+        box-sizing: border-box;
+    }
+
+    body { overflow-x: hidden; width: 100%; }
+
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+
     .det-grid    { grid-template-columns: 1fr; }
     .form-row    { grid-template-columns: 1fr; }
     .estado-grid { grid-template-columns: 1fr; }
-    .det-top h1  { font-size: 1.9rem; }
     .card, .form-section { padding: 20px; }
-    .modal-box   { padding: 24px 20px; }
 
-    .main-wrapper { margin-left: 0; max-width: 100vw; }
+    .page-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        margin-top: 60px;
+    }
+    .page-top h1 { font-size: 1.7rem; }
+    .page-top p  { font-size: 0.7rem; }
+    .btn-nuevo   { width: 100%; justify-content: center; }
 
-    .ag-header,
     .det-top {
         flex-direction: column;
         align-items: stretch;
         gap: 14px;
+        margin-top: 60px;
     }
-    .ag-header h1, .det-top h1 { font-size: 1.6rem; }
+    .det-top h1 { font-size: 1.7rem; }
 
-    .ag-header-actions {
+    .toolbar {
         flex-direction: column;
         align-items: stretch;
-        width: 100%;
+        gap: 10px;
     }
-    
-    .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
     .search-wrap { max-width: none; }
-    .btn-nuevo { width: 100%; }
 
-    .card-encargo { flex-direction: column; align-items: stretch; padding: 16px; gap: 12px; }
+    .enc-date-picker {
+        right: auto;
+        left: 0;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .card-encargo {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+        gap: 12px;
+    }
     .card-fecha {
-        flex-direction: row; justify-content: flex-start; align-items: center;
-        min-width: 0; width: 100%; padding-right: 0; padding-bottom: 12px;
-        border-right: none; border-bottom: 0.5px solid var(--borde); gap: 8px;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        min-width: 0;
+        width: 100%;
+        padding-right: 0;
+        padding-bottom: 12px;
+        border-right: none;
+        border-bottom: 0.5px solid var(--borde);
+        gap: 8px;
     }
     .card-fecha .dia { font-size: 1.4rem; }
-    .card-fecha .atrasado, .card-fecha .hoy { margin-top: 0; margin-left: auto; }
-    .card-info h3, .card-info .cliente, .card-info .desc {
-        white-space: normal; overflow: visible; text-overflow: clip;
-    }
+    .card-fecha .atrasado,
+    .card-fecha .hoy { margin-top: 0; margin-left: auto; }
+    .card-info h3,
+    .card-info .cliente,
+    .card-info .desc { white-space: normal; overflow: visible; text-overflow: clip; }
     .card-montos { flex-direction: column; gap: 4px; }
     .card-encargo > div:last-child { align-self: flex-start; }
+
+    .modal-box   { padding: 24px 20px; }
+    .modal-encargo { max-width: 95vw; }
+    .modal-encargo-grid { grid-template-columns: 1fr; gap: 0; }
+}
+
+@media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .stat-card { padding: 14px 12px; gap: 10px; border-radius: 14px; }
+    .stat-icon { width: 42px; height: 42px; }
+    .stat-icon svg { width: 20px; height: 20px; }
+    .stat-val  { font-size: 1.6rem; }
+    .stat-lbl  { font-size: 0.62rem; }
+
+    .section-title { font-size: 1.15rem; margin: 20px 0 12px; }
+
+    .enc-paginacion { gap: 8px; margin: 12px 0 20px; }
+    .enc-pag-btn { width: 26px; height: 26px; font-size: 0.78rem; }
 }
 
 @media (max-width: 420px) {
-    .stats-grid { grid-template-columns: 1fr; }
-}
-
-/* ── MODAL NUEVO ENCARGO (dos columnas, más ancho) ───────── */
-.modal-encargo {
-    max-width: 880px;
-    max-height: 88vh;
-    overflow-y: auto;
-}
-
-.modal-encargo-grid {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 28px;
-    align-items: start;
-}
-
-.modal-encargo-col .divider { margin: 18px 0; }
-
-@media (max-width: 720px) {
-    .modal-encargo { max-width: 92vw; }
-    .modal-encargo-grid { grid-template-columns: 1fr; gap: 0; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+    .stat-card  { padding: 12px 10px; }
+    .stat-val   { font-size: 1.4rem; }
 }
 
 /* ── Filtros barra encargos ─────────────────────── */
