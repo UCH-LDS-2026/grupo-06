@@ -38,7 +38,12 @@ function initClienteAutocomplete(listaClientes) {
     inputHidden.value = '';
     renderLista(inputBusqueda.value);
   });
-  inputBusqueda.addEventListener('focus', () => renderLista(inputBusqueda.value));
+  inputBusqueda.addEventListener('focus', () => {
+    if (!inputHidden.value && inputBusqueda.value !== 'Sin cliente...') {
+      inputBusqueda.value = '';
+    }
+    renderLista(inputBusqueda.value);
+  });
 
   listaEl.addEventListener('click', (e) => {
     const opcion = e.target.closest('.cliente-opcion');
