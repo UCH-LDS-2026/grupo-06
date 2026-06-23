@@ -95,14 +95,15 @@ class Cliente {
      */
     public static function buscar(string $termino): array {
         $pdo  = Database::getInstance()->getConnection();
-        $stmt = $pdo->prepare(
+       $stmt = $pdo->prepare(
             "SELECT id, nombre, telefono, email, created_at
-             FROM cliente
-             WHERE nombre LIKE :termino
-                OR email  LIKE :termino
-             ORDER BY nombre"
+            FROM cliente
+            WHERE nombre LIKE :termino1
+                OR email  LIKE :termino2
+            ORDER BY nombre"
         );
-        $stmt->execute([':termino' => '%' . $termino . '%']);
+        $like = '%' . $termino . '%';
+        $stmt->execute([':termino1' => $like, ':termino2' => $like]);
  
         $lista = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
