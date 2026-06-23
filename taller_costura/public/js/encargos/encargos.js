@@ -85,6 +85,7 @@ function cerrarModalEntregados() {
 
 // ── index.php: paginación ────────────────────────────────
 let encFiltroEstados = [];
+let encFiltroSinCliente = false;
 let encPaginaActual  = 1;
 const ENC_POR_PAG    = 5;
 let encTodasVisibles = [];
@@ -123,6 +124,13 @@ function filtrarPorEstadoCard(estados) {
   filtrarEncargos();
 }
 
+function filtrarSinCliente() {
+  encFiltroSinCliente = true;
+  filtrarEncargos();
+  document.getElementById('enc-limpiar-btn').style.display = '';
+  document.getElementById('enc-section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function filtrarEncargos() {
   const textoVal = document.getElementById('enc-q').value || '';
   const texto    = textoVal.toLowerCase();
@@ -136,12 +144,13 @@ function filtrarEncargos() {
     const estado  = card.dataset.estado || '';
 
     const okTexto  = !texto || cliente.includes(texto) || tipo.includes(texto);
-    const okEstado = encFiltroEstados.length === 0 || encFiltroEstados.includes(estado);
+    const okEstado     = encFiltroEstados.length === 0 || encFiltroEstados.includes(estado);
+    const okSinCliente = !encFiltroSinCliente || card.dataset.sinCliente === '1';
     let   okFecha  = true;
     if (desde && fecha < desde) okFecha = false;
     if (hasta && fecha > hasta) okFecha = false;
 
-    return okTexto && okEstado && okFecha;
+    return okTexto && okEstado && okFecha && okSinCliente;
   });
 
   encPaginaActual = 1;
@@ -153,6 +162,7 @@ function filtrarEncargos() {
 
 function limpiarFiltrosEnc() {
   encFiltroEstados = [];
+  encFiltroSinCliente = false;
   document.getElementById('enc-q').value      = '';
   document.getElementById('enc-desde').value  = '';
   document.getElementById('enc-hasta').value  = '';

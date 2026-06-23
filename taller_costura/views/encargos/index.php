@@ -43,6 +43,8 @@ $estadisticas = [
     'pendiente_pago' => array_sum(array_column($todos, 'monto_total')) - array_sum(array_column($todos, 'sena')),
 ];
 
+$sinCliente = count(array_filter($todos, fn($e) => empty($e['cliente_nombre'])));
+
 function fmtMonto($n) { return '$' . number_format($n, 0, ',', '.'); }
 function estadoBadge($estado) {
     $map = [
@@ -63,6 +65,14 @@ function estadoBadge($estado) {
     </div>
     <a href="#" class="btn-nuevo" onclick="abrirModalEncargo(); return false;">+ Nuevo Encargo</a>
 </div>
+
+<?php if ($sinCliente > 0): ?>
+<div class="alerta-sin-cliente" onclick="filtrarSinCliente()" style="cursor:pointer;" title="Ver encargos sin cliente">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <?= $sinCliente === 1 ? 'Hay 1 encargo sin cliente asignado.' : "Hay {$sinCliente} encargos sin cliente asignado." ?>
+  &nbsp;— <strong>Ver</strong>
+</div>
+<?php endif; ?>
 
 <div class="stats-grid">
   <div class="stat-card stat-card--activos" onclick="filtrarPorEstadoCard(['pendiente','en_proceso','listo'])" style="cursor:pointer;" title="Filtrar encargos activos">
@@ -134,8 +144,7 @@ function estadoBadge($estado) {
     $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
     $saldo = $enc['monto_total'] - $enc['sena'];
   ?>
-  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo" data-estado="<?= $enc['estado'] ?>" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>">
-    <div class="card-fecha">
+      <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo" data-estado="<?= $enc['estado'] ?>" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>" data-sin-cliente="<?= empty($enc['cliente_nombre']) ? '1' : '0' ?>">    <div class="card-fecha">
       <span class="dia"><?= $dia ?></span>
       <span class="mes"><?= $mes ?></span>
       <?php if ($diff < 0): ?><span class="atrasado">Atrasado <?= abs($diff) ?>d</span>
@@ -156,7 +165,12 @@ function estadoBadge($estado) {
         &nbsp;·&nbsp; Pendiente: <span class="pend"><?= fmtMonto($saldo) ?></span>
       </p>
     </div>
-    <div><?= estadoBadge($enc['estado']) ?></div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+      <?= estadoBadge($enc['estado']) ?>
+      <?php if (empty($enc['cliente_nombre'])): ?>
+        <span class="badge-sin-cliente">⚠</span>
+      <?php endif; ?>
+    </div>
   </a>
   <?php endforeach; ?>
 <?php else: ?>
