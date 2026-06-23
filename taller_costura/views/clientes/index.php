@@ -1,4 +1,3 @@
-
 <?php
 require_once BASE_PATH . '/models/Cliente.php';
 require_once BASE_PATH . '/models/FichaCliente.php';
@@ -29,14 +28,7 @@ $error = $_SESSION['error_cliente'] ?? null;
 unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 ?>
 
-<?php if ($exito): ?>
-    <div class="alerta alerta-ok"><?= htmlspecialchars($exito) ?></div>
-<?php endif; ?>
-<?php if ($error): ?>
-    <div class="alerta alerta-err"><?= htmlspecialchars($error) ?></div>
-<?php endif; ?>
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/homeCliente.css">
-
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <div class="page-top">
@@ -56,7 +48,6 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     <a href="?page=clientes&filtro=sin_ficha">Ver los clientes</a>
 </div>
 <?php endif; ?>
-
 
 <form method="GET" action="" class="toolbar-form">
     <input type="hidden" name="page" value="clientes">
@@ -196,3 +187,14 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 </div>
 
 <script src="<?= BASE_URL ?>/public/js/cliente/clientes.js"></script>
+
+<?php if ($error): ?>
+<script>
+document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($error) ?>, false));
+</script>
+<?php endif; ?>
+<?php if ($exito): ?>
+<script>
+document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($exito) ?>));
+</script>
+<?php endif; ?>

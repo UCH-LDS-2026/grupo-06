@@ -51,7 +51,7 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
     <a href="index.php?page=editar-encargo&id=<?= $enc['id'] ?>" class="btn-cancel" style="display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border-radius: 999px; font-size: 0.85rem; text-decoration: none;">      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
       Editar Encargo
     </a>
-    <button onclick="eliminarEncargo(<?= $enc['id'] ?>)" class="btn-cancel" style="display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border-radius: 999px; font-size: 0.85rem; color: #b05040; border-color: rgba(176,80,64,0.2); background: transparent; cursor: pointer;">
+    <button onclick="eliminarEncargo(<?= $enc['id'] ?>, <?= $totalPagado ?>)" class="btn-cancel" style="display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border-radius: 999px; font-size: 0.85rem; color: #b05040; border-color: rgba(176,80,64,0.2); background: transparent; cursor: pointer;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
       Eliminar Encargo
     </button>
@@ -246,30 +246,53 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
 
 </div>
 
-<div class="modal-overlay" id="modalPago" style="display:none">
+<div class="modal-overlay" id="modalPago" style="display:none" onclick="if(event.target===this) cerrarModalPago()">
   <div class="modal-box">
-    <h3>Registrar Pago</h3>
-    <p class="modal-sub">Saldo pendiente: <strong id="modalSaldo"><?= fmtMonto($saldo) ?></strong></p>
-    <div class="form-group" style="margin-bottom:16px">
-      <label>Monto</label>
-      <input type="number" id="inputMonto" class="form-control" placeholder="0" min="1" step="1">
+    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h3 style="margin:0;">Registrar Pago</h3>
+      <button onclick="cerrarModalPago()" style="background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--texto-sec);">&times;</button>
     </div>
-    <div class="form-group" style="margin-bottom:16px">
+
+    <div style="background:var(--bg-input,#f8f5f1); border-radius:10px; padding:12px 16px; margin-bottom:20px; font-size:0.87rem; line-height:1.7;">
+      <strong><?= htmlspecialchars($enc['tipo']) ?></strong><br>
+      <?php if ($cliente): ?><span><?= htmlspecialchars($cliente['nombre']) ?></span><br><?php endif; ?>
+      Total: <strong><?= fmtMonto($enc['monto_total']) ?></strong> &nbsp;|&nbsp;
+      Pagado: <strong><?= fmtMonto($totalPagado) ?></strong><br>
+      Saldo pendiente: <strong id="modalSaldo" style="color:#b05040;"><?= fmtMonto($saldo) ?></strong>
+    </div>
+
+    <div class="form-group" style="margin-bottom:8px;">
+      <label>Monto a registrar</label>
+      <input type="number" id="inputMonto" class="form-control" placeholder="Ej: 3000" min="1" step="1" oninput="validarMontoDetalle(this)">
+      <div id="inputMontoHint" style="font-size:0.8rem; margin-top:5px; min-height:18px; color:#b05040;"></div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:20px;">
       <label>Método de pago</label>
-      <select id="selectMetodo" class="form-control">
-        <option value="efectivo">Efectivo</option>
-        <option value="transferencia">Transferencia</option>
-        <option value="tarjeta">Tarjeta</option>
-        <option value="otro">Otro</option>
-      </select>
+      <div style="display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;">
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.87rem;">
+          <input type="radio" name="detalle_metodo_pago" value="efectivo" checked> Efectivo
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.87rem;">
+          <input type="radio" name="detalle_metodo_pago" value="transferencia"> Transferencia
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.87rem;">
+          <input type="radio" name="detalle_metodo_pago" value="tarjeta"> Tarjeta
+        </label>
+      </div>
     </div>
-    <div class="form-group" style="margin-bottom:24px">
+
+    <div class="form-group" style="margin-bottom:24px;">
       <label>Nota (opcional)</label>
       <input type="text" id="inputNota" class="form-control" placeholder="Ej: Seña 50%">
     </div>
+
     <div class="modal-actions">
-      <button class="btn-cancel" id="btnCerrarModal">Cancelar</button>
-      <button class="btn-submit" id="btnConfirmarPago">Confirmar Pago</button>
+      <button class="btn-cancel" onclick="cerrarModalPago()">Cancelar</button>
+      <button class="btn-submit" id="btnConfirmarPago">
+        Confirmar Pago
+        <span id="spinnerPago" style="display:none; margin-left:6px;">⏳</span>
+      </button>
     </div>
   </div>
 </div>
@@ -278,9 +301,39 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
 
 <script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
 <script>
-  // MONTO_TOTAL lo necesita el modal de pago; lo inyectamos en el data del elemento
-  document.addEventListener('DOMContentLoaded', () => {
-    const fill = document.getElementById('progresoFill');
-    if (fill) fill.dataset.total = <?= (float)$enc['monto_total'] ?>;
-  });
+const SALDO_PENDIENTE_DETALLE = <?= $saldo ?>;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const fill = document.getElementById('progresoFill');
+  if (fill) fill.dataset.total = <?= (float)$enc['monto_total'] ?>;
+});
+
+function cerrarModalPago() {
+  document.getElementById('modalPago').style.display = 'none';
+  document.getElementById('inputMonto').value = '';
+  document.getElementById('inputNota').value  = '';
+  document.getElementById('inputMontoHint').textContent = '';
+  document.getElementById('btnConfirmarPago').disabled = false;
+  const efectivo = document.querySelector('input[name="detalle_metodo_pago"][value="efectivo"]');
+  if (efectivo) efectivo.checked = true;
+}
+
+function validarMontoDetalle(input) {
+  const hint = document.getElementById('inputMontoHint');
+  const btn  = document.getElementById('btnConfirmarPago');
+  const val  = parseFloat(input.value);
+  const saldoActual = parseFloat(document.getElementById('progresoFill').dataset.total)
+                    - parseFloat(document.getElementById('spanTotalPagado').textContent.replace(/[^0-9]/g,''));
+
+  if (isNaN(val) || val <= 0) {
+    hint.textContent = 'Ingresá un monto mayor a cero.';
+    btn.disabled = true;
+  } else if (val > SALDO_PENDIENTE_DETALLE) {
+    hint.textContent = 'El monto no puede superar el saldo pendiente.';
+    btn.disabled = true;
+  } else {
+    hint.textContent = '';
+    btn.disabled = false;
+  }
+}
 </script>

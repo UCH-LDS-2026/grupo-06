@@ -9,10 +9,19 @@ $db   = Database::getInstance()->getConnection();
 $stmt = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
 $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$clienteSeleccionado = null;
-if (!empty($_POST['cliente_id'])) {
+$clienteSeleccionado      = null;
+$clienteIdPreseleccionado = '';
+
+// Prioridad: POST (resubmit con error) → GET (viene de ficha cliente)
+$clienteIdBuscar = $_POST['cliente_id'] ?? $_GET['cliente_id'] ?? '';
+
+if (!empty($clienteIdBuscar)) {
     foreach ($clientes as $c) {
-        if ($c['id'] == $_POST['cliente_id']) { $clienteSeleccionado = $c['nombre']; break; }
+        if ($c['id'] == $clienteIdBuscar) {
+            $clienteSeleccionado      = $c['nombre'];
+            $clienteIdPreseleccionado = $c['id'];
+            break;
+        }
     }
 }
 ?>
@@ -37,15 +46,12 @@ if (!empty($_POST['cliente_id'])) {
   <div class="det-grid">
 
     <div>
-      <div class="card">
+      <div class="card" style="overflow: visible;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <h3 style="margin-bottom:0;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             Cliente
           </h3>
-          <a href="<?= $baseUrl ?>/index.php?page=clientes" class="btn-ficha"
-             style="margin-top:0; text-decoration:none; font-size:1.2rem; font-weight:700; color: var(--accent); line-height:1;"
-             title="Agregar nuevo cliente">+!!!!!!!</a>
         </div>
 
         <div class="form-group" style="margin-top:20px; margin-bottom:0;">
@@ -53,7 +59,7 @@ if (!empty($_POST['cliente_id'])) {
             <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
                    placeholder="Escribí para buscar un cliente..."
                    value="<?= htmlspecialchars($clienteSeleccionado ?? '') ?>">
-            <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($_POST['cliente_id'] ?? '') ?>">
+            <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($clienteIdPreseleccionado) ?>">
             <div id="clienteLista" class="cliente-lista"
                  style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #e3d8cc; border-radius:var(--r-m); max-height:220px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
           </div>

@@ -46,15 +46,12 @@ $error   = isset($_GET['error']);
 <div class="det-grid">
 
   <div>
-    <div class="card">
+    <div class="card" style="overflow: visible;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <h3 style="margin-bottom:0;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           Cliente
         </h3>
-        <a href="<?= $baseUrl ?>/index.php?page=clientes" class="btn-ficha"
-           style="margin-top:0; text-decoration:none; font-size:1.2rem; font-weight:700; color: var(--accent); line-height:1;"
-           title="Agregar nuevo cliente">+</a>
       </div>
 
       <div class="form-group" style="margin-top:20px; margin-bottom:0;">
@@ -97,6 +94,7 @@ $error   = isset($_GET['error']);
       <div class="form-group" style="margin-bottom:0;">
         <label for="fecha_entrega">Fecha de Entrega *</label>
         <input type="date" name="fecha_entrega" id="fecha_entrega" class="form-control" required
+       min="<?= date('Y-m-d', strtotime($enc['created_at'])) ?>"
                value="<?= htmlspecialchars($enc['fecha_entrega']) ?>">
       </div>
     </div>
@@ -146,6 +144,7 @@ $error   = isset($_GET['error']);
     </div>
 
     <div class="card">
+      <div id="editar-error" style="display:none; margin-bottom:16px; padding:10px 14px; background:#fff3f3; color:#b05040; border:1px solid rgba(176,80,64,0.25); border-radius:10px; font-size:0.86rem;"></div>
       <div class="form-actions" style="margin:0; justify-content:space-between;">
         <a href="<?= $baseUrl ?>/index.php?page=detalle-encargo&id=<?= $idEncargo ?>" class="btn-cancel">Cancelar</a>
         <button type="submit" class="btn-submit">
@@ -172,5 +171,27 @@ $error   = isset($_GET['error']);
 <script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
 <script>
 const CLIENTES = <?= json_encode($clientes, JSON_UNESCAPED_UNICODE) ?>;
-document.addEventListener('DOMContentLoaded', () => initClienteAutocomplete(CLIENTES));
+document.addEventListener('DOMContentLoaded', () => {
+  initClienteAutocomplete(CLIENTES);
+
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const total = parseFloat(document.getElementById('monto_total').value) || 0;
+    const sena  = parseFloat(document.getElementById('sena').value) || 0;
+    const errorDiv = document.getElementById('editar-error');
+
+    const errores = [];
+    if (total > 0 && sena > total) {
+      errores.push('La seña / total pagado no puede superar el precio total.');
+    }
+
+    if (errores.length > 0) {
+      e.preventDefault();
+      errorDiv.innerHTML = errores.map(e => `• ${e}`).join('<br>');
+      errorDiv.style.display = 'block';
+      errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      errorDiv.style.display = 'none';
+    }
+  });
+});
 </script>
