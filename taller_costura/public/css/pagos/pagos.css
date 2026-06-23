@@ -1182,3 +1182,62 @@ body {
     color: #e91e8c;
     font-size: 22px;
 }
+.badge-sin-retirar {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
+    background: #fff0ee;
+    color: #c04a00;
+    border: 1px solid #ffc5a0;
+    border-radius: 20px;
+    font-size: .68rem;
+    font-weight: 600;
+    margin-left: 6px;
+}
+/* ── PAGINACIÓN ──────────────────────────────────── */
+.enc-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0 28px;
+}
+
+.enc-pag-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: none;
+    background: var(--acento-gradient);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-btn);
+    transition: all 0.2s var(--ease);
+    flex-shrink: 0;
+}
+
+.enc-pag-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 30, 100, 0.38);
+}
+
+.enc-pag-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.enc-pag-info {
+    font-size: 0.78rem;
+    color: var(--texto-ter);
+    min-width: 80px;
+    text-align: center;
+    letter-spacing: 0.3px;
+}

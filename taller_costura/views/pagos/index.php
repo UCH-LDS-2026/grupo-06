@@ -175,7 +175,9 @@ function etiquetaEstado(string $estado): string {
                <div class="encargo-card historial-item"
                     data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
                      data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
-                    data-fecha="<?= $e['fecha_entrega'] ?>"> 
+                    data-fecha="<?= $e['fecha_entrega'] ?>"
+                    onclick="window.location.href='index.php?page=detalle-encargo&id=<?= $e['id'] ?>'"
+                    style="cursor: pointer;"> 
  
                     <!-- Fila superior -->
                     <div class="encargo-card-top">
@@ -189,13 +191,16 @@ function etiquetaEstado(string $estado): string {
                                 </p>
                                 <p class="encargo-fecha">
                                     Entrega: <?= date('d/m/Y', strtotime($e['fecha_entrega'])) ?>
+                                    <?php if (strtotime($e['fecha_entrega']) < strtotime('today')): ?>
+                                        <span class="badge-sin-retirar"> Sin retirar</span>
+                                    <?php endif; ?>
                                 </p>
                             </div>
                             <?= etiquetaEstado($e['estado']) ?>
                         </div>
  
                         <button class="btn-registrar"
-                                onclick="abrirModal(
+                                onclick="event.stopPropagation(); abrirModal(
                                     <?= $e['id'] ?>,
                                     '<?= addslashes(htmlspecialchars($e['tipo'])) ?>',
                                     '<?= addslashes(htmlspecialchars($e['cliente_nombre'] ?? 'Sin nombre')) ?>',
@@ -258,8 +263,10 @@ function etiquetaEstado(string $estado): string {
             <?php foreach ($historialPagos as $e): ?>
                 <div class="encargo-card historial-item"
                         data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
-                         data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
-                        data-fecha="<?= $e['fecha_entrega'] ?>">
+                        data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
+                        data-fecha="<?= $e['fecha_entrega'] ?>"
+                        onclick="window.location.href='index.php?page=detalle-encargo&id=<?= $e['id'] ?>'"
+                        style="cursor: pointer;">
                     <div class="encargo-card-top">
                         <div class="encargo-card-top-left">
                             <div>
@@ -367,206 +374,6 @@ function etiquetaEstado(string $estado): string {
  
 <!-- Toast -->
 <div id="toast" class="toast"></div>
- 
-<!-- ══════════════════════════════════════════════════
-     JS
-══════════════════════════════════════════════════ -->
-<script>
-/* Estado del modal */
-let modalData = { encargoId: 0, saldoPendiente: 0 };
- 
-/* ── Tabs ─────────────────────────────────────────── */
-function cambiarTab(tab, btn) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
-    btn.classList.add('active');
-}
- 
-/* ── Modal ────────────────────────────────────────── */
-function abrirModal(id, tipo, cliente, total, sena, saldo) {
-    modalData = { encargoId: id, saldoPendiente: parseFloat(saldo) };
- 
-    document.getElementById('modal-tipo').textContent    = tipo;
-    document.getElementById('modal-cliente').textContent = cliente;
-    document.getElementById('modal-total').textContent   = formatPesos(total);
-    document.getElementById('modal-sena').textContent    = formatPesos(sena);
-    document.getElementById('modal-saldo').textContent   = formatPesos(saldo);
- 
-    const input = document.getElementById('modal-monto');
-    input.value = '';
-    input.max   = saldo;
- 
-    document.getElementById('modal-monto-hint').textContent = '';
-    document.getElementById('modal-monto-hint').className   = 'hint';
-    document.getElementById('btn-confirmar').disabled = false;
- 
-    document.getElementById('modalPago').classList.add('open');
-    setTimeout(() => input.focus(), 80);
-}
- 
-function cerrarModal() {
-    document.getElementById('modalPago').classList.remove('open');
-}
- 
-function cerrarModalSiFondo(e) {
-    if (e.target === document.getElementById('modalPago')) cerrarModal();
-}
- 
-/* ── Validación en tiempo real ───────────────────── */
-function validarMonto(input) {
-    const hint = document.getElementById('modal-monto-hint');
-    const val  = parseFloat(input.value);
-    const btn  = document.getElementById('btn-confirmar');
- 
-    if (isNaN(val) || val <= 0) {
-        hint.textContent = 'Ingresá un monto mayor a cero.';
-        hint.className   = 'hint error';
-        btn.disabled = true;
-    } else if (val > modalData.saldoPendiente) {
-        hint.textContent = 'El monto no puede superar el saldo pendiente (' + formatPesos(modalData.saldoPendiente) + ').';
-        hint.className   = 'hint error';
-        btn.disabled = true;
-    } else {
-        hint.textContent = '';
-        hint.className   = 'hint';
-        btn.disabled = false;
-    }
-}
- 
-/* ── Envío AJAX ──────────────────────────────────── */
-function enviarPago() {
-    const monto = parseFloat(document.getElementById('modal-monto').value);
-    if (!monto || monto <= 0 || monto > modalData.saldoPendiente) return;
- 
-    const btn     = document.getElementById('btn-confirmar');
-    const spinner = document.getElementById('spinner-pago');
-    btn.disabled        = true;
-    spinner.style.display = 'inline-block';
- 
-    const fd = new FormData();
-    fd.append('encargo_id', modalData.encargoId);
-    fd.append('monto',      monto);
-    const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
-    fd.append('metodo_pago', metodoPago);
- 
-    fetch('index.php?page=pagos&accion=registrar', {
-        method:  'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body:    fd
-    })
-    .then(r => r.json())
-    .then(data => {
-        cerrarModal();
-        mostrarToast(data.mensaje, data.ok ? 'ok' : 'error');
-        if (data.ok) {
-            // Recargar la página tras un momento para reflejar el nuevo estado
-            setTimeout(() => location.reload(), 1200);
-        } else {
-            btn.disabled        = false;
-            spinner.style.display = 'none';
-        }
-    })
-    .catch(() => {
-        cerrarModal();
-        mostrarToast('Error de conexión. Intentá de nuevo.', 'error');
-        btn.disabled        = false;
-        spinner.style.display = 'none';
-    });
-}
- 
-function mostrarToast(msg, tipo) {
-    if (tipo !== 'error') {
-        mostrarToastCampana(msg);
-    } else {
-        const t = document.getElementById('toast');
-        if (t) {
-            t.textContent = msg;
-            t.className = 'toast toast-error';
-            void t.offsetWidth;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3200);
-        }
-    }
-}
 
-function mostrarToastCampana(msg) {
-    const toast = document.getElementById('toast-campana');
-    const msgEl = document.getElementById('toast-campana-msg');
-    if (!toast || !msgEl) return;
-
-    msgEl.textContent = msg;
-    toast.style.display = 'flex';
-    void toast.offsetWidth;
-    toast.classList.add('visible');
-
-    setTimeout(() => {
-        toast.classList.remove('visible');
-        setTimeout(() => toast.style.display = 'none', 300);
-    }, 3500);
-}
- 
-/* ── Helper formato ──────────────────────────────── */
-function formatPesos(n) {
-    return '$' + Number(n).toLocaleString('es-AR');
-}
- 
-function toggleCalendarioPago() {
-    const picker = document.getElementById('pago-date-picker');
-    picker.classList.toggle('visible');
-}
-
-// Cerrar el calendario si se clickea afuera
-document.addEventListener('click', function(e) {
-    const picker = document.getElementById('pago-date-picker');
-    const btn = document.getElementById('pago-cal-btn');
-    if (picker && !picker.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-        picker.classList.remove('visible');
-    }
-});
-
-function limpiarFiltros() {
-    document.getElementById('filtro-cliente').value = '';
-    document.getElementById('filtro-desde').value = '';
-    document.getElementById('filtro-hasta').value = '';
-    document.getElementById('pago-limpiar-btn').style.display = 'none';
-    document.getElementById('pago-date-picker').classList.remove('visible');
-    filtrarHistorial();
-}
-
-function filtrarHistorial() {
-    const inputCliente = document.getElementById('filtro-cliente');
-    const inputDesde   = document.getElementById('filtro-desde');
-    const inputHasta   = document.getElementById('filtro-hasta');
-
-    if (!inputCliente) return;
-
-    const textoBusqueda = inputCliente.value.toLowerCase();
-    const desde = inputDesde ? inputDesde.value : '';
-    const hasta = inputHasta ? inputHasta.value : '';
-
-    // Mostrar botón limpiar si hay algún filtro activo
-    const limpiarBtn = document.getElementById('pago-limpiar-btn');
-    if (limpiarBtn) {
-        limpiarBtn.style.display = (textoBusqueda || desde || hasta) ? 'inline-flex' : 'none';
-    }
-
-    const items = document.querySelectorAll('.historial-item');
-    if (items.length === 0) return;
-
-    items.forEach(card => {
-        const cliente = card.dataset.cliente || '';
-        const tipo    = card.dataset.tipo    || '';
-        const fecha   = card.dataset.fecha   || '';
-
-        const coincideCliente = cliente.includes(textoBusqueda) || tipo.includes(textoBusqueda);
-
-        let coincideFecha = true;
-        if (desde && fecha < desde) coincideFecha = false;
-        if (hasta && fecha > hasta) coincideFecha = false;
-
-        card.style.display = coincideCliente && coincideFecha ? 'flex' : 'none';
-    });
-}
-</script>
+<script src="<?= BASE_URL ?>/public/js/pagos/pagos.js"></script>
  
