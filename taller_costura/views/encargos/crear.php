@@ -10,9 +10,10 @@ $stmt = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
 $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $clienteSeleccionado = null;
-if (!empty($_POST['cliente_id'])) {
+$clienteIdInicial = $_POST['cliente_id'] ?? $_GET['cliente_id'] ?? null;
+if (!empty($clienteIdInicial)) {
     foreach ($clientes as $c) {
-        if ($c['id'] == $_POST['cliente_id']) { $clienteSeleccionado = $c['nombre']; break; }
+        if ($c['id'] == $clienteIdInicial) { $clienteSeleccionado = $c['nombre']; break; }
     }
 }
 ?>
@@ -53,7 +54,7 @@ if (!empty($_POST['cliente_id'])) {
             <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
                    placeholder="Escribí para buscar un cliente..."
                    value="<?= htmlspecialchars($clienteSeleccionado ?? '') ?>">
-            <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($_POST['cliente_id'] ?? '') ?>">
+            <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($clienteIdInicial ?? '') ?>">
             <div id="clienteLista" class="cliente-lista"
                  style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #e3d8cc; border-radius:var(--r-m); max-height:220px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
           </div>
