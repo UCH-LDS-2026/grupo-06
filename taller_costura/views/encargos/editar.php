@@ -46,15 +46,12 @@ $error   = isset($_GET['error']);
 <div class="det-grid">
 
   <div>
-    <div class="card">
+    <div class="card" style="overflow: visible;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <h3 style="margin-bottom:0;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           Cliente
         </h3>
-        <a href="<?= $baseUrl ?>/index.php?page=clientes" class="btn-ficha"
-           style="margin-top:0; text-decoration:none; font-size:1.2rem; font-weight:700; color: var(--accent); line-height:1;"
-           title="Agregar nuevo cliente">+</a>
       </div>
 
       <div class="form-group" style="margin-top:20px; margin-bottom:0;">

@@ -38,27 +38,33 @@ function initClienteAutocomplete(listaClientes) {
     inputHidden.value = '';
     renderLista(inputBusqueda.value);
   });
-
   inputBusqueda.addEventListener('focus', () => {
-    if (inputHidden.value) return; // ya tiene cliente pre-seleccionado, no abrir
+    if (!inputHidden.value && inputBusqueda.value !== 'Sin cliente...') {
+      inputBusqueda.value = '';
+    }
     renderLista(inputBusqueda.value);
   });
 
   listaEl.addEventListener('click', (e) => {
     const opcion = e.target.closest('.cliente-opcion');
-    if (!opcion) return;
+    if (!opcion || opcion.classList.contains('vacia') && !opcion.dataset.id && opcion.textContent.trim() === 'Sin resultados') return;
     if (opcion.dataset.id) {
-      inputHidden.value      = opcion.dataset.id;
-      inputBusqueda.value    = opcion.dataset.nombre;
+      inputHidden.value   = opcion.dataset.id;
+      inputBusqueda.value = opcion.dataset.nombre;
     } else {
-      inputHidden.value      = '';
-      inputBusqueda.value    = '';
+      inputHidden.value   = '';
+      inputBusqueda.value = 'Sin cliente...';
     }
     listaEl.style.display = 'none';
   });
 
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.cliente-autocomplete')) listaEl.style.display = 'none';
+    if (!e.target.closest('.cliente-autocomplete')) {
+      listaEl.style.display = 'none';
+      if (!inputHidden.value && inputBusqueda.value !== 'Sin cliente...') {
+        inputBusqueda.value = '';
+      }
+    }
   });
 }
 
@@ -84,6 +90,7 @@ function cerrarModalEntregados() {
 
 // ── index.php: paginación ────────────────────────────────
 let encFiltroEstados = [];
+let encFiltroSinCliente = false;
 let encPaginaActual  = 1;
 const ENC_POR_PAG    = 5;
 let encTodasVisibles = [];
@@ -122,6 +129,13 @@ function filtrarPorEstadoCard(estados) {
   filtrarEncargos();
 }
 
+function filtrarSinCliente() {
+  encFiltroSinCliente = true;
+  filtrarEncargos();
+  document.getElementById('enc-limpiar-btn').style.display = '';
+  document.getElementById('enc-section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function filtrarEncargos() {
   const textoVal = document.getElementById('enc-q').value || '';
   const texto    = textoVal.toLowerCase();
@@ -135,12 +149,13 @@ function filtrarEncargos() {
     const estado  = card.dataset.estado || '';
 
     const okTexto  = !texto || cliente.includes(texto) || tipo.includes(texto);
-    const okEstado = encFiltroEstados.length === 0 || encFiltroEstados.includes(estado);
+    const okEstado     = encFiltroEstados.length === 0 || encFiltroEstados.includes(estado);
+    const okSinCliente = !encFiltroSinCliente || card.dataset.sinCliente === '1';
     let   okFecha  = true;
     if (desde && fecha < desde) okFecha = false;
     if (hasta && fecha > hasta) okFecha = false;
 
-    return okTexto && okEstado && okFecha;
+    return okTexto && okEstado && okFecha && okSinCliente;
   });
 
   encPaginaActual = 1;
@@ -152,6 +167,7 @@ function filtrarEncargos() {
 
 function limpiarFiltrosEnc() {
   encFiltroEstados = [];
+  encFiltroSinCliente = false;
   document.getElementById('enc-q').value      = '';
   document.getElementById('enc-desde').value  = '';
   document.getElementById('enc-hasta').value  = '';
