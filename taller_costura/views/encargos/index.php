@@ -264,7 +264,7 @@ function estadoBadge($estado) {
                 <div class="seccion-label" style="display:flex; justify-content:space-between; align-items:center;">
                     Cliente
                     <a href="index.php?page=clientes" target="_blank" title="Agregar nuevo cliente"
-                       style="text-transform:none; letter-spacing:0; font-weight:700; font-size:1rem; color:var(--acento-2); text-decoration:none; line-height:1;">+</a>
+                       style="text-transform:none; letter-spacing:0; font-weight:700; font-size:0.75rem; color:var(--acento-2); text-decoration:none; line-height:1;">+ Nuevo</a>
                 </div>
                 <div class="form-group">
                     <div class="cliente-autocomplete" style="position:relative;">

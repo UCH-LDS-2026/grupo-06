@@ -42,19 +42,24 @@ function initClienteAutocomplete(listaClientes) {
 
   listaEl.addEventListener('click', (e) => {
     const opcion = e.target.closest('.cliente-opcion');
-    if (!opcion) return;
+    if (!opcion || opcion.classList.contains('vacia') && !opcion.dataset.id && opcion.textContent.trim() === 'Sin resultados') return;
     if (opcion.dataset.id) {
-      inputHidden.value      = opcion.dataset.id;
-      inputBusqueda.value    = opcion.dataset.nombre;
+      inputHidden.value   = opcion.dataset.id;
+      inputBusqueda.value = opcion.dataset.nombre;
     } else {
-      inputHidden.value      = '';
-      inputBusqueda.value    = '';
+      inputHidden.value   = '';
+      inputBusqueda.value = 'Sin cliente...';
     }
     listaEl.style.display = 'none';
   });
 
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.cliente-autocomplete')) listaEl.style.display = 'none';
+    if (!e.target.closest('.cliente-autocomplete')) {
+      listaEl.style.display = 'none';
+      if (!inputHidden.value && inputBusqueda.value !== 'Sin cliente...') {
+        inputBusqueda.value = '';
+      }
+    }
   });
 }
 
