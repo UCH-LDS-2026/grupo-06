@@ -188,8 +188,12 @@ function limpiarFiltrosEnc() {
 }
 
 // ── detalle.php: eliminar encargo ────────────────────────
-function eliminarEncargo(id) {
-  if (!confirm('¿Estás seguro de que querés eliminar este encargo? Esta acción no se puede deshacer.')) return;
+function eliminarEncargo(id, pagado) {
+  if (pagado > 0) {
+    if (!confirm(`Este encargo tiene $${Math.round(pagado).toLocaleString('es-AR')} de pago. ¿Estás seguro de que querés eliminarlo de todas formas? Esta acción no se puede deshacer.`)) return;
+  } else {
+    if (!confirm('¿Estás seguro de que querés eliminar este encargo? Esta acción no se puede deshacer.')) return;
+  }
   fetch('index.php?page=eliminar-encargo', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
