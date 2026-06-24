@@ -162,6 +162,19 @@ function limpiarFiltros() {
     document.getElementById('filtro-hasta').value   = '';
     document.getElementById('pago-limpiar-btn').style.display = 'none';
     document.getElementById('pago-date-picker').classList.remove('visible');
+
+    // Desactivar filtro sin retirar si está activo
+    const btnSinRetirar = document.getElementById('btn-sin-retirar');
+    if (btnSinRetirar && btnSinRetirar.classList.contains('active')) {
+        btnSinRetirar.classList.remove('active');
+        document.querySelectorAll('#tab-cuentas .historial-item').forEach(card => {
+            card.style.display = 'flex';
+        });
+        const pagVieja = document.getElementById('pag-tab-cuentas');
+        if (pagVieja) pagVieja.remove();
+        setTimeout(() => iniciarPaginacion('tab-cuentas'), 50);
+    }
+
     filtrarHistorial();
 }
 
@@ -175,10 +188,11 @@ function filtrarHistorial() {
     const textoBusqueda = inputCliente.value.toLowerCase();
     const desde = inputDesde ? inputDesde.value : '';
     const hasta  = inputHasta ? inputHasta.value : '';
+    const sinRetirarActivo = document.getElementById('btn-sin-retirar')?.classList.contains('active');
 
     const limpiarBtn = document.getElementById('pago-limpiar-btn');
     if (limpiarBtn) {
-        limpiarBtn.style.display = (textoBusqueda || desde || hasta) ? 'inline-flex' : 'none';
+        limpiarBtn.style.display = (textoBusqueda || desde || hasta || sinRetirarActivo) ? 'inline-flex' : 'none';
     }
 
     const items = document.querySelectorAll('.historial-item');
@@ -188,6 +202,7 @@ function filtrarHistorial() {
         const cliente = card.dataset.cliente || '';
         const tipo    = card.dataset.tipo    || '';
         const fecha   = card.dataset.fecha   || '';
+        const tieneBadge = card.querySelector('.badge-sin-retirar');
 
         const coincideTexto = cliente.includes(textoBusqueda) || tipo.includes(textoBusqueda);
 
@@ -195,7 +210,10 @@ function filtrarHistorial() {
         if (desde && fecha < desde) coincideFecha = false;
         if (hasta && fecha > hasta) coincideFecha = false;
 
-        card.style.display = coincideTexto && coincideFecha ? 'flex' : 'none';
+        // Si filtro sin retirar activo, solo mostrar los que tienen badge
+        const coincideSinRetirar = !sinRetirarActivo || tieneBadge;
+
+        card.style.display = coincideTexto && coincideFecha && coincideSinRetirar ? 'flex' : 'none';
     });
 }
 
@@ -268,3 +286,51 @@ document.addEventListener('DOMContentLoaded', () => {
         iniciarPaginacion('tab-historial');
     }, 100);
 });
+/* ── Filtro sin retirar ──────────────────────────── */
+function toggleSinRetirar(btn) {
+    btn.classList.toggle('active');
+
+    // Asegurarse de estar en el tab de cuentas
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-cuentas').classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.tab-btn[onclick*="cuentas"]').classList.add('active');
+
+    // Filtrar primero
+    filtrarHistorial();
+
+    // Re-iniciar paginación respetando el display actual
+    const pagVieja = document.getElementById('pag-tab-cuentas');
+    if (pagVieja) pagVieja.remove();
+
+    setTimeout(() => {
+        const tab = document.getElementById('tab-cuentas');
+        const itemsVisibles = Array.from(tab.querySelectorAll('.encargo-card'))
+            .filter(card => card.style.display !== 'none');
+
+        if (itemsVisibles.length <= ITEMS_POR_PAGINA) return;
+
+        const totalPaginas = Math.ceil(itemsVisibles.length / ITEMS_POR_PAGINA);
+        const paginacion = document.createElement('div');
+        paginacion.className = 'enc-paginacion';
+        paginacion.id = 'pag-tab-cuentas';
+        tab.appendChild(paginacion);
+
+        function mostrarPaginaFiltrada(pagina) {
+            itemsVisibles.forEach((item, i) => {
+                const desde = (pagina - 1) * ITEMS_POR_PAGINA;
+                const hasta = desde + ITEMS_POR_PAGINA;
+                item.style.display = (i >= desde && i < hasta) ? 'flex' : 'none';
+            });
+            paginacion.innerHTML = `
+                <button class="enc-pag-btn" onclick="cambiarPagina('tab-cuentas', ${pagina - 1})"
+                    ${pagina === 1 ? 'disabled' : ''}>‹</button>
+                <span class="enc-pag-info">Página ${pagina} de ${totalPaginas}</span>
+                <button class="enc-pag-btn" onclick="cambiarPagina('tab-cuentas', ${pagina + 1})"
+                    ${pagina === totalPaginas ? 'disabled' : ''}>›</button>
+            `;
+        }
+
+        mostrarPaginaFiltrada(1);
+    }, 50);
+}

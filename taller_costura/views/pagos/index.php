@@ -120,7 +120,7 @@ function etiquetaEstado(string $estado): string {
     <div class="toolbar">
         <div class="search-wrap">
             <span class="material-symbols-outlined search-icon">search</span>
-            <input type="text" id="filtro-cliente" placeholder="Buscar por encargo, cliente o fecha ..."
+            <input type="text" id="filtro-cliente" placeholder="Buscar por encargo, cliente o fecha..."
                 oninput="filtrarHistorial()">
             <button type="button" class="search-cal-btn" id="pago-cal-btn"
                 title="Filtrar por rango de fechas"
@@ -139,6 +139,10 @@ function etiquetaEstado(string $estado): string {
                 <input type="date" id="filtro-hasta" onchange="filtrarHistorial()">
             </div>
         </div>
+        <button type="button" class="btn-filtro-pill" id="btn-sin-retirar" 
+            onclick="toggleSinRetirar(this)">
+            ⚠ Sin retirar
+        </button>
         <button type="button" class="filtro-btn" id="pago-limpiar-btn"
             style="display:none;" onclick="limpiarFiltros()">
             ✕ Limpiar

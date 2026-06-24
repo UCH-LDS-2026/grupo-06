@@ -1241,3 +1241,29 @@ body {
     text-align: center;
     letter-spacing: 0.3px;
 }
+.filtro-sin-retirar-wrap {
+    margin-bottom: 14px;
+}
+
+.btn-filtro-pill {
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1px solid #ffc5a0;
+    background: transparent;
+    color: #c04a00;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-filtro-pill.active {
+    background: #fff0ee;
+    border-color: #c04a00;
+    font-weight: 600;
+}
+
+.btn-filtro-pill:hover {
+    background: #fff0ee;
+}
