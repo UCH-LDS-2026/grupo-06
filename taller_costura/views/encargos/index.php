@@ -43,6 +43,8 @@ $estadisticas = [
     'pendiente_pago' => array_sum(array_column($todos, 'monto_total')) - array_sum(array_column($todos, 'sena')),
 ];
 
+$sinCliente = count(array_filter($todos, fn($e) => empty($e['cliente_nombre'])));
+
 function fmtMonto($n) { return '$' . number_format($n, 0, ',', '.'); }
 function estadoBadge($estado) {
     $map = [
@@ -63,6 +65,14 @@ function estadoBadge($estado) {
     </div>
     <a href="#" class="btn-nuevo" onclick="abrirModalEncargo(); return false;">+ Nuevo Encargo</a>
 </div>
+
+<?php if ($sinCliente > 0): ?>
+<div class="alerta-sin-cliente" onclick="filtrarSinCliente()" style="cursor:pointer;" title="Ver encargos sin cliente">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <?= $sinCliente === 1 ? 'Hay 1 encargo sin cliente asignado.' : "Hay {$sinCliente} encargos sin cliente asignado." ?>
+  &nbsp;— <strong>Ver</strong>
+</div>
+<?php endif; ?>
 
 <div class="stats-grid">
   <div class="stat-card stat-card--activos" onclick="filtrarPorEstadoCard(['pendiente','en_proceso','listo'])" style="cursor:pointer;" title="Filtrar encargos activos">
@@ -134,8 +144,7 @@ function estadoBadge($estado) {
     $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
     $saldo = $enc['monto_total'] - $enc['sena'];
   ?>
-  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo" data-estado="<?= $enc['estado'] ?>" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>">
-    <div class="card-fecha">
+      <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo" data-estado="<?= $enc['estado'] ?>" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>" data-sin-cliente="<?= empty($enc['cliente_nombre']) ? '1' : '0' ?>">    <div class="card-fecha">
       <span class="dia"><?= $dia ?></span>
       <span class="mes"><?= $mes ?></span>
       <?php if ($diff < 0): ?><span class="atrasado">Atrasado <?= abs($diff) ?>d</span>
@@ -156,7 +165,12 @@ function estadoBadge($estado) {
         &nbsp;·&nbsp; Pendiente: <span class="pend"><?= fmtMonto($saldo) ?></span>
       </p>
     </div>
-    <div><?= estadoBadge($enc['estado']) ?></div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+      <?= estadoBadge($enc['estado']) ?>
+      <?php if (empty($enc['cliente_nombre'])): ?>
+        <span class="badge-sin-cliente">⚠</span>
+      <?php endif; ?>
+    </div>
   </a>
   <?php endforeach; ?>
 <?php else: ?>
@@ -256,6 +270,7 @@ function estadoBadge($estado) {
             Completá los campos obligatorios: Tipo de prenda, Fecha de entrega y Seña inicial (mayor a $0).
           </div>
         <?php endif; ?>
+        <div id="modal-error-encargo" style="display:none; margin-bottom:16px; padding:10px 14px; background:#fff3f3; color:#b05040; border:1px solid rgba(176,80,64,0.25); border-radius:10px; font-size:0.86rem;"></div>
 
         <form method="POST" action="index.php?page=crear">
           <div class="modal-encargo-grid">
@@ -264,7 +279,7 @@ function estadoBadge($estado) {
                 <div class="seccion-label" style="display:flex; justify-content:space-between; align-items:center;">
                     Cliente
                     <a href="index.php?page=clientes" target="_blank" title="Agregar nuevo cliente"
-                       style="text-transform:none; letter-spacing:0; font-weight:700; font-size:1rem; color:var(--acento-2); text-decoration:none; line-height:1;">+</a>
+                       style="text-transform:none; letter-spacing:0; font-weight:700; font-size:0.75rem; color:var(--acento-2); text-decoration:none; line-height:1;">+ Nuevo</a>
                 </div>
                 <div class="form-group">
                     <div class="cliente-autocomplete" style="position:relative;">
@@ -293,7 +308,7 @@ function estadoBadge($estado) {
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
                     <label>Fecha de Entrega <span class="req">*</span></label>
-                    <input type="date" name="fecha_entrega" required>
+                    <input type="date" name="fecha_entrega" id="modal_fecha_entrega" min="<?= date('Y-m-d') ?>" required>
                 </div>
             </div>
 
@@ -302,14 +317,14 @@ function estadoBadge($estado) {
                 <div class="form-group">
                     <label>Precio Total</label>
                     <div class="input-cm" style="text-align:left;">
-                        <input type="number" name="monto_total" placeholder="0" min="0" step="0.01" style="padding-left:24px;">
+                        <input type="number" name="monto_total" id="modal_monto_total" placeholder="1000" min="1000" step="1" style="padding-left:24px;">
                         <span style="left:12px; right:auto;">$</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Seña Inicial <span class="req">*</span></label>
                     <div class="input-cm" style="text-align:left;">
-                        <input type="number" name="sena" required placeholder="0" min="0.01" step="0.01" style="padding-left:24px;">
+                        <input type="number" name="sena" id="modal_sena" required placeholder="0" min="1" step="1" style="padding-left:24px;">
                         <span style="left:12px; right:auto;">$</span>
                     </div>
                 </div>
@@ -327,7 +342,7 @@ function estadoBadge($estado) {
 
             <div class="modal-footer">
                 <button type="button" class="btn-cancelar" onclick="cerrarModalEncargo()">Cancelar</button>
-                <button type="submit" class="btn-guardar">+ Guardar Encargo</button>
+                <button type="button" class="btn-guardar" onclick="validarYGuardarEncargo()">+ Guardar Encargo</button>
             </div>
         </form>
     </div>
@@ -336,6 +351,52 @@ function estadoBadge($estado) {
 <script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
 <script>
 const CLIENTES_MODAL = <?= json_encode($clientesModal, JSON_UNESCAPED_UNICODE) ?>;
+
+function validarYGuardarEncargo() {
+  const tipo      = document.querySelector('[name="tipo"]');
+  const fecha     = document.getElementById('modal_fecha_entrega');
+  const total     = document.getElementById('modal_monto_total');
+  const sena      = document.getElementById('modal_sena');
+  const errorDiv  = document.getElementById('modal-error-encargo');
+  const hoy       = new Date(); hoy.setHours(0,0,0,0);
+  const errores   = [];
+
+  if (!tipo || !tipo.value.trim()) {
+    errores.push('El tipo de prenda es obligatorio.');
+  }
+
+  if (!fecha.value) {
+    errores.push('La fecha de entrega es obligatoria.');
+  } else if (new Date(fecha.value + 'T00:00:00') < hoy) {
+    errores.push('La fecha de entrega no puede ser anterior a hoy.');
+  }
+
+  const montoVal = parseFloat(total.value);
+  const senaVal  = parseFloat(sena.value);
+
+  if (total.value !== '' && !isNaN(montoVal) && montoVal < 1000) {
+    errores.push('El precio total debe ser al menos $1.000.');
+  }
+
+  if (!sena.value || isNaN(senaVal) || senaVal < 1) {
+    errores.push('La seña inicial es obligatoria y debe ser mayor a $0.');
+  } else if (total.value !== '' && !isNaN(montoVal) && montoVal >= 1000 && senaVal > montoVal) {
+    errores.push('La seña no puede superar el precio total.');
+  } else if ((total.value === '' || isNaN(montoVal)) && senaVal <= 1000) {
+    errores.push('La seña no puede ser menor o igual al precio total mínimo ($1.000). Completá el precio total primero.');
+  }
+
+  if (errores.length > 0) {
+    errorDiv.innerHTML = errores.map(e => `• ${e}`).join('<br>');
+    errorDiv.style.display = 'block';
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+
+  errorDiv.style.display = 'none';
+  tipo.closest('form').submit();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initClienteAutocomplete(CLIENTES_MODAL);
     <?php if ($errorCrear): ?>

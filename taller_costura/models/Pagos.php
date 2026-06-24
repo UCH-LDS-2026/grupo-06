@@ -90,7 +90,9 @@ class Pago {
              LEFT JOIN cliente c ON e.cliente_id = c.id
              WHERE e.administrador_id = :admin_id
                AND (e.monto_total - e.sena) > 0
-             ORDER BY e.fecha_entrega ASC"
+             ORDER BY 
+            CASE WHEN e.fecha_entrega >= CURDATE() THEN 0 ELSE 1 END ASC,
+            ABS(DATEDIFF(e.fecha_entrega, CURDATE())) ASC"
         );
         $stmt->execute([':admin_id' => $adminId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

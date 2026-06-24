@@ -38,27 +38,33 @@ function initClienteAutocomplete(listaClientes) {
     inputHidden.value = '';
     renderLista(inputBusqueda.value);
   });
-
   inputBusqueda.addEventListener('focus', () => {
-    if (inputHidden.value) return; // ya tiene cliente pre-seleccionado, no abrir
+    if (!inputHidden.value && inputBusqueda.value !== 'Sin cliente...') {
+      inputBusqueda.value = '';
+    }
     renderLista(inputBusqueda.value);
   });
 
   listaEl.addEventListener('click', (e) => {
     const opcion = e.target.closest('.cliente-opcion');
-    if (!opcion) return;
+    if (!opcion || opcion.classList.contains('vacia') && !opcion.dataset.id && opcion.textContent.trim() === 'Sin resultados') return;
     if (opcion.dataset.id) {
-      inputHidden.value      = opcion.dataset.id;
-      inputBusqueda.value    = opcion.dataset.nombre;
+      inputHidden.value   = opcion.dataset.id;
+      inputBusqueda.value = opcion.dataset.nombre;
     } else {
-      inputHidden.value      = '';
-      inputBusqueda.value    = '';
+      inputHidden.value   = '';
+      inputBusqueda.value = 'Sin cliente...';
     }
     listaEl.style.display = 'none';
   });
 
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.cliente-autocomplete')) listaEl.style.display = 'none';
+    if (!e.target.closest('.cliente-autocomplete')) {
+      listaEl.style.display = 'none';
+      if (!inputHidden.value && inputBusqueda.value !== 'Sin cliente...') {
+        inputBusqueda.value = '';
+      }
+    }
   });
 }
 
@@ -68,8 +74,17 @@ function abrirModalEncargo() {
   document.body.style.overflow = 'hidden';
 }
 function cerrarModalEncargo() {
-  document.getElementById('modalEncargo').classList.remove('visible');
+  const modal = document.getElementById('modalEncargo');
+  modal.classList.remove('visible');
   document.body.style.overflow = '';
+  modal.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], textarea').forEach(el => el.value = '');
+  modal.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  const clienteHidden = document.getElementById('cliente_id');
+  const clienteBusqueda = document.getElementById('clienteBusqueda');
+  if (clienteHidden) clienteHidden.value = '';
+  if (clienteBusqueda) clienteBusqueda.value = '';
+  const errorDiv = document.getElementById('modal-error-encargo');
+  if (errorDiv) errorDiv.style.display = 'none';
 }
 
 // ── index.php: modal todos los entregados ───────────────
@@ -84,6 +99,7 @@ function cerrarModalEntregados() {
 
 // ── index.php: paginación ────────────────────────────────
 let encFiltroEstados = [];
+let encFiltroSinCliente = false;
 let encPaginaActual  = 1;
 const ENC_POR_PAG    = 5;
 let encTodasVisibles = [];
@@ -122,6 +138,13 @@ function filtrarPorEstadoCard(estados) {
   filtrarEncargos();
 }
 
+function filtrarSinCliente() {
+  encFiltroSinCliente = true;
+  filtrarEncargos();
+  document.getElementById('enc-limpiar-btn').style.display = '';
+  document.getElementById('enc-section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function filtrarEncargos() {
   const textoVal = document.getElementById('enc-q').value || '';
   const texto    = textoVal.toLowerCase();
@@ -135,12 +158,13 @@ function filtrarEncargos() {
     const estado  = card.dataset.estado || '';
 
     const okTexto  = !texto || cliente.includes(texto) || tipo.includes(texto);
-    const okEstado = encFiltroEstados.length === 0 || encFiltroEstados.includes(estado);
+    const okEstado     = encFiltroEstados.length === 0 || encFiltroEstados.includes(estado);
+    const okSinCliente = !encFiltroSinCliente || card.dataset.sinCliente === '1';
     let   okFecha  = true;
     if (desde && fecha < desde) okFecha = false;
     if (hasta && fecha > hasta) okFecha = false;
 
-    return okTexto && okEstado && okFecha;
+    return okTexto && okEstado && okFecha && okSinCliente;
   });
 
   encPaginaActual = 1;
@@ -152,6 +176,7 @@ function filtrarEncargos() {
 
 function limpiarFiltrosEnc() {
   encFiltroEstados = [];
+  encFiltroSinCliente = false;
   document.getElementById('enc-q').value      = '';
   document.getElementById('enc-desde').value  = '';
   document.getElementById('enc-hasta').value  = '';
@@ -163,8 +188,12 @@ function limpiarFiltrosEnc() {
 }
 
 // ── detalle.php: eliminar encargo ────────────────────────
-function eliminarEncargo(id) {
-  if (!confirm('¿Estás seguro de que querés eliminar este encargo? Esta acción no se puede deshacer.')) return;
+function eliminarEncargo(id, pagado) {
+  if (pagado > 0) {
+    if (!confirm(`Este encargo tiene $${Math.round(pagado).toLocaleString('es-AR')} de pago. ¿Estás seguro de que querés eliminarlo de todas formas? Esta acción no se puede deshacer.`)) return;
+  } else {
+    if (!confirm('¿Estás seguro de que querés eliminar este encargo? Esta acción no se puede deshacer.')) return;
+  }
   fetch('index.php?page=eliminar-encargo', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -316,13 +345,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!btn) return;
       const nuevoEstado = btn.dataset.estado;
       const id = this.dataset.id;
+      const estadoAnterior = this.dataset.current;
 
       document.querySelectorAll('.estado-btn').forEach(b => b.classList.remove('activo'));
       btn.classList.add('activo');
-
-      const badge = document.getElementById('badgeEstado');
-      badge.className = 'badge ' + (badgeClasses[nuevoEstado] || '');
-      badge.textContent = badgeLabels[nuevoEstado] || nuevoEstado;
 
       fetch('index.php?page=actualizar-estado-encargo', {
         method: 'POST',
@@ -330,7 +356,21 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({id, estado: nuevoEstado})
       })
       .then(r => r.json())
-      .then(d => showToast(d.ok ? '✅ Estado actualizado' : '❌ Error al actualizar', d.ok))
+      .then(d => {
+        if (d.ok) {
+          estadoGrid.dataset.current = nuevoEstado;
+          const badge = document.getElementById('badgeEstado');
+          badge.className = 'badge ' + (badgeClasses[nuevoEstado] || '');
+          badge.textContent = badgeLabels[nuevoEstado] || nuevoEstado;
+          showToast('✅ Estado actualizado');
+        } else {
+          document.querySelectorAll('.estado-btn').forEach(b => b.classList.remove('activo'));
+          document.querySelectorAll('.estado-btn').forEach(b => {
+            if (b.dataset.estado === estadoAnterior) b.classList.add('activo');
+          });
+          showToast('❌ ' + (d.mensaje || 'Error al actualizar'), false);
+        }
+      })
       .catch(() => showToast('❌ Error de red', false));
     });
   }
@@ -352,7 +392,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnConfirmar.addEventListener('click', () => {
       const monto  = parseFloat(document.getElementById('inputMonto').value);
-      const metodo = document.getElementById('selectMetodo').value;
+      const metodoRadio = document.querySelector('input[name="detalle_metodo_pago"]:checked');
+      const metodo = metodoRadio ? metodoRadio.value : 'efectivo';
       const nota   = document.getElementById('inputNota').value.trim();
 
       if (!monto || monto <= 0) { showToast('❌ Ingresá un monto válido', false); return; }
