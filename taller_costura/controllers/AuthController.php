@@ -44,6 +44,14 @@ class AuthController {
         $_SESSION['admin_email']  = $admin->getEmail();
         unset($_SESSION['error_login']);
 
+        // ── Generar alertas al iniciar sesión ──────────────────────
+        require_once __DIR__ . '/../controllers/AlertaController.php';
+        $alertaCtrl = new AlertaController();
+        $alertaCtrl->verificarVencimientos($admin->getId());
+        $alertaCtrl->verificarMorosos($admin->getId());
+        $alertaCtrl->verificarClientasSinFicha($admin->getId());
+        // ───────────────────────────────────────────────────────────
+
         header('Location: ' . BASE_URL . '/index.php');
         exit;
     }
@@ -115,7 +123,6 @@ class AuthController {
     // =========================================================================
  
     public static function requiereLogin(): void {
-
         if (!isset($_SESSION['admin_id'])) {
             header('Location: ' . BASE_URL . '/views/auth/login.php');
             exit;
@@ -153,9 +160,9 @@ class AuthController {
 
         $accion = $_POST['accion'] ?? '';
 
-        if ($accion === 'login')              { self::iniciarSesion(); }
+        if ($accion === 'login')                  { self::iniciarSesion(); }
         elseif ($accion === 'cambiar_contrasena') { self::cambiarContrasena(); }
-        elseif ($accion === 'logout')         { self::cerrarSesion(); }
+        elseif ($accion === 'logout')             { self::cerrarSesion(); }
         else { header('Location: ' . BASE_URL . '/views/auth/login.php'); }
         exit;
     }
@@ -165,4 +172,3 @@ class AuthController {
 if (basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
     AuthController::dispatch();
 }
- 

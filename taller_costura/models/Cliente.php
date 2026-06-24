@@ -140,6 +140,29 @@ class Cliente {
             $row['created_at']
         ) : null;
     }
+
+    /**
+ * Busca un cliente por teléfono exacto.
+ * Útil para validar duplicados antes de guardar.
+ */
+    public static function getByTelefono(string $telefono): ?self {
+        $pdo  = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare(
+            "SELECT id, nombre, telefono, email, created_at
+            FROM cliente
+            WHERE telefono = :telefono"
+        );
+        $stmt->execute([':telefono' => $telefono]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new self(
+            (int)$row['id'],
+            $row['nombre'],
+            $row['telefono'] ?? '',
+            $row['email']    ?? '',
+            $row['created_at']
+        ) : null;
+    }
  
     /**
      * Inserta este cliente en la base de datos.
