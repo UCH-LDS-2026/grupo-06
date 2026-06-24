@@ -83,7 +83,7 @@ function actualizarBadge(cambio) {
 }
  
 /* ── Paginación alertas ──────────────────────────── */
-const ALERTAS_POR_PAGINA = 6;
+const ALERTAS_POR_PAGINA = 5;
  
 function iniciarPaginacionAlertas() {
     const lista = document.getElementById('lista-alertas');
