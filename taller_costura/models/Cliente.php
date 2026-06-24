@@ -139,7 +139,23 @@ class Cliente {
             $row['created_at']
         ) : null;
     }
- 
+        public static function getByTelefono(string $telefono): ?self {
+    if ($telefono === '') return null;
+    $pdo  = Database::getInstance()->getConnection();
+    $stmt = $pdo->prepare(
+        "SELECT id, nombre, telefono, email, created_at
+         FROM cliente WHERE telefono = :telefono"
+    );
+    $stmt->execute([':telefono' => $telefono]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? new self(
+        (int)$row['id'],
+        $row['nombre'],
+        $row['telefono'] ?? '',
+        $row['email']    ?? '',
+        $row['created_at']
+    ) : null;
+}
     /**
      * Inserta este cliente en la base de datos.
      * Actualiza $this->id al terminar.
