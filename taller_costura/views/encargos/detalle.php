@@ -22,7 +22,14 @@ $stmtObs = $pdo->prepare("SELECT * FROM observacion WHERE encargo_id = ? ORDER B
 $stmtObs->execute([$idEncargo]);
 $observaciones = $stmtObs->fetchAll(PDO::FETCH_ASSOC);
 
-$historialPagos = [];
+$stmtPagos = $pdo->prepare(
+    "SELECT monto, metodo, nota, fecha 
+     FROM pago 
+     WHERE encargo_id = ? 
+     ORDER BY fecha ASC"
+);
+$stmtPagos->execute([$idEncargo]);
+$historialPagos = $stmtPagos->fetchAll(PDO::FETCH_ASSOC);
 
 $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 function fmtFecha($dateStr, $meses) {
@@ -183,7 +190,7 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
       <div class="fechas-container">
         <div class="fecha-block">
           <span class="lbl">Fecha de Encargo</span>
-          <strong><?= fmtFecha($enc['created_at'], $meses) ?></strong>
+         <strong><?= fmtFecha($enc['created_at'], $meses) ?></strong>
         </div>
         <div class="fecha-block">
           <span class="lbl">Fecha de Entrega</span>
@@ -220,29 +227,32 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
         </div>
       </div>
 
-      <button class="btn-registrar-pago" id="btnAbrirPago" style="<?= $saldo <= 0 ? 'display:none;' : '' ?>">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        Registrar Pago
-      </button>
     </div>
 
-    <div class="card" id="cardHistorial"<?= empty($historialPagos) ? ' style="display:none"' : '' ?>>
-      <h3>Historial de Pagos</h3>
-      <div id="listaPagos">
+    <?php if (!empty($historialPagos)): ?>
+<div class="card" id="cardHistorial">
+    <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
+         onclick="toggleHistorialPagos()">
+        <h3 style="margin:0;">Historial de Pagos</h3>
+        <span id="historial-toggle-icon" style="font-size:1.2rem; color:var(--texto-ter);">↓</span>
+    </div>
+    
+    <div id="historial-pagos-lista" style="display:none; margin-top:16px;">
         <?php foreach ($historialPagos as $p): ?>
         <div class="pago-hist-item">
           <div class="pago-hist-icon">✓</div>
           <div class="pago-hist-info">
             <strong><?= fmtMonto($p['monto']) ?></strong>
-            <span><?= fmtFecha($p['created_at'], $meses) ?></span>
+            <span><?= fmtFecha($p['fecha'], $meses) ?></span>
             <div><span class="pago-metodo-tag"><?= ucfirst($p['metodo']) ?></span></div>
             <?php if (!empty($p['nota'])): ?><em><?= htmlspecialchars($p['nota']) ?></em><?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>
+       </div>
       </div>
     </div>
-  </div>
+        <?php endif; ?>
 
 </div>
 
@@ -335,5 +345,16 @@ function validarMontoDetalle(input) {
     hint.textContent = '';
     btn.disabled = false;
   }
+}
+function toggleHistorialPagos() {
+    const lista = document.getElementById('historial-pagos-lista');
+    const icon  = document.getElementById('historial-toggle-icon');
+    if (lista.style.display === 'none') {
+        lista.style.display = 'block';
+        icon.textContent = '↑';
+    } else {
+        lista.style.display = 'none';
+        icon.textContent = '↓';
+    }
 }
 </script>
