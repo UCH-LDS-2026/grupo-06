@@ -3,7 +3,7 @@ require_once 'config/database.php';
 require_once 'config/config.php';
 require_once 'controllers/AuthController.php';
 require_once 'models/Encargo.php';
- 
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 // Verificar vencimientos en cada carga
@@ -17,24 +17,18 @@ if (isset($_SESSION['admin_id'])) {
 // Rutas AJAX de encargos (estado, pago-detalle, observaciones, editar) — salen antes de cualquier output
 require_once 'controllers/ajax_encargos.php';
 
-// POST pagos AJAX — PRIMERO antes de cualquier output
-if (isset($_GET['page']) && $_GET['page'] === 'pagos' && isset($_GET['accion']) && $_GET['accion'] === 'registrar') {
-    $db = Database::getInstance()->getConnection();
-    require_once 'controllers/PagoController.php';
-    $ctrl = new PagoController($db);
-    $ctrl->manejar();
-    exit;
-}
- 
+// Rutas AJAX de pagos (registrar pago desde panel, stats) — antes de cualquier output
+require_once 'controllers/ajax_pagos.php';
+
 // Manejar todos los POST antes de cualquier output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = $_POST['accion'] ?? '';
-    
+
     if ($accion === 'login' || $accion === 'logout' || $accion === 'cambiar_contrasena') {
         AuthController::dispatch();
         exit;
     }
- 
+
     // POST de crear encargo
     if (isset($_GET['page']) && $_GET['page'] === 'crear') {
         $db = Database::getInstance()->getConnection();
@@ -47,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $encargo->fecha_entrega         = $_POST['fecha_entrega'] ?? '';
         $encargo->monto_total           = !empty($_POST['monto_total']) ? (float)$_POST['monto_total'] : 0;
         $encargo->sena                  = !empty($_POST['sena']) ? (float)$_POST['sena'] : 0;
-        $encargo->metodo_pago = $_POST['metodo_pago'] ?? 'efectivo';
+        $encargo->metodo_pago           = $_POST['metodo_pago'] ?? 'efectivo';
 
         if ($encargo->tipo !== '' && $encargo->fecha_entrega !== '' && $encargo->sena > 0 && $encargo->create()) {
             header('Location: ' . BASE_URL . '/index.php?nuevo=1');
@@ -56,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         exit;
     }
- 
+
     // POST de clientes
     if (in_array($accion, ['registrar', 'editar', 'eliminar', 'guardar_ficha'])) {
         require_once 'controllers/ClienteController.php';
@@ -64,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
- 
+
 $page = $_GET['page'] ?? 'agenda';
 
 $vistas = [
@@ -78,7 +72,7 @@ $vistas = [
     'pagos'           => 'views/pagos/index.php',
     'alertas'         => 'views/alertas/index.php',
 ];
- 
+
 $vista = $vistas[$page] ?? $vistas['agenda'];
 
 if ($page === 'alertas' && isset($_GET['accion'])) {
@@ -87,8 +81,9 @@ if ($page === 'alertas' && isset($_GET['accion'])) {
     $ctrl->manejar();
     exit;
 }
- 
+
 require_once 'views/layout/sidebar.php';
+
 if ($page === 'pagos') {
     $db = Database::getInstance()->getConnection();
     require_once 'controllers/PagoController.php';
