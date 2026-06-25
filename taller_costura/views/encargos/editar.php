@@ -122,7 +122,7 @@ $error   = isset($_GET['error']);
         Información de Pago
       </h3>
 
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:0;">
         <label for="monto_total">Precio Total</label>
         <div class="input-with-prefix">
           <span class="input-prefix">$</span>
@@ -131,16 +131,8 @@ $error   = isset($_GET['error']);
                  value="<?= htmlspecialchars($enc['monto_total'] ?? '0') ?>">
         </div>
       </div>
-
-     <div class="form-group" style="margin-bottom:0;">
-        <label for="sena">Seña / Total Pagado</label>
-        <div class="input-with-prefix">
-          <span class="input-prefix">$</span>
-          <input type="number" name="sena" id="sena" class="form-control"
-                 placeholder="0" min="0" step="0.01"
-                 value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
-        </div>
-      </div>
+      <input type="hidden" name="sena" value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
+    </div>
 
     <div class="card">
       <div id="editar-error" style="display:none; margin-bottom:16px; padding:10px 14px; background:#fff3f3; color:#b05040; border:1px solid rgba(176,80,64,0.25); border-radius:10px; font-size:0.86rem;"></div>
