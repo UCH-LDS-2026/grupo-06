@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modal      = document.getElementById('modalPago');
   const btnAbrir   = document.getElementById('btnAbrirPago');
   const btnCerrar  = document.getElementById('btnCerrarModal');
-  const btnConfirmar = document.getElementById('btnConfirmarPago');
+  const btnConfirmar = document.getElementById('btnConfirmarPagoDetalle') || document.getElementById('btnConfirmarPago');
   if (modal) {
     if (btnAbrir)  btnAbrir.addEventListener('click', () => modal.style.display = 'flex');
     if (btnCerrar) btnCerrar.addEventListener('click', () => modal.style.display = 'none');
@@ -431,20 +431,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const now   = new Date();
         const fecha = now.getDate() + ' de ' + MESES[now.getMonth()] + ' de ' + now.getFullYear();
         const card  = document.getElementById('cardHistorial');
-        const lista = document.getElementById('listaPagos');
-        card.style.display = 'block';
+       const lista = document.getElementById('historial-pagos-lista');
+       card.style.display = 'block';
+        document.getElementById('historial-pagos-lista').style.display = 'block';
+        document.getElementById('historial-toggle-icon').textContent = '↑';
         lista.insertAdjacentHTML('afterbegin', `
-          <div class="pago-hist-item">
-            <div class="pago-hist-icon">✓</div>
-            <div class="pago-hist-info">
-              <strong>${fmtMontoJS(monto)}</strong>
-              <span>${fecha}</span>
-              <div><span class="pago-metodo-tag">${metodo.charAt(0).toUpperCase()+metodo.slice(1)}</span></div>
-              ${nota ? '<em>' + nota + '</em>' : ''}
-            </div>
-          </div>
-        `);
-        showToast('✅ Pago registrado correctamente');
+      <div class="pago-hist-item" id="pago-${d.pago_id}">
+        <div class="pago-hist-icon">✓</div>
+        <div class="pago-hist-info">
+          <strong>${fmtMontoJS(monto)}</strong>
+          <span>${fecha}</span>
+          <div><span class="pago-metodo-tag">${metodo.charAt(0).toUpperCase()+metodo.slice(1)}</span></div>
+          ${nota ? '<em>' + nota + '</em>' : ''}
+        </div>
+        <button onclick="eliminarPago(${d.pago_id}, ${monto}, ${ENCARGO_ID})"
+          style="background:none;border:none;cursor:pointer;color:#b05040;font-size:1rem;flex-shrink:0;padding:2px 6px;">✕</button>
+      </div>
+    `);
+        setTimeout(() => location.reload(), 1200);
       })
       .catch(() => {
         btnConfirmar.disabled = false;

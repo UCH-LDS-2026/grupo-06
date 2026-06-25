@@ -96,8 +96,16 @@ if ($ajaxPage === 'registrar-pago-detalle' && $_SERVER['REQUEST_METHOD'] === 'PO
                 alertaEncargoSiNoExiste($db, $encId, $_SESSION['admin_id'] ?? 1, 'pago', "{$r['tipo']}{$cliente} tiene saldo pendiente.");
             }
         }
+         // Guardar en tabla pago
         $db->prepare("UPDATE encargo SET sena = ? WHERE id = ?")->execute([$nuevaSena, $encId]);
-        echo json_encode(['ok' => true, 'nueva_sena' => $nuevaSena, 'monto_total' => $row['monto_total']]);
+        $nota = $data['nota'] ?? '';
+        $db->prepare(
+            "INSERT INTO pago (encargo_id, administrador_id, monto, metodo, nota)
+            VALUES (?, ?, ?, ?, ?)"
+        )->execute([$encId, $_SESSION['admin_id'] ?? 1, $monto, $metodo, $nota ?: null]);
+
+        $nuevoPagoId = $db->lastInsertId();
+        echo json_encode(['ok' => true, 'nueva_sena' => $nuevaSena, 'monto_total' => $row['monto_total'], 'pago_id' => $nuevoPagoId]);
     } else {
         echo json_encode(['ok' => false, 'mensaje' => 'Datos inválidos.']);
     }
@@ -202,12 +210,48 @@ if ($ajaxPage === 'editar-encargo' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 alertaEncargoSiNoExiste($db, $id, $_SESSION['admin_id'] ?? 1, 'estado', "{$enc->tipo}{$cliente} está listo para entregar.");
             }
+            // Si actualizó la seña y no hay pagos registrados, insertar en tabla pago
+            if ($enc->sena > 0) {
+                $checkPagos = $db->prepare("SELECT COUNT(*) FROM pago WHERE encargo_id = ?");
+                $checkPagos->execute([$id]);
+                if ((int)$checkPagos->fetchColumn() === 0) {
+                    $db->prepare(
+    "INSERT INTO pago (encargo_id, administrador_id, monto, metodo, nota)
+     VALUES (?, ?, ?, ?, 'Seña inicial')"
+)->execute([$id, $_SESSION['admin_id'] ?? 1, $enc->sena, $_POST['metodo_pago'] ?? 'efectivo']);
+                }
+            }
             header('Location: ' . BASE_URL . '/index.php?page=detalle-encargo&id=' . $id . '&editado=1');
         } else {
             header('Location: ' . BASE_URL . '/index.php?page=editar-encargo&id=' . $id . '&error=1');
         }
     } else {
         header('Location: ' . BASE_URL . '/index.php');
+    }
+    exit;
+}
+// ── AJAX: eliminar pago individual ───────────────────────────────────────────
+if ($ajaxPage === 'eliminar-pago' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    $data     = json_decode(file_get_contents('php://input'), true);
+    $pagoId   = (int)($data['pago_id']   ?? 0);
+    $encargoId = (int)($data['encargo_id'] ?? 0);
+    $monto    = (float)($data['monto']    ?? 0);
+
+    if ($pagoId && $encargoId && $monto > 0) {
+        $db = Database::getInstance()->getConnection();
+
+        // Borrar el pago
+        $stmt = $db->prepare("DELETE FROM pago WHERE id = ?");
+        $stmt->execute([$pagoId]);
+
+        // Descontar el monto de la seña del encargo
+        $stmt2 = $db->prepare("UPDATE encargo SET sena = sena - ? WHERE id = ?");
+        $ok = $stmt2->execute([$monto, $encargoId]);
+
+        echo json_encode(['ok' => $ok]);
+    } else {
+        echo json_encode(['ok' => false, 'mensaje' => 'Datos inválidos.']);
     }
     exit;
 }

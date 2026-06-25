@@ -11,6 +11,10 @@ if (!$idEncargo) { header('Location: ' . BASE_URL . '/index.php'); exit; }
 $encargoModel = new Encargo($db);
 $encargoModel->id = $idEncargo;
 $enc = $encargoModel->getById();
+$stmtTienePagos = $db->prepare("SELECT COUNT(*) FROM pago WHERE encargo_id = ?");
+$stmtTienePagos->execute([$idEncargo]);
+$cantidadPagos = (int)$stmtTienePagos->fetchColumn();
+$tienePagos = $cantidadPagos > 0 || (float)$enc['sena'] > 0;
 if (!$enc) { header('Location: ' . BASE_URL . '/index.php'); exit; }
 
 $stmtClientes = $db->query("SELECT id, nombre FROM cliente ORDER BY nombre");
@@ -134,13 +138,30 @@ $error   = isset($_GET['error']);
 
       <div class="form-group" style="margin-bottom:0;">
         <label for="sena">Seña / Total Pagado</label>
+        <?php if ($tienePagos): ?>
+            <div class="form-control" style="background:#f5f0ea; color:#9c978a; cursor:not-allowed;">
+                <?= '$' . number_format((float)$enc['sena'], 0, ',', '.') ?>
+            </div>
+            <input type="hidden" name="sena" value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
+            <p style="font-size:0.78rem; color:#9c978a; margin-top:6px;">
+                Para modificar pagos usá el historial de pagos en el detalle del encargo.
+            </p>
+        <?php else: ?>
         <div class="input-with-prefix">
-          <span class="input-prefix">$</span>
-          <input type="number" name="sena" id="sena" class="form-control"
-                 placeholder="0" min="0" step="0.01"
-                 value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
+            <span class="input-prefix">$</span>
+            <input type="number" name="sena" id="sena" class="form-control"
+                   placeholder="0" min="0" step="0.01"
+                   value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
         </div>
-      </div>
+        <div class="form-group" style="margin-top:12px; margin-bottom:0;">
+            <label>Método de pago</label>
+            <select name="metodo_pago" class="form-control custom-select">
+                <option value="efectivo">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="tarjeta">Tarjeta</option>
+            </select>
+        </div>
+    <?php endif; ?>
     </div>
 
     <div class="card">

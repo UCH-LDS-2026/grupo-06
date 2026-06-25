@@ -23,7 +23,7 @@ $stmtObs->execute([$idEncargo]);
 $observaciones = $stmtObs->fetchAll(PDO::FETCH_ASSOC);
 
 $stmtPagos = $pdo->prepare(
-    "SELECT monto, metodo, nota, fecha 
+    "SELECT id, monto, metodo, nota, fecha 
      FROM pago 
      WHERE encargo_id = ? 
      ORDER BY fecha ASC"
@@ -229,8 +229,7 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
 
     </div>
 
-    <?php if (!empty($historialPagos)): ?>
-<div class="card" id="cardHistorial">
+    <div class="card" id="cardHistorial" style="<?= empty($historialPagos) ? 'display:none' : '' ?>">
     <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
          onclick="toggleHistorialPagos()">
         <h3 style="margin:0;">Historial de Pagos</h3>
@@ -239,22 +238,21 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
     
     <div id="historial-pagos-lista" style="display:none; margin-top:16px;">
         <?php foreach ($historialPagos as $p): ?>
-        <div class="pago-hist-item">
+          <div class="pago-hist-item" id="pago-<?= $p['id'] ?>">
           <div class="pago-hist-icon">✓</div>
           <div class="pago-hist-info">
-            <strong><?= fmtMonto($p['monto']) ?></strong>
-            <span><?= fmtFecha($p['fecha'], $meses) ?></span>
-            <div><span class="pago-metodo-tag"><?= ucfirst($p['metodo']) ?></span></div>
-            <?php if (!empty($p['nota'])): ?><em><?= htmlspecialchars($p['nota']) ?></em><?php endif; ?>
+          <strong><?= fmtMonto($p['monto']) ?></strong>
+          <span><?= fmtFecha($p['fecha'], $meses) ?></span>
+          <div><span class="pago-metodo-tag"><?= ucfirst($p['metodo']) ?></span></div>
+          <?php if (!empty($p['nota'])): ?><em><?= htmlspecialchars($p['nota']) ?></em><?php endif; ?>
           </div>
-        </div>
+          <button onclick="eliminarPago(<?= $p['id'] ?>, <?= $p['monto'] ?>, <?= $idEncargo ?>)"
+          style="background:none;border:none;cursor:pointer;color:#b05040;font-size:1rem;flex-shrink:0;padding:2px 6px;">✕</button>
+    </div>
         <?php endforeach; ?>
        </div>
       </div>
     </div>
-        <?php endif; ?>
-
-</div>
 
 <div class="modal-overlay" id="modalPago" style="display:none" onclick="if(event.target===this) cerrarModalPago()">
   <div class="modal-box">
@@ -299,7 +297,7 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
 
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModalPago()">Cancelar</button>
-      <button class="btn-submit" id="btnConfirmarPago">
+      <button class="btn-submit" id="btnConfirmarPagoDetalle">
         Confirmar Pago
         <span id="spinnerPago" style="display:none; margin-left:6px;">⏳</span>
       </button>
@@ -323,7 +321,7 @@ function cerrarModalPago() {
   document.getElementById('inputMonto').value = '';
   document.getElementById('inputNota').value  = '';
   document.getElementById('inputMontoHint').textContent = '';
-  document.getElementById('btnConfirmarPago').disabled = false;
+  document.getElementById('btnConfirmarPagoDetalle').disabled = false;
   const efectivo = document.querySelector('input[name="detalle_metodo_pago"][value="efectivo"]');
   if (efectivo) efectivo.checked = true;
 }
@@ -356,5 +354,42 @@ function toggleHistorialPagos() {
         lista.style.display = 'none';
         icon.textContent = '↓';
     }
+}
+function eliminarPago(pagoId, monto, encargoId) {
+    if (!confirm('¿Eliminár este pago de ' + formatPesos(monto) + '?')) return;
+    
+    fetch('index.php?page=eliminar-pago', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest' 
+        },
+        body: JSON.stringify({ pago_id: pagoId, encargo_id: encargoId, monto: monto })
+    })
+    .then(r => r.json())
+ .then(data => {
+    if (data.ok) {
+        document.getElementById('pago-' + pagoId).remove();
+        mostrarToast('Pago eliminado correctamente');
+        setTimeout(() => location.reload(), 1200);
+    } else {
+        mostrarToast(data.mensaje || 'Error al eliminar', false);
+    }
+})
+    .catch(() => mostrarToast('Error de conexión', true));
+}
+
+function formatPesos(n) {
+    return '$' + Number(n).toLocaleString('es-AR');
+}
+
+function mostrarToast(msg, esError = false) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.className = esError ? 'toast toast-error' : 'toast';
+    void t.offsetWidth;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
 }
 </script>
