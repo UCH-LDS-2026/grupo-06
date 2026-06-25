@@ -24,7 +24,7 @@ if ($busqueda !== '') {
 }
 
 // ── Paginación ────────────────────────────────────────────
-$porPagina    = 8;
+$porPagina     = 8;
 $totalClientes = count($clientes);
 $totalPaginas  = max(1, (int)ceil($totalClientes / $porPagina));
 $paginaActual  = max(1, min((int)($_GET['pagina'] ?? 1), $totalPaginas));
@@ -80,6 +80,9 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     </div>
 </form>
 
+<!-- ── Contenedor AJAX ── -->
+<div id="clientes-container">
+
 <?php if (empty($clientes)): ?>
     <div class="empty">
         <div class="empty-icon">👤</div>
@@ -132,16 +135,8 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     <!-- ── Paginación ── -->
     <?php if ($totalPaginas > 1): ?>
     <div class="paginacion">
-        <?php
-        // Construir parámetros base para los links
-        $params = ['page' => 'clientes'];
-        if ($busqueda !== '') $params['buscar'] = $busqueda;
-        if ($filtro !== 'todas') $params['filtro'] = $filtro;
-        ?>
-
         <?php if ($paginaActual > 1): ?>
-            <a href="?<?= http_build_query(array_merge($params, ['pagina' => $paginaActual - 1])) ?>"
-               class="pag-btn pag-prev">‹</a>
+            <a href="#" class="pag-btn pag-prev" onclick="cambiarPagina(<?= $paginaActual - 1 ?>);return false">‹</a>
         <?php else: ?>
             <span class="pag-btn pag-prev disabled">‹</span>
         <?php endif; ?>
@@ -149,8 +144,7 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
         <span class="pag-info">Página <?= $paginaActual ?> de <?= $totalPaginas ?></span>
 
         <?php if ($paginaActual < $totalPaginas): ?>
-            <a href="?<?= http_build_query(array_merge($params, ['pagina' => $paginaActual + 1])) ?>"
-               class="pag-btn pag-next">›</a>
+            <a href="#" class="pag-btn pag-next" onclick="cambiarPagina(<?= $paginaActual + 1 ?>);return false">›</a>
         <?php else: ?>
             <span class="pag-btn pag-next disabled">›</span>
         <?php endif; ?>
@@ -158,6 +152,8 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     <?php endif; ?>
 
 <?php endif; ?>
+
+</div><!-- /clientes-container -->
 
 <div class="modal-overlay" id="modalNueva">
     <div class="modal">
@@ -176,7 +172,6 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
             <div class="form-row">
                 <div class="form-group">
                     <label>Teléfono</label>
-                    <!-- Solo números, máximo 15 dígitos -->
                     <input type="tel" name="telefono"
                            placeholder="Ej: 2615059493"
                            maxlength="15"
