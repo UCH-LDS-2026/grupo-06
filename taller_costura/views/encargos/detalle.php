@@ -23,7 +23,7 @@ $stmtObs->execute([$idEncargo]);
 $observaciones = $stmtObs->fetchAll(PDO::FETCH_ASSOC);
 
 $stmtPagos = $pdo->prepare(
-    "SELECT monto, metodo, nota, fecha 
+    "SELECT id, monto, metodo, nota, fecha 
      FROM pago 
      WHERE encargo_id = ? 
      ORDER BY fecha ASC"
@@ -47,7 +47,13 @@ $badgeClass  = 'badge-' . ($enc['estado'] === 'en_proceso' ? 'proceso' : $enc['e
 $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
 ?>
 
-<a href="index.php" class="nav-back">← Volver a Agenda</a>
+<?php 
+$origen = $_GET['origen'] ?? 'agenda';
+$filtro = $_GET['filtro'] ?? '';
+?>
+<a href="<?= $origen === 'pagos' ? 'index.php?page=pagos&filtro=' . urlencode($filtro) : 'index.php' ?>" class="nav-back">
+    ← Volver a <?= $origen === 'pagos' ? 'Pagos' : 'Agenda' ?>
+</a>
 
 <div class="det-top">
   <div>
@@ -227,30 +233,37 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
         </div>
       </div>
 
+      <?php if ($saldo > 0): ?>
+      <button class="btn-registrar-pago" id="btnAbrirPago" style="margin-top:16px; width:100%;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Registrar Pago
+      </button>
+      <?php endif; ?>
+
     </div>
 
-    <div class="card" id="cardHistorial" style="<?= empty($historialPagos) ? 'display:none' : '' ?>">
+    <div class="card" id="cardHistorial" style="<?= empty($historialPagos) ? 'display:none' : '' ?>; overflow:hidden;">
     <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
          onclick="toggleHistorialPagos()">
         <h3 style="margin:0;">Historial de Pagos</h3>
         <span id="historial-toggle-icon" style="font-size:1.2rem; color:var(--texto-ter);">↓</span>
     </div>
     
-    <div id="historial-pagos-lista" style="display:none; margin-top:16px;">
-        <?php foreach ($historialPagos as $p): ?>
-         <div class="pago-hist-item">
-          <div class="pago-hist-icon">✓</div>
-          <div class="pago-hist-info">
-          <strong><?= fmtMonto($p['monto']) ?></strong>
-          <span><?= fmtFecha($p['fecha'], $meses) ?></span>
-          <div><span class="pago-metodo-tag"><?= ucfirst($p['metodo']) ?></span></div>
-          <?php if (!empty($p['nota'])): ?><em><?= htmlspecialchars($p['nota']) ?></em><?php endif; ?>
-          </div>
+   <div id="historial-pagos-lista" style="display:none; margin-top:16px;">
+    <?php foreach ($historialPagos as $p): ?>
+    <div class="pago-hist-item" id="pago-<?= $p['id'] ?>">
+        <div class="pago-hist-icon">✓</div>
+        <div class="pago-hist-info">
+            <strong><?= fmtMonto($p['monto']) ?></strong>
+            <span><?= fmtFecha($p['fecha'], $meses) ?></span>
+            <div><span class="pago-metodo-tag"><?= ucfirst($p['metodo']) ?></span></div>
+            <?php if (!empty($p['nota'])): ?><em><?= htmlspecialchars($p['nota']) ?></em><?php endif; ?>
+        </div>
+        <button onclick="eliminarPago(<?= $p['id'] ?>, <?= $p['monto'] ?>, <?= $idEncargo ?>)"
+            style="background:none;border:none;cursor:pointer;color:#b05040;font-size:1rem;flex-shrink:0;padding:2px 6px;">✕</button>
     </div>
-        <?php endforeach; ?>
-       </div>
-      </div>
-    </div>
+    <?php endforeach; ?>
+</div>
 
 <div class="modal-overlay" id="modalPago" style="display:none" onclick="if(event.target===this) cerrarModalPago()">
   <div class="modal-box">
@@ -352,5 +365,23 @@ function toggleHistorialPagos() {
         lista.style.display = 'none';
         icon.textContent = '↓';
     }
+}
+function eliminarPago(pagoId, monto, encargoId) {
+    if (!confirm('¿Eliminár este pago de $' + Number(monto).toLocaleString('es-AR') + '?')) return;
+    fetch('index.php?page=eliminar-pago', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pago_id: pagoId, encargo_id: encargoId, monto: monto })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) {
+            document.getElementById('pago-' + pagoId).remove();
+            setTimeout(() => location.reload(), 800);
+        } else {
+            alert(data.mensaje || 'Error al eliminar');
+        }
+    })
+    .catch(() => alert('Error de conexión'));
 }
 </script>

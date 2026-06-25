@@ -167,12 +167,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('form').addEventListener('submit', function(e) {
     const total = parseFloat(document.getElementById('monto_total').value) || 0;
-    const sena  = parseFloat(document.getElementById('sena').value) || 0;
     const errorDiv = document.getElementById('editar-error');
 
     const errores = [];
-    if (total > 0 && sena > total) {
-      errores.push('La seña / total pagado no puede superar el precio total.');
+    const senActual = <?= (float)$enc['sena'] ?>;
+    if (senActual > total) {
+      errores.push('El precio total no puede ser menor a lo ya cobrado ($' + Math.round(senActual).toLocaleString('es-AR') + ').');
     }
 
     if (errores.length > 0) {
