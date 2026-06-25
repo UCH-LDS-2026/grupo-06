@@ -158,7 +158,7 @@ function etiquetaEstado(string $estado): string {
         </button>
         <button class="tab-btn <?= $tabActiva === 'historial' ? 'active' : '' ?>"
                 onclick="cambiarTab('historial', this)">
-            Historial de Pagos
+            Resumen Mensual
         </button>
     </div>
  
@@ -180,7 +180,7 @@ function etiquetaEstado(string $estado): string {
                     data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
                      data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
                     data-fecha="<?= $e['fecha_entrega'] ?>"
-                    onclick="window.location.href='index.php?page=detalle-encargo&id=<?= $e['id'] ?>'"
+                   onclick="window.location.href='index.php?page=detalle-encargo&id=<?= $e['id'] ?>&origen=pagos&filtro=' + encodeURIComponent(document.getElementById('filtro-cliente').value)"
                     style="cursor: pointer;"> 
  
                     <!-- Fila superior -->
@@ -249,71 +249,117 @@ function etiquetaEstado(string $estado): string {
             <?php endforeach; ?>
             </div>
         <?php endif; ?>
-    </div><!-- /#tab-cuentas -->
+    </div>
+    
+    <!-- /#tab-cuentas -->
  
-    <!-- ── Tab: Historial ───────────────────────────── -->
-        <div id="tab-historial" class="tab-panel <?= $tabActiva === 'historial' ? 'active' : '' ?>">
-        <?php if (empty($historialPagos)): ?>
-            <div class="empty-state">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                     stroke="#C0B0A0" stroke-width="1.5">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="8" y1="12" x2="16" y2="12"/>
-                </svg>
-                <p>Todavía no hay encargos entregados o saldados.</p>
+    <div id="tab-historial" class="tab-panel <?= $tabActiva === 'historial' ? 'active' : '' ?>">
+    <?php if (empty($resumenPorMes)): ?>
+        <div class="empty-state">
+            <p>No hay pagos registrados todavía.</p>
+        </div>
+    <?php else: ?>
+        <?php
+        $mesesNombres = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        
+        // Encontrar índice del mes activo en el array
+        $idxActivo = 0;
+        foreach ($resumenPorMes as $i => $r) {
+            if ((int)$r['anio'] === $anioActivo && (int)$r['mes'] === $mesActivo) {
+                $idxActivo = $i;
+                break;
+            }
+        }
+        $hasPrev = isset($resumenPorMes[$idxActivo + 1]);
+        $hasNext = isset($resumenPorMes[$idxActivo - 1]);
+        $prev = $hasPrev ? $resumenPorMes[$idxActivo + 1] : null;
+        $next = $hasNext ? $resumenPorMes[$idxActivo - 1] : null;
+        ?>
+
+        <!-- Navegación de mes -->
+        <div class="resumen-nav">
+            <?php if ($hasPrev): ?>
+            <a href="index.php?page=pagos&tab=historial&mes=<?= $prev['mes'] ?>&anio=<?= $prev['anio'] ?>" class="resumen-nav-btn">‹</a>
+            <?php else: ?>
+            <span class="resumen-nav-btn disabled">‹</span>
+            <?php endif; ?>
+
+            <div class="resumen-nav-center">
+                <h2><?= $mesesNombres[$mesActivo] ?> <?= $anioActivo ?></h2>
+                <p><?= $detalleMes['resumen']['cantidad_pagos'] ?> pagos registrados</p>
             </div>
-        <?php else: ?>
-            <div class="encargo-list">
-            <?php foreach ($historialPagos as $e): ?>
-                <div class="encargo-card historial-item"
-                        data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
-                        data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
-                        data-fecha="<?= $e['fecha_entrega'] ?>"
-                        onclick="window.location.href='index.php?page=detalle-encargo&id=<?= $e['id'] ?>'"
-                        style="cursor: pointer;">
-                    <div class="encargo-card-top">
-                        <div class="encargo-card-top-left">
-                            <div>
-                                <p class="encargo-tipo"><?= htmlspecialchars($e['tipo']) ?></p>
-                                <p class="encargo-cliente">
-                                    <?= $e['cliente_nombre']
-                                        ? htmlspecialchars($e['cliente_nombre'])
-                                        : '<em style="opacity:.6">Sin cliente registrado</em>' ?>
-                                </p>
-                                <p class="encargo-fecha">
-                                    Entrega: <?= date('d/m/Y', strtotime($e['fecha_entrega'])) ?>
-                                </p>
-                            </div>
-                            <?= etiquetaEstado($e['estado']) ?>
-                        </div>
+
+            <?php if ($hasNext): ?>
+            <a href="index.php?page=pagos&tab=historial&mes=<?= $next['mes'] ?>&anio=<?= $next['anio'] ?>" class="resumen-nav-btn">›</a>
+            <?php else: ?>
+            <span class="resumen-nav-btn disabled">›</span>
+            <?php endif; ?>
+        </div>
+
+        <!-- Total del mes -->
+        <div class="resumen-total-card">
+            <p class="resumen-total-label">TOTAL INGRESADO EN <?= strtoupper($mesesNombres[$mesActivo]) ?></p>
+            <p class="resumen-total-monto"><?= formatPesos((float)$detalleMes['resumen']['total']) ?></p>
+            <p class="resumen-total-sub">
+                entre <?= $detalleMes['resumen']['cantidad_pagos'] ?> pagos · <?= $detalleMes['resumen']['entregados'] ?> encargos entregados
+            </p>
+        </div>
+
+        <div class="resumen-grid">
+            <!-- Cómo pagaron -->
+            <div class="resumen-card">
+                <h4 class="resumen-card-titulo">CÓMO PAGARON</h4>
+                <?php foreach ($detalleMes['metodos'] as $m): ?>
+                <?php $pct = $detalleMes['resumen']['total'] > 0 ? round(($m['total'] / $detalleMes['resumen']['total']) * 100) : 0; ?>
+                <div class="resumen-metodo-item">
+                    <div class="resumen-metodo-top">
+                        <span class="resumen-metodo-nombre"><?= ucfirst($m['metodo']) ?></span>
+                        <span class="resumen-metodo-pct"><?= $pct ?>% <strong><?= formatPesos((float)$m['total']) ?></strong></span>
                     </div>
-                    <div class="encargo-card-footer">
-                    <div class="encargo-footer-info">
-                        <span>Total: <strong><?= formatPesos((float)$e['monto_total']) ?></strong></span>
-                        <?php if (!empty($e['metodo_pago'])): ?>
-                        <span class="badge-metodo">
-                            <?= ucfirst($e['metodo_pago']) ?>
-                        </span>
-                        <?php endif; ?>
-                            <?php if ((float)$e['sena'] >= (float)$e['monto_total']): ?>
-                                <span class="badge-pagado-completo">✓ Pagado completo</span>
-                            <?php else: ?>
-                                <span class="badge-seniado">◑ Señado: <?= formatPesos((float)$e['sena']) ?></span>
-                            <?php endif; ?>
-                        </div>
+                    <div class="resumen-barra-bg">
+                        <div class="resumen-barra-fill" style="width:<?= $pct ?>%"></div>
                     </div>
                 </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
             </div>
-        <?php endif; ?>
-    </div><!-- /#tab-historial -->
 
- <div id="toast-campana" class="toast-campana" style="display:none;">
-    <span class="material-symbols-outlined">check_circle</span>
-    <span id="toast-campana-msg"></span>
-</div>
+            <!-- Quién pagó más -->
+            <div class="resumen-card">
+                <h4 class="resumen-card-titulo">QUIÉN PAGÓ MÁS</h4>
+                <?php foreach ($detalleMes['topClientes'] as $i => $c): ?>
+                <div class="resumen-cliente-item">
+                    <span class="resumen-cliente-num"><?= $i + 1 ?></span>
+                    <span class="resumen-cliente-nombre"><?= htmlspecialchars($c['nombre']) ?></span>
+                    <span class="resumen-cliente-monto"><?= formatPesos((float)$c['total']) ?></span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
 
-</div><!-- /.pagos-wrapper -->
+        <!-- Cada pago del mes -->
+        <div class="resumen-card" style="margin-top:16px;">
+            <h4 class="resumen-card-titulo">CADA PAGO DEL MES</h4>
+            <?php foreach ($detalleMes['pagos'] as $p): ?>
+            <div class="resumen-pago-item">
+                <div class="resumen-pago-metodo-icon resumen-icon-<?= $p['metodo'] ?>">
+                    <?php if ($p['metodo'] === 'efectivo'): ?>💵
+                    <?php elseif ($p['metodo'] === 'transferencia'): ?>⇄
+                    <?php else: ?>💳<?php endif; ?>
+                </div>
+                <div class="resumen-pago-info">
+                    <strong><?= htmlspecialchars($p['cliente_nombre']) ?></strong>
+                    <span><?= htmlspecialchars($p['tipo']) ?></span>
+                </div>
+                <div class="resumen-pago-derecha">
+                    <strong><?= formatPesos((float)$p['monto']) ?></strong>
+                    <span><?= date('j/n', strtotime($p['fecha'])) ?></span>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+    <?php endif; ?>
+</div><!-- /#tab-historial -->
  
 <!-- ══════════════════════════════════════════════════
      MODAL — Registrar Pago

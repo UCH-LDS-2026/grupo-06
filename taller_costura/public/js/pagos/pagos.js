@@ -89,9 +89,14 @@ function enviarPago() {
     .then(data => {
         cerrarModal();
         mostrarToast(data.mensaje, data.ok ? 'ok' : 'error');
-        if (data.ok) {
-            setTimeout(() => location.reload(), 1200);
-        } else {
+       if (data.ok) {
+    const filtro = document.getElementById('filtro-cliente').value;
+    console.log('filtro guardado:', filtro);
+    console.log('url destino:', 'index.php?page=pagos&filtro=' + encodeURIComponent(filtro));
+    setTimeout(() => {
+        location.href = 'index.php?page=pagos&filtro=' + encodeURIComponent(filtro);
+    }, 1200);
+}else {
             btn.disabled          = false;
             spinner.style.display = 'none';
         }
@@ -158,6 +163,7 @@ document.addEventListener('click', function(e) {
 /* ── Filtros ─────────────────────────────────────── */
 function limpiarFiltros() {
     document.getElementById('filtro-cliente').value = '';
+    sessionStorage.removeItem('pagos_filtro');
     document.getElementById('filtro-desde').value   = '';
     document.getElementById('filtro-hasta').value   = '';
     document.getElementById('pago-limpiar-btn').style.display = 'none';
@@ -179,6 +185,8 @@ function limpiarFiltros() {
 }
 
 function filtrarHistorial() {
+    sessionStorage.setItem('pagos_filtro', document.getElementById('filtro-cliente').value);
+
     const inputCliente = document.getElementById('filtro-cliente');
     const inputDesde   = document.getElementById('filtro-desde');
     const inputHasta   = document.getElementById('filtro-hasta');
@@ -281,10 +289,16 @@ function cambiarPagina(tabId, pagina) {
 
 /* ── Init ────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const filtroUrl = params.get('filtro');
+    if (filtroUrl) {
+        document.getElementById('filtro-cliente').value = filtroUrl;
+    }
     setTimeout(() => {
         iniciarPaginacion('tab-cuentas');
         iniciarPaginacion('tab-historial');
-    }, 100);
+        if (filtroUrl) filtrarHistorial();
+    }, 150);
 });
 /* ── Filtro sin retirar ──────────────────────────── */
 function toggleSinRetirar(btn) {

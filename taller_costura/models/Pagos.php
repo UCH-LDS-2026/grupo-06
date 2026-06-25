@@ -16,28 +16,35 @@ class Pago {
      * Suma de todas las señas registradas (monto ya cobrado)
      */
     public function getTotalCobrado(int $adminId): float {
-        $stmt = $this->pdo->prepare(
-            "SELECT COALESCE(SUM(sena), 0) AS total
-             FROM encargo
-             WHERE administrador_id = :admin_id
-               AND estado != 'entregado'"
-        );
-        $stmt->execute([':admin_id' => $adminId]);
-        return (float) $stmt->fetchColumn();
-    }
+    $stmt = $this->pdo->prepare(
+        "SELECT COALESCE(SUM(p.monto), 0) AS total
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         WHERE e.administrador_id = :admin_id
+           AND e.estado != 'entregado'"
+    );
+    $stmt->execute([':admin_id' => $adminId]);
+    return (float) $stmt->fetchColumn();
+}
  
     /**
      * Suma de todos los saldos pendientes (monto_total - sena)
      */
     public function getSaldoPendienteTotal(int $adminId): float {
-        $stmt = $this->pdo->prepare(
-            "SELECT COALESCE(SUM(monto_total - sena), 0) AS total
-             FROM encargo
-             WHERE administrador_id = :admin_id
-               AND estado != 'entregado'"
-        );
-        $stmt->execute([':admin_id' => $adminId]);
-        return (float) $stmt->fetchColumn();
+    $stmt = $this->pdo->prepare(
+        "SELECT COALESCE(SUM(e.monto_total - COALESCE(pagado.total, 0)), 0) AS total
+         FROM encargo e
+         LEFT JOIN (
+             SELECT encargo_id, SUM(monto) as total
+             FROM pago
+             GROUP BY encargo_id
+         ) pagado ON pagado.encargo_id = e.id
+         WHERE e.administrador_id = :admin_id
+           AND e.estado != 'entregado'
+           AND (e.monto_total - COALESCE(pagado.total, 0)) > 0"
+    );
+    $stmt->execute([':admin_id' => $adminId]);
+    return (float) $stmt->fetchColumn();
     }
  
     /**
@@ -98,32 +105,7 @@ class Pago {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
  
-    /**
-     * Historial: encargos entregados o con saldo saldado
-     */
-    public function getHistorialPagos(int $adminId): array {
-    $stmt = $this->pdo->prepare(
-        "SELECT 
-            e.id,
-            e.tipo,
-            e.descripcion,
-            e.fecha_entrega,
-            e.monto_total,
-            e.sena,
-            e.metodo_pago,
-            (e.monto_total - e.sena) AS saldo_pendiente,
-            e.estado,
-            c.nombre AS cliente_nombre,
-            (SELECT COUNT(*) FROM pago p WHERE p.encargo_id = e.id) AS cantidad_pagos
-        FROM encargo e
-        LEFT JOIN cliente c ON e.cliente_id = c.id
-        WHERE e.administrador_id = :admin_id
-        AND e.sena > 0
-        ORDER BY (SELECT MAX(p2.fecha) FROM pago p2 WHERE p2.encargo_id = e.id) DESC"
-    );
-    $stmt->execute([':admin_id' => $adminId]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+
     
     /**
      * Obtener un encargo por ID (para validar antes de registrar pago)
@@ -220,20 +202,122 @@ public function getPagosPorEncargo(int $encargoId): array {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-    public function getResumenMensual(int $adminId): array {
+  public function getResumenMensual(int $adminId): array {
     $stmt = $this->pdo->prepare(
         "SELECT 
-            COALESCE(SUM(CASE WHEN MONTH(e.created_at) = MONTH(CURDATE()) 
-                AND YEAR(e.created_at) = YEAR(CURDATE()) 
-                THEN e.sena ELSE 0 END), 0) AS cobrado_este_mes,
-            COALESCE(SUM(CASE WHEN MONTH(e.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) 
-                AND YEAR(e.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) 
-                THEN e.sena ELSE 0 END), 0) AS cobrado_mes_anterior
-         FROM encargo e
+            COALESCE(SUM(CASE WHEN MONTH(p.fecha) = MONTH(CURDATE()) 
+                AND YEAR(p.fecha) = YEAR(CURDATE()) 
+                THEN p.monto ELSE 0 END), 0) AS cobrado_este_mes,
+            COALESCE(SUM(CASE WHEN MONTH(p.fecha) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) 
+                AND YEAR(p.fecha) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) 
+                THEN p.monto ELSE 0 END), 0) AS cobrado_mes_anterior
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
          WHERE e.administrador_id = :admin_id"
     );
     $stmt->execute([':admin_id' => $adminId]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Resumen de cobros agrupado por mes y año
+ */
+public function getResumenPorMes(int $adminId): array {
+    $stmt = $this->pdo->prepare(
+        "SELECT 
+            YEAR(p.fecha) as anio,
+            MONTH(p.fecha) as mes,
+            SUM(p.monto) as total
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         WHERE e.administrador_id = :admin_id
+         GROUP BY YEAR(p.fecha), MONTH(p.fecha)
+         ORDER BY anio DESC, mes DESC"
+    );
+    $stmt->execute([':admin_id' => $adminId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Detalle completo de un mes específico
+ */
+public function getDetalleMes(int $adminId, int $anio, int $mes): array {
+    // Total y cantidad de pagos
+    $stmtTotal = $this->pdo->prepare(
+        "SELECT 
+            COUNT(*) as cantidad_pagos,
+            SUM(p.monto) as total,
+            SUM(CASE WHEN e.estado = 'entregado' THEN 1 ELSE 0 END) as entregados
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         WHERE e.administrador_id = :admin_id
+           AND YEAR(p.fecha) = :anio
+           AND MONTH(p.fecha) = :mes"
+    );
+    $stmtTotal->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
+    $resumen = $stmtTotal->fetch(PDO::FETCH_ASSOC);
+
+    // Por método de pago
+    $stmtMetodos = $this->pdo->prepare(
+        "SELECT 
+            p.metodo,
+            SUM(p.monto) as total,
+            COUNT(*) as cantidad
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         WHERE e.administrador_id = :admin_id
+           AND YEAR(p.fecha) = :anio
+           AND MONTH(p.fecha) = :mes
+         GROUP BY p.metodo
+         ORDER BY total DESC"
+    );
+    $stmtMetodos->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
+    $metodos = $stmtMetodos->fetchAll(PDO::FETCH_ASSOC);
+
+    // Top clientas
+    $stmtClientes = $this->pdo->prepare(
+        "SELECT 
+            COALESCE(c.nombre, 'Sin cliente') as nombre,
+            SUM(p.monto) as total
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         LEFT JOIN cliente c ON e.cliente_id = c.id
+         WHERE e.administrador_id = :admin_id
+           AND YEAR(p.fecha) = :anio
+           AND MONTH(p.fecha) = :mes
+         GROUP BY c.id, c.nombre
+         ORDER BY total DESC
+         LIMIT 3"
+    );
+    $stmtClientes->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
+    $topClientes = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
+
+    // Pagos individuales
+    $stmtPagos = $this->pdo->prepare(
+        "SELECT 
+            p.monto,
+            p.metodo,
+            p.nota,
+            p.fecha,
+            e.tipo,
+            COALESCE(c.nombre, 'Sin cliente') as cliente_nombre
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         LEFT JOIN cliente c ON e.cliente_id = c.id
+         WHERE e.administrador_id = :admin_id
+           AND YEAR(p.fecha) = :anio
+           AND MONTH(p.fecha) = :mes
+         ORDER BY p.fecha DESC"
+    );
+    $stmtPagos->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
+    $pagos = $stmtPagos->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        'resumen'     => $resumen,
+        'metodos'     => $metodos,
+        'topClientes' => $topClientes,
+        'pagos'       => $pagos,
+    ];
 }
 
 }

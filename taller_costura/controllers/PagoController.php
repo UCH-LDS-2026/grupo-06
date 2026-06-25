@@ -80,7 +80,11 @@ class PagoController {
         $totalSenas          = $this->pagoModel->getTotalSenas($this->adminId);
         $cuentasCount        = $this->pagoModel->getCuentasPorCobrarCount($this->adminId);
         $cuentasPorCobrar    = $this->pagoModel->getCuentasPorCobrar($this->adminId);
-        $historialPagos      = $this->pagoModel->getHistorialPagos($this->adminId);
+        $resumenPorMes       = $this->pagoModel->getResumenPorMes($this->adminId);
+        // Mes activo para el resumen detallado
+        $mesActivo  = (int)($_GET['mes']  ?? date('n'));
+        $anioActivo = (int)($_GET['anio'] ?? date('Y'));
+        $detalleMes = $this->pagoModel->getDetalleMes($this->adminId, $anioActivo, $mesActivo);
         $tabActiva           = $_GET['tab'] ?? 'cuentas';
         $flash               = $_SESSION['flash'] ?? null;
         $resumenMensual = $this->pagoModel->getResumenMensual($this->adminId);

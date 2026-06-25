@@ -122,7 +122,7 @@ $error   = isset($_GET['error']);
         Información de Pago
       </h3>
 
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:0;">
         <label for="monto_total">Precio Total</label>
         <div class="input-with-prefix">
           <span class="input-prefix">$</span>
@@ -131,16 +131,7 @@ $error   = isset($_GET['error']);
                  value="<?= htmlspecialchars($enc['monto_total'] ?? '0') ?>">
         </div>
       </div>
-
-      <div class="form-group" style="margin-bottom:0;">
-        <label for="sena">Seña / Total Pagado</label>
-        <div class="input-with-prefix">
-          <span class="input-prefix">$</span>
-          <input type="number" name="sena" id="sena" class="form-control"
-                 placeholder="0" min="0" step="0.01"
-                 value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
-        </div>
-      </div>
+      <input type="hidden" name="sena" value="<?= htmlspecialchars($enc['sena'] ?? '0') ?>">
     </div>
 
     <div class="card">
@@ -176,12 +167,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('form').addEventListener('submit', function(e) {
     const total = parseFloat(document.getElementById('monto_total').value) || 0;
-    const sena  = parseFloat(document.getElementById('sena').value) || 0;
     const errorDiv = document.getElementById('editar-error');
 
     const errores = [];
-    if (total > 0 && sena > total) {
-      errores.push('La seña / total pagado no puede superar el precio total.');
+    const senActual = <?= (float)$enc['sena'] ?>;
+    if (senActual > total) {
+      errores.push('El precio total no puede ser menor a lo ya cobrado ($' + Math.round(senActual).toLocaleString('es-AR') + ').');
     }
 
     if (errores.length > 0) {
