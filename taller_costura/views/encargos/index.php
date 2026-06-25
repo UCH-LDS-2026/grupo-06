@@ -14,7 +14,6 @@ $errorCrear = isset($_GET['error']);
 
 $busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
 
-// Para estadísticas siempre se usan TODOS los encargos.
 $todos = ($busqueda !== '')
     ? $encargoModel->buscar($busqueda)->fetchAll(PDO::FETCH_ASSOC)
     : $encargoModel->getAll()->fetchAll(PDO::FETCH_ASSOC);
@@ -24,22 +23,20 @@ $dias  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 $fechaHoy = $dias[date('w')] . ', ' . date('d') . ' de ' . $meses[date('n')-1] . ' de ' . date('Y');
 
 if ($busqueda !== '') {
-    $activos           = array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']));
-    $entregados        = array_filter($todos, fn($e) => $e['estado'] === 'entregado');
-    $todosEntregados   = $entregados; // en búsqueda, el modal muestra los mismos
+    $activos         = array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']));
+    $todosEntregados = array_filter($todos, fn($e) => $e['estado'] === 'entregado');
 } else {
-    $activos           = $encargoModel->getUltimosActivos()->fetchAll(PDO::FETCH_ASSOC);
-    $todosEntregados   = $encargoModel->getTodosEntregados()->fetchAll(PDO::FETCH_ASSOC);
-    $entregados        = array_slice($todosEntregados, 0, 2); // últimos 2 para mostrar siempre
+    $activos         = $encargoModel->getUltimosActivos()->fetchAll(PDO::FETCH_ASSOC);
+    $todosEntregados = $encargoModel->getTodosEntregados()->fetchAll(PDO::FETCH_ASSOC);
 }
 
 $estadisticas = [
-    'activos'    => count(array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']))),
-    'pendiente' => count(array_filter($todos, fn($e) => $e['estado'] === 'pendiente')),
-    'en_proceso' => count(array_filter($todos, fn($e) => $e['estado'] === 'en_proceso')),
-    'listos'     => count(array_filter($todos, fn($e) => $e['estado'] === 'listo')),
-    'senas'      => array_sum(array_column($todos, 'sena')),
-    'cobrado'    => array_sum(array_column($todos, 'monto_total')),
+    'activos'        => count(array_filter($todos, fn($e) => in_array($e['estado'], ['pendiente','en_proceso','listo']))),
+    'pendiente'      => count(array_filter($todos, fn($e) => $e['estado'] === 'pendiente')),
+    'en_proceso'     => count(array_filter($todos, fn($e) => $e['estado'] === 'en_proceso')),
+    'listos'         => count(array_filter($todos, fn($e) => $e['estado'] === 'listo')),
+    'senas'          => array_sum(array_column($todos, 'sena')),
+    'cobrado'        => array_sum(array_column($todos, 'monto_total')),
     'pendiente_pago' => array_sum(array_column($todos, 'monto_total')) - array_sum(array_column($todos, 'sena')),
 ];
 
@@ -58,10 +55,10 @@ function estadoBadge($estado) {
 }
 ?>
 
+<!-- ENCABEZADO -->
 <div class="page-top">
     <div>
         <h1>Agenda de Encargos</h1>
-        <p>Hoy es <?= $fechaHoy ?></p>
     </div>
     <a href="#" class="btn-nuevo" onclick="abrirModalEncargo(); return false;">+ Nuevo Encargo</a>
 </div>
@@ -75,44 +72,74 @@ function estadoBadge($estado) {
 <?php endif; ?>
 
 <div class="stats-grid">
-  <div class="stat-card stat-card--activos" onclick="filtrarPorEstadoCard(['pendiente','en_proceso','listo'])" style="cursor:pointer;" title="Filtrar encargos activos">
+ 
+  <!-- FECHA CARD -->
+  <div class="stat-card stat-card--fecha">
+    <div class="fecha-card-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span>HOY</span>
+    </div>
+    <div class="fecha-card-dia"><?= date('d') ?></div>
+    <div class="fecha-card-mes"><?= strtoupper($meses[date('n')-1]) ?> <?= date('Y') ?></div>
+    <div class="fecha-card-dow"><?= ucfirst($dias[date('w')]) ?></div>
+  </div>
+ 
+  <!-- ACTIVOS -->
+  <div class="stat-card stat-card--activos" onclick="filtrarPorEstadoCard(['pendiente','en_proceso','listo'])" style="cursor:pointer;">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
     </div>
     <div class="stat-text">
       <span class="stat-val"><?= $estadisticas['activos'] ?></span>
-      <p class="stat-lbl">Encargos Activos</p>
+      <p class="stat-lbl">Encargos activos</p>
+      <span class="stat-sub">Para entregar</span>
     </div>
   </div>
-  <div class="stat-card stat-card--proceso" onclick="filtrarPorEstadoCard(['pendiente'])" style="cursor:pointer;" title="Filtrar en proceso">
+ 
+  <!-- PENDIENTES -->
+  <div class="stat-card stat-card--proceso" onclick="filtrarPorEstadoCard(['pendiente'])" style="cursor:pointer;">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
     </div>
     <div class="stat-text">
       <span class="stat-val"><?= $estadisticas['pendiente'] ?></span>
       <p class="stat-lbl">Pendientes</p>
+      <span class="stat-sub">Para entregar</span>
     </div>
   </div>
-  <div class="stat-card stat-card--proceso2" onclick="filtrarPorEstadoCard(['en_proceso'])" style="cursor:pointer;" title="Filtrar en proceso">
+ 
+  <!-- EN PROCESO -->
+  <div class="stat-card stat-card--proceso2" onclick="filtrarPorEstadoCard(['en_proceso'])" style="cursor:pointer;">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
     </div>
     <div class="stat-text">
       <span class="stat-val"><?= $estadisticas['en_proceso'] ?></span>
-      <p class="stat-lbl">En Proceso</p>
+      <p class="stat-lbl">En proceso</p>
+      <span class="stat-sub">En confección</span>
     </div>
   </div>
-  <div class="stat-card stat-card--listos" onclick="filtrarPorEstadoCard(['listo'])" style="cursor:pointer;" title="Filtrar listos">
+ 
+  <!-- LISTOS -->
+  <div class="stat-card stat-card--listos" onclick="filtrarPorEstadoCard(['listo'])" style="cursor:pointer;">
     <div class="stat-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
     </div>
     <div class="stat-text">
       <span class="stat-val"><?= $estadisticas['listos'] ?></span>
       <p class="stat-lbl">Listos</p>
+      <span class="stat-sub">Para retirar</span>
     </div>
   </div>
+ 
 </div>
 
+<!-- BUSCADOR + TABS en la misma fila -->
 <div class="ag-buscador-bar">
   <div class="toolbar">
     <div class="search-wrap">
@@ -128,127 +155,123 @@ function estadoBadge($estado) {
         <input type="date" id="enc-hasta" onchange="filtrarEncargos()">
       </div>
     </div>
+
+    <!-- TABS -->
+    <div class="enc-tabs">
+      <button type="button" class="enc-tab-btn active" id="tab-btn-activos" onclick="switchTabEnc('activos')">
+        Próximas Entregas
+        <span class="tab-count"><?= $estadisticas['activos'] ?></span>
+      </button>
+      <button type="button" class="enc-tab-btn" id="tab-btn-entregados" onclick="switchTabEnc('entregados')">
+        Entregados
+        <span class="tab-count"><?= count($todosEntregados) ?></span>
+      </button>
+    </div>
+
     <button type="button" class="filtro-btn" id="enc-limpiar-btn" style="display:none;" onclick="limpiarFiltrosEnc()">✕ Limpiar</button>
   </div>
 </div>
 
-<h2 class="section-title" id="enc-section-title">Próximas Entregas</h2>
+<!-- TAB: PRÓXIMAS ENTREGAS -->
+<div class="enc-tab-panel active" id="tab-panel-activos">
+  <div id="enc-cards-container">
+  <?php if (!empty($activos)): ?>
+    <?php foreach ($activos as $enc):
+      $fecha = new DateTime($enc['fecha_entrega']);
+      $hoy   = new DateTime('today');
+      $diff  = (int)$hoy->diff($fecha)->format('%r%a');
+      $dia   = $fecha->format('d');
+      $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
+      $saldo = $enc['monto_total'] - $enc['sena'];
+      $esHoy = $diff === 0 ? ' card-es-hoy' : '';
+    ?>
+    <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>"
+       class="card-encargo<?= $esHoy ?>"
+       data-estado="<?= $enc['estado'] ?>"
+       data-fecha="<?= $enc['fecha_entrega'] ?>"
+       data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>"
+       data-sin-cliente="<?= empty($enc['cliente_nombre']) ? '1' : '0' ?>">
+      <div class="card-fecha">
+        <span class="dia"><?= $dia ?></span>
+        <span class="mes"><?= $mes ?></span>
+        <?php if ($diff < 0): ?>
+          <span class="atrasado">Atrasado <?= abs($diff) ?>d</span>
+        <?php elseif ($diff === 0): ?>
+          <span class="hoy">¡Hoy!</span>
+        <?php endif; ?>
+      </div>
+      <div class="card-info">
+        <h3><?= htmlspecialchars($enc['tipo']) ?></h3>
+        <p class="cliente"><?= htmlspecialchars($enc['cliente_nombre'] ?? 'Sin cliente') ?></p>
+        <?php if (!empty($enc['descripcion'])): ?>
+          <p class="desc"><?= htmlspecialchars($enc['descripcion']) ?></p>
+        <?php endif; ?>
+        <?php if (!empty($enc['observaciones_encargo'])): ?>
+          <div class="card-obs">ℹ️ <?= htmlspecialchars($enc['observaciones_encargo']) ?></div>
+        <?php endif; ?>
+        <p class="card-montos">
+          Total: <strong><?= fmtMonto($enc['monto_total']) ?></strong>
+          &nbsp;·&nbsp; Seña: <strong><?= fmtMonto($enc['sena']) ?></strong>
+          &nbsp;·&nbsp; Pendiente: <span class="pend"><?= fmtMonto($saldo) ?></span>
+        </p>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+        <?= estadoBadge($enc['estado']) ?>
+        <?php if (empty($enc['cliente_nombre'])): ?>
+          <span class="badge-sin-cliente">⚠</span>
+        <?php endif; ?>
+      </div>
+    </a>
+    <?php endforeach; ?>
+  <?php else: ?>
+    <div class="empty-state">No hay encargos activos.</div>
+  <?php endif; ?>
+  </div>
 
-<div id="enc-cards-container">
-<?php if (!empty($activos)): ?>
-  <?php foreach ($activos as $enc):
-    $fecha = new DateTime($enc['fecha_entrega']);
-    $hoy   = new DateTime('today');
-    $diff  = (int)$hoy->diff($fecha)->format('%r%a');
-    $dia   = $fecha->format('d');
-    $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
-    $saldo = $enc['monto_total'] - $enc['sena'];
-  ?>
-      <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo" data-estado="<?= $enc['estado'] ?>" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>" data-sin-cliente="<?= empty($enc['cliente_nombre']) ? '1' : '0' ?>">    <div class="card-fecha">
-      <span class="dia"><?= $dia ?></span>
-      <span class="mes"><?= $mes ?></span>
-      <?php if ($diff < 0): ?><span class="atrasado">Atrasado <?= abs($diff) ?>d</span>
-      <?php elseif ($diff === 0): ?><span class="hoy">¡Hoy!</span><?php endif; ?>
-    </div>
-    <div class="card-info">
-      <h3><?= htmlspecialchars($enc['tipo']) ?></h3>
-      <p class="cliente"><?= htmlspecialchars($enc['cliente_nombre'] ?? 'Sin cliente') ?></p>
-      <?php if (!empty($enc['descripcion'])): ?>
-        <p class="desc"><?= htmlspecialchars($enc['descripcion']) ?></p>
-      <?php endif; ?>
-      <?php if (!empty($enc['observaciones_encargo'])): ?>
-        <div class="card-obs">ℹ️ <?= htmlspecialchars($enc['observaciones_encargo']) ?></div>
-      <?php endif; ?>
-      <p class="card-montos">
-        Total: <strong><?= fmtMonto($enc['monto_total']) ?></strong>
-        &nbsp;·&nbsp; Seña: <strong><?= fmtMonto($enc['sena']) ?></strong>
-        &nbsp;·&nbsp; Pendiente: <span class="pend"><?= fmtMonto($saldo) ?></span>
-      </p>
-    </div>
-    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-      <?= estadoBadge($enc['estado']) ?>
-      <?php if (empty($enc['cliente_nombre'])): ?>
-        <span class="badge-sin-cliente">⚠</span>
-      <?php endif; ?>
-    </div>
-  </a>
-  <?php endforeach; ?>
-<?php else: ?>
-  <div class="empty-state">No hay encargos activos.</div>
-<?php endif; ?>
-
+  <div class="enc-paginacion" id="enc-paginacion">
+    <button class="enc-pag-btn" id="enc-pag-prev" onclick="cambiarPaginaEnc(-1)">&#8592;</button>
+    <span class="enc-pag-info" id="enc-pag-info"></span>
+    <button class="enc-pag-btn" id="enc-pag-next" onclick="cambiarPaginaEnc(1)">&#8594;</button>
+  </div>
 </div>
 
-<div class="enc-paginacion" id="enc-paginacion">
-  <button class="enc-pag-btn" id="enc-pag-prev" onclick="cambiarPaginaEnc(-1)">&#8592;</button>
-  <span class="enc-pag-info" id="enc-pag-info"></span>
-  <button class="enc-pag-btn" id="enc-pag-next" onclick="cambiarPaginaEnc(1)">&#8594;</button>
-</div>
-
-<?php if (!empty($entregados)): ?>
-  <h2 class="section-title section-title-alt">Últimos Entregados</h2>
-  <?php foreach ($entregados as $enc):
-    $fecha = new DateTime($enc['fecha_entrega']);
-    $dia   = $fecha->format('d');
-    $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
-  ?>
-  <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado card-bloqueada" data-estado="entregado" data-fecha="<?= $enc['fecha_entrega'] ?>" data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>">
-    <div class="card-fecha">
-      <span class="dia"><?= $dia ?></span>
-      <span class="mes"><?= $mes ?></span>
-    </div>
-    <div class="card-info">
-      <h3><?= htmlspecialchars($enc['tipo']) ?></h3>
-      <p class="cliente"><?= htmlspecialchars($enc['cliente_nombre'] ?? 'Sin cliente') ?></p>
-    </div>
-    <div><?= estadoBadge($enc['estado']) ?></div>
-  </a>
-  <?php endforeach; ?>
-<?php endif; ?>
-
-<?php if (!empty($todosEntregados)): ?>
-<div style="text-align:center; margin: 1rem 0 1.5rem;">
-  <button type="button" class="btn-nuevo" onclick="abrirModalEntregados()">Ver todos los entregados</button>
-</div>
-
-<div class="modal-overlay" id="modalEntregados">
-  <div class="modal" style="max-width:700px; width:95%; max-height:85vh; overflow-y:auto;">
-    <button class="modal-close" type="button" onclick="cerrarModalEntregados()">✕</button>
-    <div class="modal-header">
-      <h2>Todos los Encargos Entregados</h2>
-      <p><?= count($todosEntregados) ?> encargo<?= count($todosEntregados) !== 1 ? 's' : '' ?> entregado<?= count($todosEntregados) !== 1 ? 's' : '' ?></p>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:0.75rem; padding: 0 0.25rem 1rem;">
+<!-- TAB: ENTREGADOS -->
+<div class="enc-tab-panel" id="tab-panel-entregados">
+  <?php if (!empty($todosEntregados)): ?>
     <?php foreach ($todosEntregados as $enc):
       $fecha = new DateTime($enc['fecha_entrega']);
       $dia   = $fecha->format('d');
       $mes   = strtoupper(substr($meses[(int)$fecha->format('n')-1], 0, 3));
       $saldo = $enc['monto_total'] - $enc['sena'];
     ?>
-      <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>" class="card-encargo card-entregado card-bloqueada" style="text-decoration:none;">
-        <div class="card-fecha">
-          <span class="dia"><?= $dia ?></span>
-          <span class="mes"><?= $mes ?></span>
-        </div>
-        <div class="card-info">
-          <h3><?= htmlspecialchars($enc['tipo']) ?></h3>
-          <p class="cliente"><?= htmlspecialchars($enc['cliente_nombre'] ?? 'Sin cliente') ?></p>
-          <?php if (!empty($enc['descripcion'])): ?>
-            <p class="desc"><?= htmlspecialchars($enc['descripcion']) ?></p>
-          <?php endif; ?>
-          <p class="card-montos">
-            Total: <strong><?= fmtMonto($enc['monto_total']) ?></strong>
-            &nbsp;·&nbsp; Seña: <strong><?= fmtMonto($enc['sena']) ?></strong>
-            &nbsp;·&nbsp; Pendiente: <span class="pend"><?= fmtMonto($saldo) ?></span>
-          </p>
-        </div>
-        <div><?= estadoBadge($enc['estado']) ?></div>
-      </a>
+    <a href="index.php?page=detalle-encargo&id=<?= $enc['id'] ?>"
+       class="card-encargo card-entregado"
+       data-estado="entregado"
+       data-fecha="<?= $enc['fecha_entrega'] ?>"
+       data-cliente="<?= strtolower(htmlspecialchars($enc['cliente_nombre'] ?? '')) ?>">
+      <div class="card-fecha">
+        <span class="dia"><?= $dia ?></span>
+        <span class="mes"><?= $mes ?></span>
+      </div>
+      <div class="card-info">
+        <h3><?= htmlspecialchars($enc['tipo']) ?></h3>
+        <p class="cliente"><?= htmlspecialchars($enc['cliente_nombre'] ?? 'Sin cliente') ?></p>
+        <?php if (!empty($enc['descripcion'])): ?>
+          <p class="desc"><?= htmlspecialchars($enc['descripcion']) ?></p>
+        <?php endif; ?>
+        <p class="card-montos">
+          Total: <strong><?= fmtMonto($enc['monto_total']) ?></strong>
+          &nbsp;·&nbsp; Seña: <strong><?= fmtMonto($enc['sena']) ?></strong>
+          &nbsp;·&nbsp; Pendiente: <span class="pend"><?= fmtMonto($saldo) ?></span>
+        </p>
+      </div>
+      <div><?= estadoBadge($enc['estado']) ?></div>
+    </a>
     <?php endforeach; ?>
-    </div>
-  </div>
+  <?php else: ?>
+    <div class="empty-state">No hay encargos entregados aún.</div>
+  <?php endif; ?>
 </div>
-<?php endif; ?>
 
 <?php if (isset($_GET['nuevo'])): ?>
 <div id="toast" class="toast show">✅ Encargo creado correctamente</div>
@@ -257,6 +280,7 @@ function estadoBadge($estado) {
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/cliente/homeCliente.css">
 
+<!-- MODAL NUEVO ENCARGO -->
 <div class="modal-overlay" id="modalEncargo">
     <div class="modal modal-encargo">
         <button class="modal-close" type="button" onclick="cerrarModalEncargo()">✕</button>
@@ -274,25 +298,21 @@ function estadoBadge($estado) {
 
         <form method="POST" action="index.php?page=crear">
           <div class="modal-encargo-grid">
-
             <div class="modal-encargo-col">
                 <div class="seccion-label" style="display:flex; justify-content:space-between; align-items:center;">
                     Cliente
-                    <a href="index.php?page=clientes" target="_blank" title="Agregar nuevo cliente"
+                    <a href="index.php?page=clientes" target="_blank"
                        style="text-transform:none; letter-spacing:0; font-weight:700; font-size:0.75rem; color:var(--acento-2); text-decoration:none; line-height:1;">+ Nuevo</a>
                 </div>
                 <div class="form-group">
                     <div class="cliente-autocomplete" style="position:relative;">
-                        <input type="text" id="clienteBusqueda" autocomplete="off"
-                               placeholder="Escribí para buscar un cliente..." value="">
+                        <input type="text" id="clienteBusqueda" autocomplete="off" placeholder="Escribí para buscar un cliente..." value="">
                         <input type="hidden" name="cliente_id" id="cliente_id" value="">
                         <div id="clienteLista" class="cliente-lista"
                              style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid var(--borde); border-radius:var(--r-md); max-height:200px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
                     </div>
                 </div>
-
                 <hr class="divider">
-
                 <div class="seccion-label">Detalles del Encargo</div>
                 <div class="form-group">
                     <label>Tipo de Prenda <span class="req">*</span></label>
@@ -311,7 +331,6 @@ function estadoBadge($estado) {
                     <input type="date" name="fecha_entrega" id="modal_fecha_entrega" min="<?= date('Y-m-d') ?>" required>
                 </div>
             </div>
-
             <div class="modal-encargo-col">
                 <div class="seccion-label">Información de Pago</div>
                 <div class="form-group">
@@ -337,13 +356,11 @@ function estadoBadge($estado) {
                     </select>
                 </div>
             </div>
-
           </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn-cancelar" onclick="cerrarModalEncargo()">Cancelar</button>
-                <button type="button" class="btn-guardar" onclick="validarYGuardarEncargo()">+ Guardar Encargo</button>
-            </div>
+          <div class="modal-footer">
+              <button type="button" class="btn-cancelar" onclick="cerrarModalEncargo()">Cancelar</button>
+              <button type="button" class="btn-guardar" onclick="validarYGuardarEncargo()">+ Guardar Encargo</button>
+          </div>
         </form>
     </div>
 </div>
@@ -352,18 +369,24 @@ function estadoBadge($estado) {
 <script>
 const CLIENTES_MODAL = <?= json_encode($clientesModal, JSON_UNESCAPED_UNICODE) ?>;
 
-function validarYGuardarEncargo() {
-  const tipo      = document.querySelector('[name="tipo"]');
-  const fecha     = document.getElementById('modal_fecha_entrega');
-  const total     = document.getElementById('modal_monto_total');
-  const sena      = document.getElementById('modal_sena');
-  const errorDiv  = document.getElementById('modal-error-encargo');
-  const hoy       = new Date(); hoy.setHours(0,0,0,0);
-  const errores   = [];
+// ── Switch de tabs ──────────────────────────────────────────
+function switchTabEnc(tab) {
+  document.querySelectorAll('.enc-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.enc-tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-btn-' + tab).classList.add('active');
+  document.getElementById('tab-panel-' + tab).classList.add('active');
+}
 
-  if (!tipo || !tipo.value.trim()) {
-    errores.push('El tipo de prenda es obligatorio.');
-  }
+function validarYGuardarEncargo() {
+  const tipo     = document.querySelector('[name="tipo"]');
+  const fecha    = document.getElementById('modal_fecha_entrega');
+  const total    = document.getElementById('modal_monto_total');
+  const sena     = document.getElementById('modal_sena');
+  const errorDiv = document.getElementById('modal-error-encargo');
+  const hoy      = new Date(); hoy.setHours(0,0,0,0);
+  const errores  = [];
+
+  if (!tipo || !tipo.value.trim()) errores.push('El tipo de prenda es obligatorio.');
 
   if (!fecha.value) {
     errores.push('La fecha de entrega es obligatoria.');
@@ -374,9 +397,8 @@ function validarYGuardarEncargo() {
   const montoVal = parseFloat(total.value);
   const senaVal  = parseFloat(sena.value);
 
-  if (total.value !== '' && !isNaN(montoVal) && montoVal < 1000) {
+  if (total.value !== '' && !isNaN(montoVal) && montoVal < 1000)
     errores.push('El precio total debe ser al menos $1.000.');
-  }
 
   if (!sena.value || isNaN(senaVal) || senaVal < 1) {
     errores.push('La seña inicial es obligatoria y debe ser mayor a $0.');
@@ -406,7 +428,81 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <style>
-  .cliente-opcion { padding: 10px 12px; cursor: pointer; font-size: 0.92rem; }
-  .cliente-opcion:hover { background: var(--bg-hover); }
-  .cliente-opcion.vacia { color: var(--texto-ter); cursor: default; }
+.stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.stat-card--fecha {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    background: linear-gradient(145deg, #fff7f2 0%, #fff0f6 100%);
+    border: 1px solid #f5d0c0;
+    border-left: 3px solid var(--acento);
+    padding: 18px 16px;
+    cursor: default;
+}
+
+.stat-card--fecha:hover {
+    transform: none;
+    box-shadow: var(--shadow-card);
+}
+
+.fecha-card-icon {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--acento);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.fecha-card-dia {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: var(--texto-pri);
+    line-height: 1;
+}
+
+.fecha-card-mes {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--texto-ter);
+    margin-top: 2px;
+}
+
+.fecha-card-dow {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--texto-sec);
+    margin-top: 6px;
+}
+
+.stat-sub {
+    font-size: 0.68rem;
+    color: var(--texto-mute);
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+}
+
+@media (max-width: 900px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stat-card--fecha {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+    }
+    .fecha-card-dia { font-size: 2rem; }
+}
+
+@media (max-width: 500px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+}
 </style>

@@ -146,3 +146,29 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => iniciarPaginacionAlertas(), 100);
 });
  
+
+function pollAlertas() {
+    fetch('controllers/ajax_alertas.php?accion=contar')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) return;
+            const campana = document.querySelector('.floating-alerts');
+            if (!campana) return;
+
+            let badge = campana.querySelector('.badge');
+            if (data.total > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'badge';
+                    campana.querySelector('.campana-btn').appendChild(badge);
+                }
+                badge.textContent = data.total;
+            } else {
+                if (badge) badge.remove();
+            }
+        })
+        .catch(() => {}); // silencioso
+}
+
+// Arranca el polling cada 30 segundos
+setInterval(pollAlertas, 30000);

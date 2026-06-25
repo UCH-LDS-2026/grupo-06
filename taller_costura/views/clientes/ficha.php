@@ -29,7 +29,6 @@ $encargos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $totalEncargos  = count($encargos);
 $activos        = count(array_filter($encargos, fn($e) => in_array($e['estado'], ['pendiente', 'en_proceso'])));
 
-// BUG 8 FIX: solo suma deuda de encargos activos (no entregados)
 $saldoPendiente = array_sum(array_map(
     fn($e) => in_array($e['estado'], ['pendiente', 'en_proceso', 'listo'])
         ? $e['monto_total'] - $e['sena']
@@ -44,7 +43,6 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 $modoEdicion      = isset($_GET['editar'])         && $_GET['editar']         === '1';
 $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] === '1';
 
-// ── Helper WhatsApp ────────────────────────────────────────────────────────
 function waLink(string $telefono, string $mensaje): string {
     $tel = preg_replace('/[^0-9]/', '', $telefono);
     $tel = ltrim($tel, '0');
@@ -137,16 +135,8 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
     transform: translateX(2px);
 }
 
-.btn-wa .wa-emoji {
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
-.btn-wa .wa-texto {
-    flex: 1;
-    text-align: left;
-}
-
+.btn-wa .wa-emoji { font-size: 16px; flex-shrink: 0; }
+.btn-wa .wa-texto { flex: 1; text-align: left; }
 .btn-wa .wa-arrow {
     color: var(--texto-mute);
     font-size: .75rem;
@@ -225,7 +215,12 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
                     </div>
                     <div class="form-group" style="margin-bottom:12px">
                         <label>Teléfono</label>
-                        <input type="text" name="telefono" value="<?= htmlspecialchars($cliente->getTelefono() ?: '') ?>">
+                        <input type="tel" name="telefono"
+                               value="<?= htmlspecialchars($cliente->getTelefono() ?: '') ?>"
+                               maxlength="15"
+                               pattern="[0-9]{7,15}"
+                               title="Solo números, entre 7 y 15 dígitos"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="form-group" style="margin-bottom:12px">
                         <label>Email</label>
@@ -323,7 +318,6 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
 
             <?php if ($tieneTel): ?>
                 <div class="wa-botones">
-
                     <a href="<?= waLink($telefono, $msgSaludo) ?>"
                        target="_blank" rel="noopener"
                        class="btn-wa btn-wa-principal">
@@ -331,7 +325,6 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
                         <span class="wa-texto">Enviar mensaje</span>
                         <span class="wa-arrow">→</span>
                     </a>
-
                     <a href="<?= waLink($telefono, $msgEncargo) ?>"
                        target="_blank" rel="noopener"
                        class="btn-wa">
@@ -339,7 +332,6 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
                         <span class="wa-texto">Encargo listo para retirar</span>
                         <span class="wa-arrow">→</span>
                     </a>
-
                     <a href="<?= waLink($telefono, $msgPago) ?>"
                        target="_blank" rel="noopener"
                        class="btn-wa">
@@ -347,7 +339,6 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
                         <span class="wa-texto">Recordar saldo pendiente</span>
                         <span class="wa-arrow">→</span>
                     </a>
-
                     <a href="<?= waLink($telefono, $msgTurno) ?>"
                        target="_blank" rel="noopener"
                        class="btn-wa">
@@ -355,7 +346,6 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
                         <span class="wa-texto">Coordinar turno / prueba</span>
                         <span class="wa-arrow">→</span>
                     </a>
-
                 </div>
             <?php else: ?>
                 <div class="wa-sin-tel">
@@ -414,7 +404,6 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
                         <div class="form-group">
                             <label><?= $label ?></label>
                             <div class="input-cm">
-                                <!-- BUG 9 FIX: agregado min="1" max="300" para limitar medidas -->
                                 <input type="number" name="<?= $name ?>"
                                        value="<?= $valor ?? '' ?>"
                                        placeholder="—" step="0.5" min="1" max="300">
