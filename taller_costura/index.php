@@ -50,16 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $encargo->metodo_pago = $_POST['metodo_pago'] ?? 'efectivo';
 
        if ($encargo->tipo !== '' && $encargo->fecha_entrega !== '' && $encargo->sena > 0 && $encargo->create()) {
-    $stmtSeña = $db->prepare(
-        "INSERT INTO pago (encargo_id, administrador_id, monto, metodo, nota)
-         VALUES (?, ?, ?, ?, 'Seña inicial')"
-    );
-    $stmtSeña->execute([
-        $encargo->id,
-        $_SESSION['admin_id'] ?? 1,
-        $encargo->sena,
-        $encargo->metodo_pago
-    ]);
     header('Location: ' . BASE_URL . '/index.php?nuevo=1');
         } else {
             header('Location: ' . BASE_URL . '/index.php?page=agenda&error=1');
