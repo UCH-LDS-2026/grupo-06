@@ -1267,3 +1267,49 @@ body {
 .btn-filtro-pill:hover {
     background: #fff0ee;
 }
+/* ── Resumen Mensual ─────────────────────────────── */
+.resumen-mensual {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.resumen-mes-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.resumen-mes-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resumen-mes-nombre {
+    font-size: 0.9rem;
+    color: var(--texto-sec);
+    font-weight: 500;
+}
+
+.resumen-mes-total {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--texto-pri);
+}
+
+.resumen-barra-bg {
+    height: 8px;
+    background: var(--bg-hover);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--borde);
+}
+
+.resumen-barra-fill {
+    height: 100%;
+    background: var(--acento-gradient);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
