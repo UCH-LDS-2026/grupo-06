@@ -114,20 +114,10 @@ function enviarPago() {
 
 /* ── Actualizar card sin recargar ────────────────── */
 function actualizarCard(data) {
-    // Buscar la card por encargo_id
-    const cards = document.querySelectorAll('.encargo-card');
-    let card = null;
-    cards.forEach(c => {
-        // El botón de registrar pago tiene el id del encargo en su onclick
-        const btn = c.querySelector('.btn-registrar');
-        if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes('abrirModal(' + data.encargo_id + ',')) {
-            card = c;
-        }
-    });
-
+    const card = document.querySelector('.encargo-card[data-id="' + data.encargo_id + '"]');
+    
     if (!card) return;
 
-    // Si pagó completo: sacar la card con animación
     if (data.pagado_completo) {
         card.style.transition = 'opacity 0.4s, transform 0.4s';
         card.style.opacity    = '0';
@@ -139,40 +129,26 @@ function actualizarCard(data) {
         return;
     }
 
-    // Actualizar barra de progreso
     const barFill = card.querySelector('.progreso-bar-fill');
-    if (barFill) {
-        barFill.style.transition = 'width 0.5s ease';
-        barFill.style.width      = Math.min(100, data.porcentaje_pagado) + '%';
-    }
+    if (barFill) barFill.style.width = Math.min(100, data.porcentaje_pagado) + '%';
 
-    // Actualizar label "Pagado"
     const progresoLabel = card.querySelector('.progreso-label');
-    if (progresoLabel) {
-        progresoLabel.textContent = 'Pagado: ' + formatPesos(data.nueva_sena);
-    }
+    if (progresoLabel) progresoLabel.textContent = 'Pagado: ' + formatPesos(data.nueva_sena);
 
-    // Actualizar porcentaje
     const progresosPct = card.querySelector('.progreso-pct');
-    if (progresosPct) {
-        progresosPct.textContent = data.porcentaje_pagado + '%';
-    }
+    if (progresosPct) progresosPct.textContent = data.porcentaje_pagado + '%';
 
-    // Actualizar saldo pendiente en el pie de la card
     const saldoValor = card.querySelector('.saldo-pendiente-valor');
     if (saldoValor) {
         saldoValor.textContent = formatPesos(data.saldo_pendiente);
-        // Pulso visual
         saldoValor.style.transition = 'color 0.3s';
-        saldoValor.style.color      = '#e05252';
+        saldoValor.style.color = '#e05252';
         setTimeout(() => saldoValor.style.color = '', 800);
     }
 
-    // Actualizar el onclick del botón de pago con el nuevo saldo
     const btnRegistrar = card.querySelector('.btn-registrar');
     if (btnRegistrar) {
         const onclickActual = btnRegistrar.getAttribute('onclick');
-        // Reemplazar el último argumento numérico (saldo) con el nuevo valor
         const nuevoOnclick = onclickActual.replace(
             /abrirModal\((\d+),\s*'([^']*)',\s*'([^']*)',\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)\)/,
             `abrirModal($1, '$2', '$3', $4, ${data.nueva_sena}, ${data.saldo_pendiente})`
@@ -180,9 +156,8 @@ function actualizarCard(data) {
         btnRegistrar.setAttribute('onclick', nuevoOnclick);
     }
 
-    // Efecto visual en la card
-    card.style.transition  = 'box-shadow 0.3s';
-    card.style.boxShadow   = '0 0 0 2px #5a9e6f';
+    card.style.transition = 'box-shadow 0.3s';
+    card.style.boxShadow  = '0 0 0 2px #5a9e6f';
     setTimeout(() => card.style.boxShadow = '', 900);
 }
 

@@ -177,6 +177,7 @@ function etiquetaEstado(string $estado): string {
             <div class="encargo-list">
             <?php foreach ($cuentasPorCobrar as $e): ?>
                <div class="encargo-card historial-item"
+                    data-id="<?= $e['id'] ?>"
                     data-cliente="<?= strtolower(htmlspecialchars($e['cliente_nombre'] ?? '')) ?>"
                      data-tipo="<?= strtolower(htmlspecialchars($e['tipo'] ?? '')) ?>"
                     data-fecha="<?= $e['fecha_entrega'] ?>"
