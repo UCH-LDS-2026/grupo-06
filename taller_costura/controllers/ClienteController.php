@@ -49,22 +49,21 @@ class ClienteController {
             exit;
         }
 
-        // Validar teléfono duplicado
-        if ($telefono !== '') {
-            $existeTel = Cliente::getByTelefono($telefono);
-            if ($existeTel !== null) {
-                $_SESSION['error_cliente'] = 'El teléfono ya está registrado para ' . $existeTel->getNombre() . '.';
-                header('Location: ' . BASE_URL . '/index.php?page=clientes');
-                exit;
-            }
-        }
-
         // Validar medidas
         $errorMedidas = self::validarMedidas($_POST);
         if ($errorMedidas !== null) {
             $_SESSION['error_cliente'] = $errorMedidas;
             header('Location: ' . BASE_URL . '/index.php?page=clientes');
             exit;
+        }
+
+        // Advertencia de teléfono duplicado (no bloquea)
+        $warningTel = null;
+        if ($telefono !== '') {
+            $existeTel = Cliente::getByTelefono($telefono);
+            if ($existeTel !== null) {
+                $warningTel = 'Atención: el teléfono ya está registrado para ' . $existeTel->getNombre() . '.';
+            }
         }
 
         $cliente = new Cliente(0, $nombre, $telefono, $email);
@@ -101,7 +100,7 @@ class ClienteController {
             $ficha->guardarOActualizar();
         }
 
-        $_SESSION['exito_cliente'] = 'Clienta registrada correctamente.';
+        $_SESSION['exito_cliente'] = 'Clienta registrada correctamente.' . ($warningTel ? ' ⚠️ ' . $warningTel : '');
         header('Location: ' . BASE_URL . '/index.php?page=clientes');
         exit;
     }
@@ -131,13 +130,12 @@ class ClienteController {
             exit;
         }
 
-        // Validar teléfono duplicado (excluyendo la clienta actual)
+        // Advertencia de teléfono duplicado (no bloquea, excluye la clienta actual)
+        $warningTel = null;
         if ($telefono !== '') {
             $existeTel = Cliente::getByTelefono($telefono);
             if ($existeTel !== null && $existeTel->getId() !== $id) {
-                $_SESSION['error_cliente'] = 'El teléfono ya está registrado para ' . $existeTel->getNombre() . '.';
-                header('Location: ' . BASE_URL . '/index.php?page=ficha-cliente&id=' . $id);
-                exit;
+                $warningTel = 'Atención: el teléfono ya está registrado para ' . $existeTel->getNombre() . '.';
             }
         }
 
@@ -146,7 +144,7 @@ class ClienteController {
         $cliente->setEmail($email);
         $cliente->actualizar();
 
-        $_SESSION['exito_cliente'] = 'Datos actualizados correctamente.';
+        $_SESSION['exito_cliente'] = 'Datos actualizados correctamente.' . ($warningTel ? ' ⚠️ ' . $warningTel : '');
         header('Location: ' . BASE_URL . '/index.php?page=ficha-cliente&id=' . $id);
         exit;
     }

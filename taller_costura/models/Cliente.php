@@ -93,29 +93,33 @@ class Cliente {
      * Devuelve todos los que coincidan.
      * @return self[]
      */
-    public static function buscar(string $termino): array {
-        $pdo  = Database::getInstance()->getConnection();
-        $stmt = $pdo->prepare(
-            "SELECT id, nombre, telefono, email, created_at
-             FROM cliente
-             WHERE nombre LIKE :termino
-                OR email  LIKE :termino
-             ORDER BY nombre"
+  public static function buscar(string $termino): array {
+    $pdo  = Database::getInstance()->getConnection();
+    $stmt = $pdo->prepare(
+        "SELECT id, nombre, telefono, email, created_at
+         FROM cliente
+         WHERE nombre   LIKE :termino1
+            OR telefono LIKE :termino2
+         ORDER BY nombre"
+    );
+    $like = '%' . $termino . '%';
+    $stmt->execute([
+        ':termino1' => $like,
+        ':termino2' => $like,
+    ]);
+
+    $lista = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $lista[] = new self(
+            (int)$row['id'],
+            $row['nombre'],
+            $row['telefono'] ?? '',
+            $row['email']    ?? '',
+            $row['created_at']
         );
-        $stmt->execute([':termino' => '%' . $termino . '%']);
- 
-        $lista = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $lista[] = new self(
-                (int)$row['id'],
-                $row['nombre'],
-                $row['telefono'] ?? '',
-                $row['email']    ?? '',
-                $row['created_at']
-            );
-        }
-        return $lista;
     }
+    return $lista;
+}
  
     /**
      * Busca un cliente por email exacto.
