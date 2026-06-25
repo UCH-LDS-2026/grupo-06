@@ -204,3 +204,50 @@ pendiente → en_proceso → listo → entregado
 ## Objetivo del proyecto
 
 Digitalizar la organización de un taller de costura para evitar pérdidas de información, mejorar el control de entregas y facilitar la gestión de clientes y pagos.
+
+# 📸 Capturas del Sistema
+
+## 🖥️ Versión Escritorio
+
+### Login
+
+<img width="1357" height="615" alt="Captura de pantalla 2026-06-25 111009" src="https://github.com/user-attachments/assets/c7cfc742-8bd2-4ba8-b7ca-24b27cee5d3a" />
+
+### Gestión de Clientes
+<img width="1334" height="615" alt="Captura de pantalla 2026-06-25 111411" src="https://github.com/user-attachments/assets/ce8386b3-ad11-452c-a532-f1261593efb2" />
+
+
+### Gestión de Encargos
+
+### Gestión de Pagos
+
+<img width="1351" height="616" alt="Captura de pantalla 2026-06-25 111448" src="https://github.com/user-attachments/assets/fb06580f-9903-4ba2-8910-f756f23bf467" />
+
+### Centro de Alertas
+
+<img width="1350" height="614" alt="Captura de pantalla 2026-06-25 111511" src="https://github.com/user-attachments/assets/8219cedc-d4b4-46d2-bb22-229cef6b2788" />
+
+
+---
+
+## 📱 Versión Responsive
+
+### Login
+
+<img width="433" height="674" alt="Captura de pantalla 2026-06-25 111649" src="https://github.com/user-attachments/assets/f12699c2-b617-46d4-8ce9-266bdea0691a" />
+
+### Gestión de Clientes
+<img width="227" height="491" alt="Captura de pantalla 2026-06-25 111922" src="https://github.com/user-attachments/assets/ea3d0f01-9a88-46fb-a3dc-4d93f3ab99bf" />
+
+### Gestión de Pagos
+
+<img width="225" height="488" alt="Captura de pantalla 2026-06-25 111938" src="https://github.com/user-attachments/assets/4a42e062-033f-43ee-a226-f4adbc42d80d" />
+
+
+### Gestión de Encargos
+
+
+### Centro de Alertas
+
+
+
