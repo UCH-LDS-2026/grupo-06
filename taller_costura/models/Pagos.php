@@ -238,4 +238,86 @@ public function getResumenPorMes(int $adminId): array {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/**
+ * Detalle completo de un mes específico
+ */
+public function getDetalleMes(int $adminId, int $anio, int $mes): array {
+    // Total y cantidad de pagos
+    $stmtTotal = $this->pdo->prepare(
+        "SELECT 
+            COUNT(*) as cantidad_pagos,
+            SUM(p.monto) as total,
+            SUM(CASE WHEN e.estado = 'entregado' THEN 1 ELSE 0 END) as entregados
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         WHERE e.administrador_id = :admin_id
+           AND YEAR(p.fecha) = :anio
+           AND MONTH(p.fecha) = :mes"
+    );
+    $stmtTotal->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
+    $resumen = $stmtTotal->fetch(PDO::FETCH_ASSOC);
+
+    // Por método de pago
+    $stmtMetodos = $this->pdo->prepare(
+        "SELECT 
+            p.metodo,
+            SUM(p.monto) as total,
+            COUNT(*) as cantidad
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         WHERE e.administrador_id = :admin_id
+           AND YEAR(p.fecha) = :anio
+           AND MONTH(p.fecha) = :mes
+         GROUP BY p.metodo
+         ORDER BY total DESC"
+    );
+    $stmtMetodos->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
+    $metodos = $stmtMetodos->fetchAll(PDO::FETCH_ASSOC);
+
+    // Top clientas
+    $stmtClientes = $this->pdo->prepare(
+        "SELECT 
+            COALESCE(c.nombre, 'Sin cliente') as nombre,
+            SUM(p.monto) as total
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         LEFT JOIN cliente c ON e.cliente_id = c.id
+         WHERE e.administrador_id = :admin_id
+           AND YEAR(p.fecha) = :anio
+           AND MONTH(p.fecha) = :mes
+         GROUP BY c.id, c.nombre
+         ORDER BY total DESC
+         LIMIT 3"
+    );
+    $stmtClientes->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
+    $topClientes = $stmtClientes->fetchAll(PDO::FETCH_ASSOC);
+
+    // Pagos individuales
+    $stmtPagos = $this->pdo->prepare(
+        "SELECT 
+            p.monto,
+            p.metodo,
+            p.nota,
+            p.fecha,
+            e.tipo,
+            COALESCE(c.nombre, 'Sin cliente') as cliente_nombre
+         FROM pago p
+         INNER JOIN encargo e ON p.encargo_id = e.id
+         LEFT JOIN cliente c ON e.cliente_id = c.id
+         WHERE e.administrador_id = :admin_id
+           AND YEAR(p.fecha) = :anio
+           AND MONTH(p.fecha) = :mes
+         ORDER BY p.fecha DESC"
+    );
+    $stmtPagos->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
+    $pagos = $stmtPagos->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        'resumen'     => $resumen,
+        'metodos'     => $metodos,
+        'topClientes' => $topClientes,
+        'pagos'       => $pagos,
+    ];
+}
+
 }
