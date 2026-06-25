@@ -33,78 +33,82 @@ class ClienteController {
         return null;
     }
 
-    // =========================================================================
-    // REGISTRAR
-    // =========================================================================
-    public static function registrar(): void {
-        AuthController::requiereLogin();
+  // =========================================================================
+// REGISTRAR
+// =========================================================================
+public static function registrar(): void {
+    AuthController::requiereLogin();
 
-        $nombre   = trim($_POST['nombre']   ?? '');
-        $telefono = trim($_POST['telefono'] ?? '');
-        $email    = trim($_POST['email']    ?? '');
+    $nombre   = trim($_POST['nombre']   ?? '');
+    $telefono = trim($_POST['telefono'] ?? '');
+    $email    = trim($_POST['email']    ?? '');
 
-        if ($nombre === '') {
-            $_SESSION['error_cliente'] = 'El nombre es obligatorio.';
-            header('Location: ' . BASE_URL . '/index.php?page=clientes');
-            exit;
-        }
-
-        // Validar medidas
-        $errorMedidas = self::validarMedidas($_POST);
-        if ($errorMedidas !== null) {
-            $_SESSION['error_cliente'] = $errorMedidas;
-            header('Location: ' . BASE_URL . '/index.php?page=clientes');
-            exit;
-        }
-
-        // Advertencia de teléfono duplicado (no bloquea)
-        $warningTel = null;
-        if ($telefono !== '') {
-            $existeTel = Cliente::getByTelefono($telefono);
-            if ($existeTel !== null) {
-                $warningTel = 'Atención: el teléfono ya está registrado para ' . $existeTel->getNombre() . '.';
-            }
-        }
-
-        $cliente = new Cliente(0, $nombre, $telefono, $email);
-        $ok      = $cliente->guardar();
-
-        if (!$ok) {
-            $_SESSION['error_cliente'] = 'El email ya está registrado para otra clienta.';
-            header('Location: ' . BASE_URL . '/index.php?page=clientes');
-            exit;
-        }
-
-        // Si se enviaron medidas, guardar la ficha también
-        $tieneMedidas =
-            ($_POST['contorno_pecho']   ?? '') !== '' ||
-            ($_POST['contorno_cintura'] ?? '') !== '' ||
-            ($_POST['contorno_cadera']  ?? '') !== '' ||
-            ($_POST['largo_espalda']    ?? '') !== '' ||
-            ($_POST['largo_manga']      ?? '') !== '' ||
-            ($_POST['largo_pantalon']   ?? '') !== '';
-
-        if ($tieneMedidas) {
-            $ficha = new FichaCliente(
-                0,
-                $cliente->getId(),
-                '',
-                ($_POST['contorno_pecho']   ?? '') !== '' ? (float)$_POST['contorno_pecho']   : null,
-                ($_POST['contorno_cintura'] ?? '') !== '' ? (float)$_POST['contorno_cintura'] : null,
-                ($_POST['contorno_cadera']  ?? '') !== '' ? (float)$_POST['contorno_cadera']  : null,
-                ($_POST['largo_manga']      ?? '') !== '' ? (float)$_POST['largo_manga']      : null,
-                ($_POST['largo_espalda']    ?? '') !== '' ? (float)$_POST['largo_espalda']    : null,
-                ($_POST['largo_pantalon']   ?? '') !== '' ? (float)$_POST['largo_pantalon']   : null,
-                ''
-            );
-            $ficha->guardarOActualizar();
-        }
-
-        $_SESSION['exito_cliente'] = 'Clienta registrada correctamente.' . ($warningTel ? ' ⚠️ ' . $warningTel : '');
+    if ($nombre === '') {
+        $_SESSION['error_cliente'] = 'El nombre es obligatorio.';
         header('Location: ' . BASE_URL . '/index.php?page=clientes');
         exit;
     }
 
+    // Validar medidas
+    $errorMedidas = self::validarMedidas($_POST);
+    if ($errorMedidas !== null) {
+        $_SESSION['error_cliente'] = $errorMedidas;
+        header('Location: ' . BASE_URL . '/index.php?page=clientes');
+        exit;
+    }
+
+    // Advertencia de teléfono duplicado (no bloquea)
+    $warningTel = null;
+    if ($telefono !== '') {
+        $existeTel = Cliente::getByTelefono($telefono);
+        if ($existeTel !== null) {
+            $warningTel = 'Atención: el teléfono ya está registrado para ' . $existeTel->getNombre() . '.';
+        }
+    }
+
+    $cliente = new Cliente(0, $nombre, $telefono, $email);
+    $ok      = $cliente->guardar();
+
+    if (!$ok) {
+        $_SESSION['error_cliente'] = 'El email ya está registrado para otra clienta.';
+        header('Location: ' . BASE_URL . '/index.php?page=clientes');
+        exit;
+    }
+
+    // Si se enviaron medidas, guardar la ficha también
+    $tieneMedidas =
+        ($_POST['contorno_pecho']   ?? '') !== '' ||
+        ($_POST['contorno_cintura'] ?? '') !== '' ||
+        ($_POST['contorno_cadera']  ?? '') !== '' ||
+        ($_POST['largo_espalda']    ?? '') !== '' ||
+        ($_POST['largo_manga']      ?? '') !== '' ||
+        ($_POST['largo_pantalon']   ?? '') !== '';
+
+    if ($tieneMedidas) {
+        $ficha = new FichaCliente(
+            0,
+            $cliente->getId(),
+            '',
+            ($_POST['contorno_pecho']   ?? '') !== '' ? (float)$_POST['contorno_pecho']   : null,
+            ($_POST['contorno_cintura'] ?? '') !== '' ? (float)$_POST['contorno_cintura'] : null,
+            ($_POST['contorno_cadera']  ?? '') !== '' ? (float)$_POST['contorno_cadera']  : null,
+            ($_POST['largo_manga']      ?? '') !== '' ? (float)$_POST['largo_manga']      : null,
+            ($_POST['largo_espalda']    ?? '') !== '' ? (float)$_POST['largo_espalda']    : null,
+            ($_POST['largo_pantalon']   ?? '') !== '' ? (float)$_POST['largo_pantalon']   : null,
+            ''
+        );
+        $ficha->guardarOActualizar();
+    }
+
+    // Generar alerta si la clienta no tiene medidas
+    require_once __DIR__ . '/../controllers/AlertaController.php';
+    $alertaCtrl = new AlertaController();
+    $alertaCtrl->verificarClientasSinFicha($_SESSION['admin_id'] ?? 1);
+
+    $_SESSION['exito_cliente'] = 'Clienta registrada correctamente.' . ($warningTel ? ' ⚠️ ' . $warningTel : '');
+    header('Location: ' . BASE_URL . '/index.php?page=clientes');
+    exit;
+}
     // =========================================================================
     // EDITAR
     // =========================================================================
