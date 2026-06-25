@@ -23,6 +23,15 @@ if ($busqueda !== '') {
     $clientes = $sinFicha;
 }
 
+// ── Paginación ────────────────────────────────────────────
+$porPagina    = 8;
+$totalClientes = count($clientes);
+$totalPaginas  = max(1, (int)ceil($totalClientes / $porPagina));
+$paginaActual  = max(1, min((int)($_GET['pagina'] ?? 1), $totalPaginas));
+$offset        = ($paginaActual - 1) * $porPagina;
+$clientesPagina = array_slice($clientes, $offset, $porPagina);
+// ──────────────────────────────────────────────────────────
+
 $exito = $_SESSION['exito_cliente'] ?? null;
 $error = $_SESSION['error_cliente'] ?? null;
 unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
@@ -78,7 +87,7 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
     </div>
 <?php else: ?>
     <div class="clientes-grid">
-        <?php foreach ($clientes as $c):
+        <?php foreach ($clientesPagina as $c):
             $ficha      = FichaCliente::getByClienteId($c->getId());
             
             $nombre     = trim($c->getNombre());
@@ -91,34 +100,63 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
             $desde      = date('M Y', strtotime($c->getCreatedAt()));
         ?>
             <div class="cliente-card">
-    <div class="card-header">
-        <div class="avatar-marco">
-            <div class="avatar-iniciales"><?= htmlspecialchars($iniciales) ?></div>
-        </div>
-        <div class="cliente-nombre"><?= htmlspecialchars($c->getNombre()) ?></div>
-    </div>
+                <div class="card-header">
+                    <div class="avatar-marco">
+                        <div class="avatar-iniciales"><?= htmlspecialchars($iniciales) ?></div>
+                    </div>
+                    <div class="cliente-nombre"><?= htmlspecialchars($c->getNombre()) ?></div>
+                </div>
 
-    <div class="cliente-datos">
-        <span class="dato"><span class="material-symbols-outlined">call</span> <?= htmlspecialchars($c->getTelefono()) ?></span>
-        <span class="dato"><span class="material-symbols-outlined">mail</span> <?= htmlspecialchars($c->getEmail()) ?></span>
-    </div>
+                <div class="cliente-datos">
+                    <span class="dato"><span class="material-symbols-outlined">call</span> <?= htmlspecialchars($c->getTelefono()) ?></span>
+                    <span class="dato"><span class="material-symbols-outlined">mail</span> <?= htmlspecialchars($c->getEmail()) ?></span>
+                </div>
 
-   <div class="cliente-tags">
-    <?php if ($tieneFicha): ?>
-        <span class="tag verde">
-    <span class="material-symbols-outlined">check_circle</span> Con ficha
-    </span>
-    <?php else: ?>
-        <span class="tag naranja"><span class="material-symbols-outlined">disabled_by_default</span> Sin ficha</span>
-    <?php endif; ?>
-    <span class="tag"><span class="material-symbols-outlined">person</span> desde <?= $desde ?></span>
-</div>
-    <a href="?page=ficha-cliente&id=<?= $c->getId() ?>" class="btn-perfil">
-        Ver perfil <span class="material-symbols-outlined">chevron_right</span>
-    </a>
-</div>
+                <div class="cliente-tags">
+                    <?php if ($tieneFicha): ?>
+                        <span class="tag verde">
+                            <span class="material-symbols-outlined">check_circle</span> Con ficha
+                        </span>
+                    <?php else: ?>
+                        <span class="tag naranja"><span class="material-symbols-outlined">disabled_by_default</span> Sin ficha</span>
+                    <?php endif; ?>
+                    <span class="tag"><span class="material-symbols-outlined">person</span> desde <?= $desde ?></span>
+                </div>
+                <a href="?page=ficha-cliente&id=<?= $c->getId() ?>" class="btn-perfil">
+                    Ver perfil <span class="material-symbols-outlined">chevron_right</span>
+                </a>
+            </div>
         <?php endforeach; ?>
     </div>
+
+    <!-- ── Paginación ── -->
+    <?php if ($totalPaginas > 1): ?>
+    <div class="paginacion">
+        <?php
+        // Construir parámetros base para los links
+        $params = ['page' => 'clientes'];
+        if ($busqueda !== '') $params['buscar'] = $busqueda;
+        if ($filtro !== 'todas') $params['filtro'] = $filtro;
+        ?>
+
+        <?php if ($paginaActual > 1): ?>
+            <a href="?<?= http_build_query(array_merge($params, ['pagina' => $paginaActual - 1])) ?>"
+               class="pag-btn pag-prev">‹</a>
+        <?php else: ?>
+            <span class="pag-btn pag-prev disabled">‹</span>
+        <?php endif; ?>
+
+        <span class="pag-info">Página <?= $paginaActual ?> de <?= $totalPaginas ?></span>
+
+        <?php if ($paginaActual < $totalPaginas): ?>
+            <a href="?<?= http_build_query(array_merge($params, ['pagina' => $paginaActual + 1])) ?>"
+               class="pag-btn pag-next">›</a>
+        <?php else: ?>
+            <span class="pag-btn pag-next disabled">›</span>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
 <?php endif; ?>
 
 <div class="modal-overlay" id="modalNueva">
@@ -138,7 +176,13 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
             <div class="form-row">
                 <div class="form-group">
                     <label>Teléfono</label>
-                    <input type="text" name="telefono" placeholder="11-2345-6789">
+                    <!-- Solo números, máximo 15 dígitos -->
+                    <input type="tel" name="telefono"
+                           placeholder="Ej: 2615059493"
+                           maxlength="15"
+                           pattern="[0-9]{7,15}"
+                           title="Solo números, entre 7 y 15 dígitos"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
                 <div class="form-group">
                     <label>Email</label>

@@ -618,7 +618,53 @@ background: #fff0ee;
     box-shadow: 0 8px 22px rgba(233, 30, 100, 0.38);
     filter: brightness(1.05);
 }
+/* ── PAGINACIÓN ──────────────────────────────────────────── */
+.paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 32px;
+}
 
+.pag-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    background: var(--acento-gradient);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(233, 30, 100, 0.28);
+}
+
+.pag-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(233, 30, 100, 0.38);
+    filter: brightness(1.05);
+}
+
+.pag-btn.disabled {
+    background: #f0ebe5;
+    color: var(--texto-mute);
+    box-shadow: none;
+    cursor: default;
+    pointer-events: none;
+}
+
+.pag-info {
+    font-family: var(--sans);
+    font-size: 0.83rem;
+    color: var(--texto-sec);
+    letter-spacing: 0.3px;
+}
 /* ── ALERTAS GENERALES ───────────────────────────────────── */
 .alerta {
     padding: 12px 18px;
