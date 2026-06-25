@@ -27,6 +27,10 @@ function abrirModal(id, tipo, cliente, total, sena, saldo) {
     document.getElementById('modal-monto-hint').className   = 'hint';
     document.getElementById('btn-confirmar').disabled = false;
 
+    // Resetear método de pago a efectivo
+    const radioEfectivo = document.querySelector('input[name="metodo_pago"][value="efectivo"]');
+    if (radioEfectivo) radioEfectivo.checked = true;
+
     document.getElementById('modalPago').classList.add('open');
     setTimeout(() => input.focus(), 80);
 }
@@ -77,8 +81,9 @@ function enviarPago() {
     const fd = new FormData();
     fd.append('encargo_id', modalData.encargoId);
     fd.append('monto',      monto);
-    const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
-    fd.append('metodo_pago', metodoPago);
+
+    const metodoPago = document.querySelector('input[name="metodo_pago"]:checked');
+    fd.append('metodo_pago', metodoPago ? metodoPago.value : 'efectivo');
 
     fetch('index.php?page=pagos&accion=registrar', {
         method:  'POST',
@@ -88,17 +93,15 @@ function enviarPago() {
     .then(r => r.json())
     .then(data => {
         cerrarModal();
-        mostrarToast(data.mensaje, data.ok ? 'ok' : 'error');
-       if (data.ok) {
-    const filtro = document.getElementById('filtro-cliente').value;
-    console.log('filtro guardado:', filtro);
-    console.log('url destino:', 'index.php?page=pagos&filtro=' + encodeURIComponent(filtro));
-    setTimeout(() => {
-        location.href = 'index.php?page=pagos&filtro=' + encodeURIComponent(filtro);
-    }, 1200);
-}else {
-            btn.disabled          = false;
-            spinner.style.display = 'none';
+        spinner.style.display = 'none';
+
+        if (data.ok) {
+            mostrarToast(data.mensaje, 'ok');
+            actualizarCard(data);
+            actualizarStats();
+        } else {
+            mostrarToast(data.mensaje || 'Error al registrar el pago.', 'error');
+            btn.disabled = false;
         }
     })
     .catch(() => {
@@ -107,6 +110,129 @@ function enviarPago() {
         btn.disabled          = false;
         spinner.style.display = 'none';
     });
+}
+
+/* ── Actualizar card sin recargar ────────────────── */
+function actualizarCard(data) {
+    // Buscar la card por encargo_id
+    const cards = document.querySelectorAll('.encargo-card');
+    let card = null;
+    cards.forEach(c => {
+        // El botón de registrar pago tiene el id del encargo en su onclick
+        const btn = c.querySelector('.btn-registrar');
+        if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes('abrirModal(' + data.encargo_id + ',')) {
+            card = c;
+        }
+    });
+
+    if (!card) return;
+
+    // Si pagó completo: sacar la card con animación
+    if (data.pagado_completo) {
+        card.style.transition = 'opacity 0.4s, transform 0.4s';
+        card.style.opacity    = '0';
+        card.style.transform  = 'translateX(30px)';
+        setTimeout(() => {
+            card.remove();
+            verificarListaVacia();
+        }, 420);
+        return;
+    }
+
+    // Actualizar barra de progreso
+    const barFill = card.querySelector('.progreso-bar-fill');
+    if (barFill) {
+        barFill.style.transition = 'width 0.5s ease';
+        barFill.style.width      = Math.min(100, data.porcentaje_pagado) + '%';
+    }
+
+    // Actualizar label "Pagado"
+    const progresoLabel = card.querySelector('.progreso-label');
+    if (progresoLabel) {
+        progresoLabel.textContent = 'Pagado: ' + formatPesos(data.nueva_sena);
+    }
+
+    // Actualizar porcentaje
+    const progresosPct = card.querySelector('.progreso-pct');
+    if (progresosPct) {
+        progresosPct.textContent = data.porcentaje_pagado + '%';
+    }
+
+    // Actualizar saldo pendiente en el pie de la card
+    const saldoValor = card.querySelector('.saldo-pendiente-valor');
+    if (saldoValor) {
+        saldoValor.textContent = formatPesos(data.saldo_pendiente);
+        // Pulso visual
+        saldoValor.style.transition = 'color 0.3s';
+        saldoValor.style.color      = '#e05252';
+        setTimeout(() => saldoValor.style.color = '', 800);
+    }
+
+    // Actualizar el onclick del botón de pago con el nuevo saldo
+    const btnRegistrar = card.querySelector('.btn-registrar');
+    if (btnRegistrar) {
+        const onclickActual = btnRegistrar.getAttribute('onclick');
+        // Reemplazar el último argumento numérico (saldo) con el nuevo valor
+        const nuevoOnclick = onclickActual.replace(
+            /abrirModal\((\d+),\s*'([^']*)',\s*'([^']*)',\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)\)/,
+            `abrirModal($1, '$2', '$3', $4, ${data.nueva_sena}, ${data.saldo_pendiente})`
+        );
+        btnRegistrar.setAttribute('onclick', nuevoOnclick);
+    }
+
+    // Efecto visual en la card
+    card.style.transition  = 'box-shadow 0.3s';
+    card.style.boxShadow   = '0 0 0 2px #5a9e6f';
+    setTimeout(() => card.style.boxShadow = '', 900);
+}
+
+/* ── Actualizar stats del header sin recargar ────── */
+function actualizarStats() {
+    fetch('index.php?page=pagos&accion=stats', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.ok) return;
+
+        // Saldo pendiente total
+        const statPendiente = document.querySelector('.stat-card--pendiente .stat-val');
+        if (statPendiente) {
+            statPendiente.textContent = formatPesos(data.saldo_pendiente_total);
+        }
+
+        // Cuentas por cobrar
+        const statCuentas = document.querySelector('.stat-card--cuentas .stat-val');
+        if (statCuentas) {
+            statCuentas.textContent = data.cuentas_count;
+        }
+
+        // Este mes
+        if (data.resumen_mensual) {
+            const statEsteMes = document.querySelector('.stat-card--estemes .stat-val');
+            if (statEsteMes) {
+                statEsteMes.textContent = formatPesos(data.resumen_mensual.cobrado_este_mes ?? 0);
+            }
+        }
+    })
+    .catch(() => {/* silencioso — las stats se actualizarán en el próximo refresh */});
+}
+
+/* ── Verificar si la lista quedó vacía ───────────── */
+function verificarListaVacia() {
+    const lista = document.querySelector('#tab-cuentas .encargo-list');
+    if (!lista) return;
+    const restantes = lista.querySelectorAll('.encargo-card');
+    if (restantes.length === 0) {
+        lista.innerHTML = `
+            <div class="empty-state">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                     stroke="#C0B0A0" stroke-width="1.5">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+                <p>¡No quedan cuentas pendientes por cobrar!</p>
+            </div>`;
+    }
 }
 
 /* ── Toasts ──────────────────────────────────────── */
@@ -169,7 +295,6 @@ function limpiarFiltros() {
     document.getElementById('pago-limpiar-btn').style.display = 'none';
     document.getElementById('pago-date-picker').classList.remove('visible');
 
-    // Desactivar filtro sin retirar si está activo
     const btnSinRetirar = document.getElementById('btn-sin-retirar');
     if (btnSinRetirar && btnSinRetirar.classList.contains('active')) {
         btnSinRetirar.classList.remove('active');
@@ -193,9 +318,9 @@ function filtrarHistorial() {
 
     if (!inputCliente) return;
 
-    const textoBusqueda = inputCliente.value.toLowerCase();
-    const desde = inputDesde ? inputDesde.value : '';
-    const hasta  = inputHasta ? inputHasta.value : '';
+    const textoBusqueda  = inputCliente.value.toLowerCase();
+    const desde          = inputDesde ? inputDesde.value : '';
+    const hasta          = inputHasta ? inputHasta.value : '';
     const sinRetirarActivo = document.getElementById('btn-sin-retirar')?.classList.contains('active');
 
     const limpiarBtn = document.getElementById('pago-limpiar-btn');
@@ -207,18 +332,16 @@ function filtrarHistorial() {
     if (items.length === 0) return;
 
     items.forEach(card => {
-        const cliente = card.dataset.cliente || '';
-        const tipo    = card.dataset.tipo    || '';
-        const fecha   = card.dataset.fecha   || '';
+        const cliente    = card.dataset.cliente || '';
+        const tipo       = card.dataset.tipo    || '';
+        const fecha      = card.dataset.fecha   || '';
         const tieneBadge = card.querySelector('.badge-sin-retirar');
 
-        const coincideTexto = cliente.includes(textoBusqueda) || tipo.includes(textoBusqueda);
-
-        let coincideFecha = true;
+        const coincideTexto     = cliente.includes(textoBusqueda) || tipo.includes(textoBusqueda);
+        let   coincideFecha     = true;
         if (desde && fecha < desde) coincideFecha = false;
         if (hasta && fecha > hasta) coincideFecha = false;
 
-        // Si filtro sin retirar activo, solo mostrar los que tienen badge
         const coincideSinRetirar = !sinRetirarActivo || tieneBadge;
 
         card.style.display = coincideTexto && coincideFecha && coincideSinRetirar ? 'flex' : 'none';
@@ -237,7 +360,7 @@ function iniciarPaginacion(tabId) {
 
     if (total <= ITEMS_POR_PAGINA) return;
 
-    let paginaActual = 1;
+    let paginaActual  = 1;
     const totalPaginas = Math.ceil(total / ITEMS_POR_PAGINA);
 
     const paginacion = document.createElement('div');
@@ -249,7 +372,7 @@ function iniciarPaginacion(tabId) {
         paginaActual = pagina;
         items.forEach((item, i) => {
             const desde = (pagina - 1) * ITEMS_POR_PAGINA;
-            const hasta = desde + ITEMS_POR_PAGINA;
+            const hasta  = desde + ITEMS_POR_PAGINA;
             item.style.display = (i >= desde && i < hasta) ? 'flex' : 'none';
         });
         paginacion.innerHTML = `
@@ -265,7 +388,7 @@ function iniciarPaginacion(tabId) {
 }
 
 function cambiarPagina(tabId, pagina) {
-    const tab = document.getElementById(tabId);
+    const tab   = document.getElementById(tabId);
     const items = tab.querySelectorAll('.encargo-card');
     const totalPaginas = Math.ceil(items.length / ITEMS_POR_PAGINA);
 
@@ -273,7 +396,7 @@ function cambiarPagina(tabId, pagina) {
 
     items.forEach((item, i) => {
         const desde = (pagina - 1) * ITEMS_POR_PAGINA;
-        const hasta = desde + ITEMS_POR_PAGINA;
+        const hasta  = desde + ITEMS_POR_PAGINA;
         item.style.display = (i >= desde && i < hasta) ? 'flex' : 'none';
     });
 
@@ -289,10 +412,11 @@ function cambiarPagina(tabId, pagina) {
 
 /* ── Init ────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
+    const params    = new URLSearchParams(window.location.search);
     const filtroUrl = params.get('filtro');
     if (filtroUrl) {
-        document.getElementById('filtro-cliente').value = filtroUrl;
+        const input = document.getElementById('filtro-cliente');
+        if (input) input.value = filtroUrl;
     }
     setTimeout(() => {
         iniciarPaginacion('tab-cuentas');
@@ -300,32 +424,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filtroUrl) filtrarHistorial();
     }, 150);
 });
+
 /* ── Filtro sin retirar ──────────────────────────── */
 function toggleSinRetirar(btn) {
     btn.classList.toggle('active');
 
-    // Asegurarse de estar en el tab de cuentas
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('tab-cuentas').classList.add('active');
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('.tab-btn[onclick*="cuentas"]').classList.add('active');
 
-    // Filtrar primero
     filtrarHistorial();
 
-    // Re-iniciar paginación respetando el display actual
     const pagVieja = document.getElementById('pag-tab-cuentas');
     if (pagVieja) pagVieja.remove();
 
     setTimeout(() => {
-        const tab = document.getElementById('tab-cuentas');
+        const tab           = document.getElementById('tab-cuentas');
         const itemsVisibles = Array.from(tab.querySelectorAll('.encargo-card'))
             .filter(card => card.style.display !== 'none');
 
         if (itemsVisibles.length <= ITEMS_POR_PAGINA) return;
 
         const totalPaginas = Math.ceil(itemsVisibles.length / ITEMS_POR_PAGINA);
-        const paginacion = document.createElement('div');
+        const paginacion   = document.createElement('div');
         paginacion.className = 'enc-paginacion';
         paginacion.id = 'pag-tab-cuentas';
         tab.appendChild(paginacion);
@@ -333,7 +455,7 @@ function toggleSinRetirar(btn) {
         function mostrarPaginaFiltrada(pagina) {
             itemsVisibles.forEach((item, i) => {
                 const desde = (pagina - 1) * ITEMS_POR_PAGINA;
-                const hasta = desde + ITEMS_POR_PAGINA;
+                const hasta  = desde + ITEMS_POR_PAGINA;
                 item.style.display = (i >= desde && i < hasta) ? 'flex' : 'none';
             });
             paginacion.innerHTML = `
