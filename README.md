@@ -204,3 +204,36 @@ pendiente → en_proceso → listo → entregado
 ## Objetivo del proyecto
 
 Digitalizar la organización de un taller de costura para evitar pérdidas de información, mejorar el control de entregas y facilitar la gestión de clientes y pagos.
+
+--- 
+# Capturas del Sistema 
+
+##  Versión Escritorio
+###login
+<img width="1357" height="615" alt="image" src="https://github.com/user-attachments/assets/d0a9e2ff-0ee6-472d-98dc-1db18a8a757c" />
+
+###panel clientes 
+<img width="1334" height="615" alt="image" src="https://github.com/user-attachments/assets/04f546a8-d22b-4c32-8ba8-228bb9e57dee" />
+
+panel encargos 
+
+panel pagos
+<img width="1351" height="616" alt="image" src="https://github.com/user-attachments/assets/3d4f11f1-ab57-4a00-8779-89ab62afc62c" />
+panel alertas 
+<img width="1376" height="614" alt="image" src="https://github.com/user-attachments/assets/e93d84ef-e9ef-4b54-8cca-d12e883994d0" />
+
+## Versión Responsive
+###Login
+<img width="831" height="674" alt="image" src="https://github.com/user-attachments/assets/f5ca7431-bd82-4c5b-ab4e-662ce168b494" />
+
+### Panel Cliente 
+<img width="408" height="665" alt="Captura de pantalla 2026-06-25 111842" src="https://github.com/user-attachments/assets/99f1a91a-4bc7-44e5-8625-7a92421e7336" />
+
+#Panel Pagos 
+<img width="225" height="488" alt="Captura de pantalla 2026-06-25 111938" src="https://github.com/user-attachments/assets/9245278a-5abf-4fef-b87b-ac18c35966ee" />
+
+###Panel Encargos
+
+###Panel Alertas
+
+
