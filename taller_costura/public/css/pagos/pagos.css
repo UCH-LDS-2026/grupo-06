@@ -1321,30 +1321,33 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--borde);
     border-radius: var(--r-xl);
-    padding: 20px 24px;
-    margin-bottom: 16px;
+    padding: 24px 28px;
+    margin-bottom: 12px;
 }
 
 .resumen-nav-btn {
-    width: 36px; height: 36px;
+    width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%;
-    background: var(--acento-gradient);
-    color: #fff;
-    font-size: 1.2rem;
+    background: var(--bg-hover);
+    color: var(--texto-sec);
+    font-size: 1rem;
     font-weight: 700;
     text-decoration: none;
-    cursor: pointer;
-    border: none;
+    border: 1px solid var(--borde);
     transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.resumen-nav-btn:hover:not(.disabled) {
+    background: var(--acento-gradient);
+    color: #fff;
+    border-color: transparent;
     box-shadow: var(--shadow-btn);
 }
 
-.resumen-nav-btn:hover { transform: translateY(-1px); }
 .resumen-nav-btn.disabled {
-    background: var(--borde);
-    color: var(--texto-ter);
-    box-shadow: none;
+    opacity: 0.3;
     cursor: not-allowed;
 }
 
@@ -1354,44 +1357,48 @@ body {
 
 .resumen-nav-center h2 {
     font-family: var(--serif);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--texto-pri);
     margin: 0 0 4px;
     font-weight: 400;
+    letter-spacing: 0.3px;
 }
 
 .resumen-nav-center p {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     color: var(--texto-ter);
     margin: 0;
+    letter-spacing: 0.02em;
 }
 
 .resumen-total-card {
     background: var(--bg-card);
     border: 1px solid var(--borde);
     border-radius: var(--r-xl);
-    padding: 28px 24px;
+    padding: 32px 24px;
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .resumen-total-label {
-    font-size: 0.72rem;
-    letter-spacing: 2px;
+    font-size: 0.68rem;
+    letter-spacing: 2.5px;
     color: var(--texto-ter);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
+    font-family: var(--sans);
 }
 
 .resumen-total-monto {
     font-family: var(--serif);
-    font-size: 2.8rem;
+    font-size: 3rem;
     color: var(--oro-dark);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
     font-weight: 400;
+    letter-spacing: -0.5px;
 }
 
 .resumen-total-sub {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--texto-ter);
     margin: 0;
 }
@@ -1399,44 +1406,54 @@ body {
 .resumen-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
 .resumen-card {
     background: var(--bg-card);
     border: 1px solid var(--borde);
     border-radius: var(--r-xl);
-    padding: 20px;
+    padding: 20px 22px;
 }
 
 .resumen-card-titulo {
-    font-size: 0.68rem;
-    letter-spacing: 2px;
+    font-size: 0.65rem;
+    letter-spacing: 2.5px;
     color: var(--texto-ter);
-    margin: 0 0 16px;
+    margin: 0 0 18px;
     font-weight: 600;
+    font-family: var(--sans);
 }
 
-.resumen-metodo-item {
-    margin-bottom: 14px;
-}
+.resumen-metodo-item { margin-bottom: 16px; }
+.resumen-metodo-item:last-child { margin-bottom: 0; }
 
 .resumen-metodo-top {
     display: flex;
     justify-content: space-between;
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     color: var(--texto-sec);
-    margin-bottom: 6px;
+    margin-bottom: 7px;
+    align-items: center;
 }
 
-.resumen-metodo-top strong {
+.resumen-metodo-nombre { font-weight: 500; }
+
+.resumen-metodo-pct {
+    font-size: 0.78rem;
+    color: var(--texto-ter);
+}
+
+.resumen-metodo-pct strong {
     color: var(--texto-pri);
+    font-weight: 600;
+    margin-left: 4px;
 }
 
 .resumen-barra-bg {
-    height: 6px;
-    background: var(--bg-hover);
+    height: 5px;
+    background: var(--borde);
     border-radius: 999px;
     overflow: hidden;
 }
@@ -1445,39 +1462,51 @@ body {
     height: 100%;
     background: var(--acento-gradient);
     border-radius: 999px;
-    transition: width 0.4s ease;
+    transition: width 0.5s ease;
 }
 
 .resumen-cliente-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 0;
+    padding: 11px 0;
     border-bottom: 1px solid var(--borde);
-    font-size: 0.85rem;
 }
 
 .resumen-cliente-item:last-child { border-bottom: none; }
 
 .resumen-cliente-num {
-    width: 24px; height: 24px;
+    width: 22px; height: 22px;
     border-radius: 50%;
     background: var(--acento-gradient);
     color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     flex-shrink: 0;
 }
 
 .resumen-cliente-nombre {
     flex: 1;
+    font-size: 0.84rem;
     color: var(--texto-sec);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .resumen-cliente-monto {
+    font-size: 0.84rem;
     font-weight: 600;
     color: var(--texto-pri);
+    white-space: nowrap;
+}
+
+/* Cada pago del mes */
+.resumen-pagos-lista {
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
 .resumen-pago-item {
@@ -1491,13 +1520,17 @@ body {
 .resumen-pago-item:last-child { border-bottom: none; }
 
 .resumen-pago-metodo-icon {
-    width: 36px; height: 36px;
+    width: 34px; height: 34px;
     border-radius: 50%;
     background: var(--bg-hover);
     border: 1px solid var(--borde);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1rem;
     flex-shrink: 0;
+    color: var(--oro-dark);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .resumen-pago-info {
@@ -1505,16 +1538,23 @@ body {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-width: 0;
 }
 
 .resumen-pago-info strong {
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     color: var(--texto-pri);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .resumen-pago-info span {
-    font-size: 0.75rem;
+    font-size: 0.73rem;
     color: var(--texto-ter);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .resumen-pago-derecha {
@@ -1522,20 +1562,21 @@ body {
     flex-direction: column;
     align-items: flex-end;
     gap: 2px;
+    flex-shrink: 0;
 }
 
 .resumen-pago-derecha strong {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: var(--oro-dark);
     font-weight: 600;
 }
 
 .resumen-pago-derecha span {
-    font-size: 0.72rem;
+    font-size: 0.71rem;
     color: var(--texto-ter);
 }
 
 @media (max-width: 768px) {
     .resumen-grid { grid-template-columns: 1fr; }
-    .resumen-total-monto { font-size: 2rem; }
+    .resumen-total-monto { font-size: 2.2rem; }
 }
