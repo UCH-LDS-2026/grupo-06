@@ -28,6 +28,58 @@ class Encargo {
         return $stmt;
     }
 
+    public function buscar($termino) {
+        $like = '%' . $termino . '%';
+        $query = "SELECT e.*, c.nombre AS cliente_nombre
+                FROM " . $this->table . " e
+                LEFT JOIN cliente c ON e.cliente_id = c.id
+                WHERE e.tipo LIKE ?
+                    OR c.nombre LIKE ?
+                    OR c.telefono LIKE ?
+                ORDER BY e.fecha_entrega ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $like);
+        $stmt->bindParam(2, $like);
+        $stmt->bindParam(3, $like);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    public function getUltimosActivos() {
+        $query = "SELECT e.*, c.nombre AS cliente_nombre
+                FROM " . $this->table . " e
+                LEFT JOIN cliente c ON e.cliente_id = c.id
+                WHERE e.estado IN ('pendiente','en_proceso','listo')
+                ORDER BY e.fecha_entrega ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    public function getUltimosEntregados($limite = 2) {
+        $query = "SELECT e.*, c.nombre AS cliente_nombre
+                  FROM " . $this->table . " e
+                  LEFT JOIN cliente c ON e.cliente_id = c.id
+                  WHERE e.estado = 'entregado'
+                  ORDER BY e.fecha_entrega DESC
+                  LIMIT ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(1, (int)$limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    public function getTodosEntregados() {
+        $query = "SELECT e.*, c.nombre AS cliente_nombre
+                FROM " . $this->table . " e
+                LEFT JOIN cliente c ON e.cliente_id = c.id
+                WHERE e.estado = 'entregado'
+                ORDER BY e.fecha_entrega DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function getByEstado($estado) {
         $query = "SELECT e.*, c.nombre AS cliente_nombre 
                   FROM " . $this->table . " e
@@ -52,24 +104,25 @@ class Encargo {
     }
 
     public function create() {
-        $query = "INSERT INTO " . $this->table . " 
-                  (administrador_id, cliente_id, tipo, descripcion, observaciones_encargo, fecha_entrega, monto_total, sena, estado)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendiente')";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->administrador_id);
-        $stmt->bindParam(2, $this->cliente_id);
-        $stmt->bindParam(3, $this->tipo);
-        $stmt->bindParam(4, $this->descripcion);
-        $stmt->bindParam(5, $this->observaciones_encargo);
-        $stmt->bindParam(6, $this->fecha_entrega);
-        $stmt->bindParam(7, $this->monto_total);
-        $stmt->bindParam(8, $this->sena);
-        if ($stmt->execute()) {
-            $this->id = $this->conn->lastInsertId();
-            return true;
-        }
-        return false;
+    $query = "INSERT INTO " . $this->table . " 
+              (administrador_id, cliente_id, tipo, descripcion, observaciones_encargo, fecha_entrega, monto_total, sena, estado, metodo_pago)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?)";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(1, $this->administrador_id);
+    $stmt->bindParam(2, $this->cliente_id);
+    $stmt->bindParam(3, $this->tipo);
+    $stmt->bindParam(4, $this->descripcion);
+    $stmt->bindParam(5, $this->observaciones_encargo);
+    $stmt->bindParam(6, $this->fecha_entrega);
+    $stmt->bindParam(7, $this->monto_total);
+    $stmt->bindParam(8, $this->sena);
+    $stmt->bindParam(9, $this->metodo_pago);
+    if ($stmt->execute()) {
+        $this->id = $this->conn->lastInsertId();
+        return true;
     }
+    return false;
+}
 
     public function update() {
         $query = "UPDATE " . $this->table . " 
@@ -108,12 +161,22 @@ class Encargo {
         return $this->monto_total - $this->sena;
     }
 
-    // devuelve cuantos dias faltan para la entrega
     public function calcularDemora() {
         $hoy = new DateTime();
         $entrega = new DateTime($this->fecha_entrega);
         $diff = $hoy->diff($entrega);
         return $diff->days;
+    }
+
+    // Función movida correctamente dentro de la clase
+    public function getByClienteId($cliente_id) {
+        $query = "SELECT * FROM " . $this->table . " 
+                  WHERE cliente_id = ?
+                  ORDER BY fecha_entrega ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $cliente_id);
+        $stmt->execute();
+        return $stmt;
     }
 }
 ?>

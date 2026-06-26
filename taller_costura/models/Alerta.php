@@ -61,5 +61,56 @@ class Alerta {
         $resultado = $this->db->fetch($sql, [$administrador_id]);
         return $resultado['total'];
     }
+public function getClientasSinMedidas() {
+    $sql = "SELECT c.nombre 
+            FROM cliente c
+            LEFT JOIN ficha_cliente f ON c.id = f.cliente_id
+            WHERE f.id IS NULL";
+
+    return $this->db->fetchAll($sql);
 }
-?>
+/**
+ * Limpia alertas viejas: máximo 50 y no más de 30 días
+ */
+public function limpiarViejas($administrador_id) {
+    // Borrar alertas de más de 30 días
+    $sql = "DELETE FROM alerta 
+            WHERE administrador_id = ? 
+            AND fecha < DATE_SUB(NOW(), INTERVAL 30 DAY)";
+    $this->db->query($sql, [$administrador_id]);
+
+    // Si quedan más de 50, borrar las más viejas
+    $sql = "DELETE FROM alerta 
+            WHERE administrador_id = ? 
+            AND id NOT IN (
+                SELECT id FROM (
+                    SELECT id FROM alerta 
+                    WHERE administrador_id = ?
+                    ORDER BY fecha DESC 
+                    LIMIT 50
+                ) tmp
+            )";
+    $this->db->query($sql, [$administrador_id, $administrador_id]);
+}
+/**
+ * Busca encargos vencidos con saldo pendiente (morosos)
+ */
+public function getEncargosVencidosConSaldo($administrador_id) {
+    $sql = "SELECT e.id, e.tipo, e.fecha_entrega, 
+                   (e.monto_total - e.sena) AS saldo_pendiente,
+                   c.nombre as nombre_cliente
+            FROM encargo e
+            LEFT JOIN cliente c ON e.cliente_id = c.id
+            WHERE e.administrador_id = ?
+            AND e.estado NOT IN ('entregado')
+            AND e.fecha_entrega < CURDATE()
+            AND (e.monto_total - e.sena) > 0
+            AND e.id NOT IN (
+                SELECT encargo_id FROM alerta
+                WHERE administrador_id = ?
+                AND tipo = 'pago'
+                AND DATE(fecha) = CURDATE()
+            )";
+    return $this->db->fetchAll($sql, [$administrador_id, $administrador_id]);
+}
+}

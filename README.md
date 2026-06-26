@@ -10,8 +10,8 @@
 
 ## Descripción del proyecto
 
-Sistema web destinado a la gestión de encargos de un taller de costura.  
-Permite registrar clientes, almacenar medidas, gestionar encargos, registrar señas y visualizar entregas próximas mediante una agenda organizada.
+Sistema web para la gestión integral de un taller de costura.  
+Permite registrar clientes con sus medidas, gestionar encargos con seguimiento de estados, registrar pagos y señas, calcular saldos pendientes, y recibir alertas sobre vencimientos y estados críticos.
 
 ---
 
@@ -28,13 +28,13 @@ Permite registrar clientes, almacenar medidas, gestionar encargos, registrar se�
 
 ## Justificación del Stack
 
-**JavaScript** se eligió para el frontend por su facilidad para generar interfaces dinámicas, especialmente útil para la agenda visual y la actualización de estados de encargos.
-
-**PHP** fue seleccionado para el backend por su integración sencilla con bases de datos relacionales y su adecuación para proyectos CRUD como este sistema.
-
-**MySQL** se eligió como gestor de base de datos por su estabilidad, facilidad de uso y compatibilidad con PHP, permitiendo almacenar clientes, encargos, observaciones y pagos de forma estructurada.
-
-El sistema se plantea como aplicación web para permitir el acceso desde distintos dispositivos sin instalación local, con arquitectura MVC que facilita la separación entre interfaz, lógica y datos.
+**JavaScript** se eligió para el frontend por su capacidad de generar interfaces dinámicas sin recargar la página, especialmente útil para el manejo de encargos y alertas en tiempo real.
+ 
+**PHP** fue seleccionado para el backend por su integración sencilla con MySQL y su adecuación natural para sistemas CRUD con arquitectura MVC.
+ 
+**MySQL** permite estructurar las relaciones entre clientes, encargos, pagos, observaciones y alertas de forma robusta y con integridad referencial.
+ 
+El sistema se plantea como aplicación web para permitir el acceso desde distintos dispositivos sin instalación adicional.
 
 ---
 
@@ -57,16 +57,18 @@ git clone https://github.com/UCH-LDS-2026/grupo-06
 
 ### 2. Configurar base de datos
 
-- Crear la base de datos `sistema_costura` en MySQL
+- Crear la base de datos en MySQL (el script la crea automáticamente si no existe)
 - Importar el archivo:
 
-```bash
+```
 taller_costura/database/sistema_costura.sql
 ```
 
+Esto crea todas las tablas e inserta datos de ejemplo listos para probar.
+
 ### 3. Configurar conexión
 
-Cada integrante debe crear su propio `config/database.php` con sus credenciales locales (este archivo está excluido del repositorio por `.gitignore`).
+Crear el archivo `taller_costura/config/database.php` con las credenciales locales (este archivo está excluido del repositorio por `.gitignore`):
 
 ```php
 <?php
@@ -79,13 +81,15 @@ define('DB_NAME', 'sistema_costura');
 
 ### 4. Iniciar servidor
 
-Con WAMP o XAMPP iniciá Apache y MySQL.
+Con WAMP o XAMPP, iniciar Apache y MySQL.
 
 ### 5. Acceder al sistema
 
 ```
-http://localhost/sistema_costura/grupo-06/taller_costura/views/auth/login.php
+http://localhost/grupo-06/taller_costura/views/auth/login.php
 ```
+
+> ⚠️ Si la URL no responde, verificar que la carpeta `grupo-06` esté dentro de `www/` (WAMP) o `htdocs/` (XAMPP).
 
 ---
 
@@ -96,30 +100,57 @@ http://localhost/sistema_costura/grupo-06/taller_costura/views/auth/login.php
 | Email | admin@taller.com |
 | Contraseña | Admin1234 |
 
-> ⚠️ Recordá correr el script `actualizar_pass.php` una sola vez para generar el hash correcto, luego eliminarlo.
+> ⚠️ La contraseña está hasheada en la base de datos. Si el login falla, correr `actualizar_pass.php` **una sola vez** desde el navegador para regenerar el hash, y luego eliminar ese archivo.
 
 ---
 
-## Estrategia de ramas
+## Screenshots
 
-| Rama | Uso |
-|---|---|
-| `main` | Versión estable — protegida, solo merge por PR |
-| `development` | Integración de funcionalidades |
-| `feature/nombre-feature` | Nuevas funcionalidades |
-| `fix/nombre-fix` | Corrección de errores |
+### Login
+![Login](docs/screenshots/login.png) 
 
----
+### Panel de encargos
+![Encargos](docs/screenshots/encargos.png)
+![Encargos](docs/screenshots/encargos2.png)
 
-## Funcionalidades MVP
+### Detalle de encargo
+![Detalle encargo](docs/screenshots/encargo-detalle.png)
+![Detalle encargo](docs/screenshots/encargo-detalle2.png)
 
-- Registro de clientes
-- Gestión de encargos
-- Agenda visual con colores según proximidad de entrega
-- Registro de señas
-- Cálculo de saldo pendiente
-- Gestión de observaciones por encargo
-- Historial de encargos entregados
+### Fichas de clientes
+![Ficha cliente](docs/screenshots/clientes.png)
+
+### Detalle de clientes
+![Detalle encargo](docs/screenshots/cliente-detalle.png)
+![Detalle encargo](docs/screenshots/cliente-detalle2.png)
+
+### Nuevo Cliente
+![Ficha cliente](docs/screenshots/nuevo-cliente.png)
+
+### Módulo de pagos
+![Pagos](docs/screenshots/pagos.png)
+
+### Registro de pagos
+![Pagos](docs/screenshots/registrar-pago.png)
+
+### Alertas
+![Alertas](docs/screenshots/alertas.png)
+
+## Responsive
+### Login
+![Login](docs/screenshots/login-responsive.png) 
+
+### Panel de encargos
+![Encargos](docs/screenshots/encargos-responsive.png)
+
+### Fichas de clientes
+![Ficha cliente](docs/screenshots/clientes-responsive.png)
+
+### Módulo de pagos
+![Pagos](docs/screenshots/pagos-responsive.png)
+
+### Alertas
+![Alertas](docs/screenshots/alertas-responsive.png)
 
 ---
 
@@ -134,7 +165,8 @@ taller_costura/
 │   ├── AuthController.php
 │   ├── ClienteController.php
 │   ├── EncargoController.php
-│   ├── AgendaController.php
+│   ├── ajax_encargos.php
+│   ├── AlertaController.php
 │   └── PagoController.php
 ├── models/
 │   ├── Administrador.php
@@ -142,112 +174,90 @@ taller_costura/
 │   ├── FichaCliente.php
 │   ├── Encargo.php
 │   ├── Observacion.php
-│   └── Alerta.php
+│   ├── Alerta.php
+│   └── Pagos.php
 ├── views/
 │   ├── auth/
 │   ├── clientes/
 │   ├── encargos/
-│   ├── agenda/
+│   ├── alertas/
 │   ├── pagos/
 │   └── layout/
-├── database/
-│   └── sistema_costura.sql
 ├── public/
 │   ├── css/
+│   │   ├── login.css
+│   │   ├── sidebar.css
+│   │   ├── encargos/
+│   │   ├── cliente/
+│   │   ├── pagos/
+│   │   └── alertas/
 │   └── js/
+│       ├── encargos/
+│       └── cliente/
+├── database/
+│   └── sistema_costura.sql
 └── index.php
 ```
 
 ---
 
-## División de tareas
+## Funcionalidades implementadas
 
-| Integrante | Módulo | Archivos |
-|---|---|---|
-| Delfina Ibañez | Autenticación & Clientes | `Administrador.php`, `Cliente.php`, `FichaCliente.php`, `AuthController.php`, `ClienteController.php`, `views/auth/`, `views/clientes/` |
-| Carolina Fetta | Encargos & Agenda | `Encargo.php`, `Observacion.php`, `EncargoController.php`, `AgendaController.php`, `views/encargos/`, `views/agenda/` |
-| Candela Aguilar | Pagos, Alertas & Infraestructura | `Alerta.php`, `PagoController.php`, `config/database.php`, `index.php`, `.htaccess`, `views/layout/`, `views/pagos/` |
+- **Autenticación**: Login con hash seguro (bcrypt), sesiones PHP, logout
+- **Clientes**: Alta, listado, ficha con medidas (talle, pecho, cintura, cadera, manga, espalda, pantalón)
+- **Encargos**: Crear, listar, ver detalle, editar, eliminar, cambio de estado
+- **Estados de encargo**: `pendiente → en_proceso → listo → entregado`
+- **Pagos**: Registro de señas y pagos parciales por encargo, cálculo de saldo pendiente, métodos: efectivo / transferencia / tarjeta
+- **Observaciones**: Notas internas por encargo
+- **Alertas**: Notificaciones automáticas por vencimiento, cambio de estado y pagos pendientes; marcado como leída
 
 ---
 
-## Diagrama ER — Tablas principales
+## Modelo de datos
 
 | Tabla | Descripción |
 |---|---|
-| `administrador` | Usuario único del sistema |
+| `administrador` | Usuario único del sistema (costurera) |
 | `cliente` | Clientes del taller |
-| `ficha_cliente` | Medidas de cada cliente (1:1 con cliente) |
-| `encargo` | Encargos de costura |
-| `observacion` | Notas por encargo |
-| `alerta` | Alertas de vencimiento y estado |
+| `ficha_cliente` | Medidas de cada cliente (relación 1:1 con cliente) |
+| `encargo` | Encargos con tipo, descripción, fecha de entrega, monto, seña y estado |
+| `observacion` | Notas internas asociadas a un encargo |
+| `pago` | Pagos registrados contra un encargo |
+| `alerta` | Alertas de vencimiento, estado y pago por encargo |
+| `pago` | Pagos registrados contra un encargo |
 
 ---
 
-## Estados de un encargo
+## Estrategia de ramas
 
-```
-pendiente → en_proceso → listo → entregado
-```
+| Rama | Uso |
+|---|---|
+| `main` | Versión estable — protegida, solo merge por PR |
+| `development` | Integración de funcionalidades |
+| `feature/nombre-feature` | Nuevas funcionalidades |
+| `fix/nombre-fix` | Corrección de errores |
 
 ---
 
-## Diagramas UML
+## División de tareas
 
-> 📁 En construcción — se agregarán en la carpeta `/docs`
+| Integrante | Módulo | Archivos principales |
+|---|---|---|
+| Delfina Ibañez | Autenticación & Clientes | `Administrador.php`, `Cliente.php`, `FichaCliente.php`, `AuthController.php`, `ClienteController.php`, `views/auth/`, `views/clientes/` |
+| Carolina Fetta | Encargos | `Encargo.php`, `Observacion.php`, `EncargoController.php`, `ajax_encargos.php`, `views/encargos/` |
+| Candela Aguilar | Pagos, Alertas & Infraestructura | `Pagos.php`, `Alerta.php`, `PagoController.php`, `AlertaController.php`, `config/`, `index.php`, `.htaccess`, `views/layout/`, `views/pagos/`, `views/alertas/` |
 
-- Diagrama de casos de uso
-- Diagrama de clases
-- Informe final
+---
+
+## Diagramas
+
+> 📁 Carpeta: `/docs/`
+
+- `Diagrama de caso de uso (1).png` — Casos de uso del sistema
+- `Diagrama_de_Clases.drawio.webp` — Diagrama de clases
 
 ---
 
 ## Objetivo del proyecto
 
 Digitalizar la organización de un taller de costura para evitar pérdidas de información, mejorar el control de entregas y facilitar la gestión de clientes y pagos.
-
-# 📸 Capturas del Sistema
-
-## 🖥️ Versión Escritorio
-
-### Login
-
-<img width="1357" height="615" alt="Captura de pantalla 2026-06-25 111009" src="https://github.com/user-attachments/assets/c7cfc742-8bd2-4ba8-b7ca-24b27cee5d3a" />
-
-### Gestión de Clientes
-<img width="1334" height="615" alt="Captura de pantalla 2026-06-25 111411" src="https://github.com/user-attachments/assets/ce8386b3-ad11-452c-a532-f1261593efb2" />
-
-
-### Gestión de Encargos
-
-### Gestión de Pagos
-
-<img width="1351" height="616" alt="Captura de pantalla 2026-06-25 111448" src="https://github.com/user-attachments/assets/fb06580f-9903-4ba2-8910-f756f23bf467" />
-
-### Centro de Alertas
-
-<img width="1350" height="614" alt="Captura de pantalla 2026-06-25 111511" src="https://github.com/user-attachments/assets/8219cedc-d4b4-46d2-bb22-229cef6b2788" />
-
-
----
-
-## 📱 Versión Responsive
-
-### Login
-
-<img width="433" height="674" alt="Captura de pantalla 2026-06-25 111649" src="https://github.com/user-attachments/assets/f12699c2-b617-46d4-8ce9-266bdea0691a" />
-
-### Gestión de Clientes
-<img width="227" height="491" alt="Captura de pantalla 2026-06-25 111922" src="https://github.com/user-attachments/assets/ea3d0f01-9a88-46fb-a3dc-4d93f3ab99bf" />
-
-### Gestión de Pagos
-
-<img width="225" height="488" alt="Captura de pantalla 2026-06-25 111938" src="https://github.com/user-attachments/assets/4a42e062-033f-43ee-a226-f4adbc42d80d" />
-
-
-### Gestión de Encargos
-
-
-### Centro de Alertas
-
-
-
