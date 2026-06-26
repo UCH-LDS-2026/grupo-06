@@ -409,9 +409,10 @@ $estiloListo = $enc['estado'] === 'listo' ? ' box-shadow:0 0 6px rgba(120,80,220
 
 <div id="toast" class="toast"></div>
 
-<script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
-<script src="<?= BASE_URL ?>/public/js/encargos/detalle.js"></script>
 <div id="detalle-meta"
      data-saldo="<?= $saldo ?>"
      data-monto-total="<?= (float)$enc['monto_total'] ?>"
      style="display:none;"></div>
+
+<script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
+<script src="<?= BASE_URL ?>/public/js/encargos/detalle.js"></script>
