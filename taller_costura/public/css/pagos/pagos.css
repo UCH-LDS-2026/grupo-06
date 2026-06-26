@@ -1580,3 +1580,30 @@ body {
     .resumen-grid { grid-template-columns: 1fr; }
     .resumen-total-monto { font-size: 2.2rem; }
 }
+.btn-ver-todos-pagos {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px;
+    background: var(--bg-hover);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-md);
+    color: var(--texto-sec);
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s;
+}
+
+.btn-ver-todos-pagos:hover {
+    background: var(--borde);
+}
+.resumen-cliente-item.clickeable:hover {
+    background: var(--bg-hover);
+    border-radius: var(--r-sm);
+    margin: 0 -8px;
+    padding: 11px 8px;
+}
+.resumen-cliente-item {
+    min-height: 44px;
+}
