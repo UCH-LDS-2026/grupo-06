@@ -937,11 +937,11 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 16px;
+    padding: 16px 18px;
     background: var(--bg);
     border: 1px solid var(--borde);
     border-radius: 14px;
-    font-size: 0.85rem;
+    font-size: 0.92rem;
     color: var(--texto-sec);
     font-family: var(--sans);
     cursor: pointer;
@@ -1427,4 +1427,15 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     gap: 6px;
     flex-shrink: 0;
     margin-left: auto;
+}
+.det-icon-wrap {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--bg-hover);
+    border: 1px solid var(--borde);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--oro-dark);
 }

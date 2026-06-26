@@ -49,7 +49,7 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
 $origen = $_GET['origen'] ?? 'agenda';
 $filtro = $_GET['filtro'] ?? '';
 ?>
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <a href="<?= $origen === 'pagos' ? 'index.php?page=pagos&filtro=' . urlencode($filtro) : 'index.php' ?>" class="nav-back">
     ← Volver a <?= $origen === 'pagos' ? 'Pagos' : 'Agenda' ?>
 </a>
@@ -62,20 +62,12 @@ $filtro = $_GET['filtro'] ?? '';
   <div style="display: flex; align-items: center; gap: 12px;">
     <a href="index.php?page=editar-encargo&id=<?= $enc['id'] ?>" class="btn-cancel"
        style="display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border-radius: 999px; font-size: 0.85rem; text-decoration: none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-      </svg>
+      <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
       Editar Encargo
     </a>
     <button onclick="eliminarEncargo(<?= $enc['id'] ?>, <?= $totalPagado ?>)" class="btn-cancel"
             style="display: inline-flex; align-items: center; gap: 6px; padding: 0.6rem 1.2rem; border-radius: 999px; font-size: 0.85rem; color: #b05040; border-color: rgba(176,80,64,0.2); background: transparent; cursor: pointer;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="3 6 5 6 21 6"></polyline>
-        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
-        <path d="M10 11v6"></path><path d="M14 11v6"></path>
-        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
-      </svg>
+      <span class="material-symbols-outlined" style="font-size:14px;">delete</span>
       Eliminar Encargo
     </button>
     <span class="badge <?= $badgeClass ?>" id="badgeEstado"><?= $badgeTxt ?></span>
@@ -91,9 +83,7 @@ $filtro = $_GET['filtro'] ?? '';
     <?php if ($cliente): ?>
     <div class="card">
       <h3>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
-        </svg>
+        <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">person</span></span>
         Cliente
       </h3>
       <div class="cliente-box">
@@ -106,9 +96,8 @@ $filtro = $_GET['filtro'] ?? '';
     <?php else: ?>
     <div class="card">
       <h3>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
-        </svg>
+        <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">person</span></span>
+        Cliente
         Cliente
       </h3>
       <p class="info-text">Sin cliente registrado</p>
@@ -119,11 +108,7 @@ $filtro = $_GET['filtro'] ?? '';
     <div class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3 style="margin: 0;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>
-          </svg>
+          <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">description</span></span>
           Descripción
         </h3>
       </div>
@@ -138,10 +123,7 @@ $filtro = $_GET['filtro'] ?? '';
     <div class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3 style="margin: 0;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
+         <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">report</span></span>
           Observaciones Especiales
         </h3>
       </div>
@@ -163,7 +145,10 @@ $filtro = $_GET['filtro'] ?? '';
     <!-- Historial de observaciones -->
     <div class="card" id="cardHistorialObs">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 style="margin:0;">📝 Historial de Observaciones</h3>
+        <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+    <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">edit_note</span></span>
+    Historial de Observaciones
+</h3>
         <button onclick="abrirFormObs()" class="btn-ficha"
                 style="margin-top:0; cursor:pointer; border:none; background:none; font-size:1.2rem; font-weight:700; color: var(--accent);"
                 title="Agregar observación">+</button>
@@ -196,7 +181,10 @@ $filtro = $_GET['filtro'] ?? '';
 
     <!-- Estado -->
     <div class="card">
-      <h3>Estado del Encargo</h3>
+     <h3 style="display:flex; align-items:center; gap:8px;">
+    <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">tune</span></span>
+    Estado del Encargo
+</h3>
       <div class="estado-grid" id="estadoGrid"
            data-id="<?= $enc['id'] ?>"
            data-current="<?= $enc['estado'] ?>">
@@ -223,11 +211,7 @@ $filtro = $_GET['filtro'] ?? '';
     <!-- Fechas -->
     <div class="card">
       <h3>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
+        <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">calendar_month</span></span>
         Fechas
       </h3>
       <div class="fechas-container">
@@ -245,10 +229,7 @@ $filtro = $_GET['filtro'] ?? '';
     <!-- Resumen de pagos -->
     <div class="card">
       <h3>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="1" x2="12" y2="23"></line>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-        </svg>
+        <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">payments</span></span>
         Resumen de Pagos
       </h3>
       <div class="pago-row">
@@ -288,7 +269,10 @@ $filtro = $_GET['filtro'] ?? '';
     <div class="card" id="cardHistorial" style="<?= empty($historialPagos) ? 'display:none;' : '' ?> overflow:hidden;">
       <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;"
            onclick="toggleHistorialPagos()">
-        <h3 style="margin:0;">Historial de Pagos</h3>
+        <h3 style="margin:0; display:flex; align-items:center; gap:8px;">
+    <span class="det-icon-wrap"><span class="material-symbols-outlined" style="font-size:16px;">receipt_long</span></span>
+    Historial de Pagos
+</h3>
         <span id="historial-toggle-icon" style="font-size:1.2rem; color:var(--texto-ter);">↓</span>
       </div>
       <div id="historial-pagos-lista" style="display:none; margin-top:16px;">
