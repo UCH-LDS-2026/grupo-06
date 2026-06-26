@@ -23,9 +23,9 @@ $stmtObs->execute([$idEncargo]);
 $observaciones = $stmtObs->fetchAll(PDO::FETCH_ASSOC);
 
 $stmtPagos = $pdo->prepare(
-    "SELECT id, monto, metodo, nota, fecha 
-     FROM pago 
-     WHERE encargo_id = ? 
+    "SELECT id, monto, metodo, nota, fecha
+     FROM pago
+     WHERE encargo_id = ?
      ORDER BY fecha ASC"
 );
 $stmtPagos->execute([$idEncargo]);
@@ -55,7 +55,6 @@ if ($cliente) {
     $inicialesCliente = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : '', array_slice($partes, 0, 2)));
 }
 
-// Dot de color por estado para el badge
 $dotColor = [
     'pendiente' => '#f0b800',
     'proceso'   => '#1ac880',
@@ -95,7 +94,6 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
             Eliminar
         </button>
 
-        <!-- BADGE ESTADO GRANDE -->
         <span class="badge-estado-grande <?= $badgeClass ?>" id="badgeEstado">
             <span class="estado-dot-badge" style="background:<?= $currentDot ?><?= $enc['estado']==='listo' ? '; box-shadow:0 0 6px rgba(120,80,220,0.5)' : '' ?>"></span>
             <?= $badgeTxt ?>

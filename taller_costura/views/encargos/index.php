@@ -369,7 +369,6 @@ function estadoBadge($estado) {
 <script>
 const CLIENTES_MODAL = <?= json_encode($clientesModal, JSON_UNESCAPED_UNICODE) ?>;
 
-// ── Switch de tabs ──────────────────────────────────────────
 function switchTabEnc(tab) {
   document.querySelectorAll('.enc-tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.enc-tab-panel').forEach(p => p.classList.remove('active'));
@@ -426,83 +425,3 @@ document.addEventListener('DOMContentLoaded', () => {
     <?php endif; ?>
 });
 </script>
-
-<style>
-.stats-grid {
-    grid-template-columns: repeat(5, 1fr);
-}
-
-.stat-card--fecha {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 2px;
-    background: linear-gradient(145deg, #fff7f2 0%, #fff0f6 100%);
-    border: 1px solid #f5d0c0;
-    border-left: 3px solid var(--acento);
-    padding: 18px 16px;
-    cursor: default;
-}
-
-.stat-card--fecha:hover {
-    transform: none;
-    box-shadow: var(--shadow-card);
-}
-
-.fecha-card-icon {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--acento);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-}
-
-.fecha-card-dia {
-    font-family: var(--serif);
-    font-size: 2.2rem;
-    font-weight: 400;
-    color: var(--texto-pri);
-    line-height: 1;
-}
-
-.fecha-card-mes {
-    font-size: 0.7rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--texto-ter);
-    margin-top: 2px;
-}
-
-.fecha-card-dow {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--texto-sec);
-    margin-top: 6px;
-}
-
-.stat-sub {
-    font-size: 0.68rem;
-    color: var(--texto-mute);
-    letter-spacing: 0.5px;
-    margin-top: 1px;
-}
-
-@media (max-width: 900px) {
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .stat-card--fecha {
-        grid-column: 1 / -1;
-        flex-direction: row;
-        align-items: center;
-        gap: 16px;
-    }
-    .fecha-card-dia { font-size: 2rem; }
-}
-
-@media (max-width: 500px) {
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-}
-</style>

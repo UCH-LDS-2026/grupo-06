@@ -94,7 +94,7 @@ $error   = isset($_GET['error']);
       <div class="form-group" style="margin-bottom:0;">
         <label for="fecha_entrega">Fecha de Entrega *</label>
         <input type="date" name="fecha_entrega" id="fecha_entrega" class="form-control" required
-       min="<?= date('Y-m-d', strtotime($enc['created_at'])) ?>"
+               min="<?= date('Y-m-d', strtotime($enc['created_at'])) ?>"
                value="<?= htmlspecialchars($enc['fecha_entrega']) ?>">
       </div>
     </div>
@@ -152,12 +152,6 @@ $error   = isset($_GET['error']);
 
 </div>
 </form>
-
-<style>
-  .cliente-opcion { padding: 10px 12px; cursor: pointer; font-size: 0.92rem; }
-  .cliente-opcion:hover { background: #FAF3EA; }
-  .cliente-opcion.vacia { color: #8B7355; cursor: default; }
-</style>
 
 <script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
 <script>

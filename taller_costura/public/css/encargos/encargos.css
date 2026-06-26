@@ -1439,3 +1439,118 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     flex-shrink: 0;
     color: var(--oro-dark);
 }
+/* ── STAT CARD FECHA ───────────────────────────────────────── */
+.stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.stat-card--fecha {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    background: linear-gradient(145deg, #fff7f2 0%, #fff0f6 100%);
+    border: 1px solid #f5d0c0;
+    border-left: 3px solid var(--acento);
+    padding: 18px 16px;
+    cursor: default;
+}
+
+.stat-card--fecha:hover {
+    transform: none;
+    box-shadow: var(--shadow-card);
+}
+
+.fecha-card-icon {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--acento);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.fecha-card-dia {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: var(--texto-pri);
+    line-height: 1;
+}
+
+.fecha-card-mes {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--texto-ter);
+    margin-top: 2px;
+}
+
+.fecha-card-dow {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--texto-sec);
+    margin-top: 6px;
+}
+
+.stat-sub {
+    font-size: 0.68rem;
+    color: var(--texto-mute);
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+}
+
+/* ── BUSCADOR BAR — fila buscador + tabs ──────────────────── */
+.ag-buscador-bar {
+    margin-bottom: 20px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.enc-tabs {
+    margin-bottom: 0;
+}
+
+/* ── PANEL DE CARDS — contenedor con fondo ────────────────── */
+.enc-tab-panel.active {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-xl);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+/* que las cards dentro no dupliquen borde exterior */
+.enc-tab-panel .card-encargo:last-child {
+    margin-bottom: 0;
+}
+
+/* ── CLIENTE AUTOCOMPLETE OPCIONES ─────────────────────────── */
+.cliente-opcion { padding: 10px 12px; cursor: pointer; font-size: 0.92rem; }
+.cliente-opcion:hover { background: #FAF3EA; }
+.cliente-opcion.vacia { color: #8B7355; cursor: default; }
+
+/* ── RESPONSIVE STATS FECHA ────────────────────────────────── */
+@media (max-width: 900px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stat-card--fecha {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+    }
+    .fecha-card-dia { font-size: 2rem; }
+}
+
+@media (max-width: 500px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+}

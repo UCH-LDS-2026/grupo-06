@@ -12,7 +12,6 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $clienteSeleccionado      = null;
 $clienteIdPreseleccionado = '';
 
-// Prioridad: POST (resubmit con error) → GET (viene de ficha cliente)
 $clienteIdBuscar = $_POST['cliente_id'] ?? $_GET['cliente_id'] ?? '';
 
 if (!empty($clienteIdBuscar)) {
@@ -153,12 +152,6 @@ if (!empty($clienteIdBuscar)) {
 
   </div>
 </form>
-
-<style>
-  .cliente-opcion { padding: 10px 12px; cursor: pointer; font-size: 0.92rem; }
-  .cliente-opcion:hover { background: #FAF3EA; }
-  .cliente-opcion.vacia { color: #8B7355; cursor: default; }
-</style>
 
 <script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
 <script>
