@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+    --bg:           #FAF8F5;
+    --bg-card:      #FFFFFF;
+    --bg-hover:     #f5f0ea;
+
+    --acento:          #ff6f3c;
+    --acento-2:        #e91e8c;
+    --acento-gradient: linear-gradient(90deg, #ff6f3c 0%, #e91e8c 100%);
+
+    --oro:          #A98B76;
+    --oro-dark:     #8f7564;
+
+    --texto-pri:    #2C1810;
+    --texto-sec:    #7a7465;
+    --texto-ter:    #9c978a;
+    --texto-mute:   #b0ac9f;
+
+    --borde:        #E8E0D8;
+    --borde-hover:  #d4c4b4;
+
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans:  'DM Sans', system-ui, sans-serif;
+
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-xl: 18px;
+
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.05);
+    --ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+/* ── ALERTAS WRAPPER ──────────────────────────────────────── */
+.alertas-wrapper {
+    padding: 0;
+}
+.alertas-header { margin-bottom: 2rem; }
+
+.alertas-header h1 {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    font-weight: 400;
+    color: var(--texto-pri);
+    letter-spacing: .5px;
+    line-height: 1.1;
+    margin: 0 0 5px;
+}
+
+.alertas-header p {
+    font-size: .72rem;
+    color: var(--texto-ter);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* ── ACCIONES ─────────────────────────────────────────────── */
+.alertas-acciones {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.2rem;
+}
+
+.btn-marcar-todas {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: .55rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    font-family: var(--sans);
+    font-size: .78rem;
+    font-weight: 500;
+    color: var(--texto-sec);
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+    transition: all .2s var(--ease);
+}
+.btn-marcar-todas:hover {
+    background: var(--bg-hover);
+    border-color: var(--borde-hover);
+    color: var(--texto-pri);
+}
+.btn-marcar-todas .material-symbols-outlined {
+    color: var(--acento-2);
+    font-size: 17px;
+}
+
+/* ── LISTA ────────────────────────────────────────────────── */
+.alertas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ── CARD ─────────────────────────────────────────────────── */
+.alerta-card {
+    background: var(--bg-card);          /* ← blanco visible */
+    border: 1px solid var(--borde);
+    border-radius: var(--r-xl);
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    box-shadow: var(--shadow-card);
+    transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s;
+}
+.alerta-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(169,139,118,.14);
+    border-color: var(--borde-hover);
+}
+.alerta-card.no-leida {
+    border-left: 3px solid var(--acento);
+    background: #FFFAF7;
+}
+.alerta-card.leida { opacity: .65; }
+
+/* ── PUNTO INDICADOR ──────────────────────────────────────── */
+.dot-unread {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--acento-gradient);
+    flex-shrink: 0;
+    margin-top: 7px;
+}
+
+/* ── ÍCONO CIRCULAR ───────────────────────────────────────── */
+.alerta-icono {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+}
+/* Colores de fondo e ícono por tipo */
+.icono-vencimiento { background: rgba(192,57,43,.12);  color: #C0392B; }
+.icono-pago        { background: rgba(169,139,118,.18); color: var(--oro-dark); }
+.icono-estado      { background: rgba(13,158,110,.14);  color: #0d9e6e; }
+.icono-default     { background: rgba(169,139,118,.1);  color: var(--texto-ter); }
+
+/* ── CONTENIDO ────────────────────────────────────────────── */
+.alerta-contenido { flex: 1; min-width: 0; }
+
+.alerta-mensaje {
+    font-size: .92rem;
+    color: var(--texto-pri);
+    margin: 0 0 7px;
+    line-height: 1.5;
+}
+
+.alerta-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ── BADGE TIPO ───────────────────────────────────────────── */
+.alerta-tipo {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: .65rem;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+.tipo-vencimiento { background: #fff0ee; color: #b05040; border: 1px solid #ffc5a0; }
+.tipo-pago        { background: #fdf6ed; color: var(--oro-dark); border: 1px solid #e8d4b4; }
+.tipo-estado      { background: #e6faf2; color: #0d9e6e; border: 1px solid #80e0bc; }
+.tipo-default     { background: var(--bg); color: var(--texto-sec); border: 1px solid var(--borde); }
+
+.alerta-tiempo { font-size: .72rem; color: var(--texto-mute); }
+
+/* ── TAG ENCARGO ──────────────────────────────────────────── */
+.alerta-encargo {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .72rem;
+    color: var(--texto-sec);
+    background: var(--bg);
+    border: 0.5px solid var(--borde);
+    border-left: 2px solid var(--oro);
+    border-radius: 0 6px 6px 0;
+    padding: 2px 9px;
+}
+
+/* ── BOTÓN MARCAR ─────────────────────────────────────────── */
+.btn-marcar {
+    background: none;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-family: var(--sans);
+    font-size: .72rem;
+    font-weight: 500;
+    color: var(--texto-sec);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-start;
+    transition: all .2s var(--ease);
+}
+.btn-marcar:hover {
+    background: var(--bg-hover);
+    border-color: var(--borde-hover);
+    color: var(--texto-pri);
+}
+
+/* ── EMPTY STATE ──────────────────────────────────────────── */
+.empty-state {
+    background: var(--bg-card);
+    border: 1px dashed var(--borde);
+    border-radius: var(--r-xl);
+    padding: 48px 40px;
+    text-align: center;
+    color: var(--texto-ter);
+    font-size: .85rem;
+}
+.empty-state .material-symbols-outlined {
+    font-size: 48px;
+    color: var(--borde);
+    display: block;
+    margin-bottom: 1rem;
+}
+/* ── PAGINACIÓN ──────────────────────────────────── */
+.enc-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0 28px;
+}
+
+.enc-pag-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: none;
+    background: var(--acento-gradient);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-btn);
+    transition: all 0.2s var(--ease);
+    flex-shrink: 0;
+}
+
+.enc-pag-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(233, 30, 100, 0.38);
+}
+
+.enc-pag-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.enc-pag-info {
+    font-size: 0.78rem;
+    color: var(--texto-ter);
+    min-width: 80px;
+    text-align: center;
+    letter-spacing: 0.3px;
+}
+body {
+    overflow: hidden;
+}

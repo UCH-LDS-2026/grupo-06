@@ -95,14 +95,15 @@ class Cliente {
      */
     public static function buscar(string $termino): array {
         $pdo  = Database::getInstance()->getConnection();
-        $stmt = $pdo->prepare(
+       $stmt = $pdo->prepare(
             "SELECT id, nombre, telefono, email, created_at
-             FROM cliente
-             WHERE nombre LIKE :termino
-                OR email  LIKE :termino
-             ORDER BY nombre"
+            FROM cliente
+            WHERE nombre LIKE :termino1
+                OR email  LIKE :termino2
+            ORDER BY nombre"
         );
-        $stmt->execute([':termino' => '%' . $termino . '%']);
+        $like = '%' . $termino . '%';
+        $stmt->execute([':termino1' => $like, ':termino2' => $like]);
  
         $lista = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -131,6 +132,29 @@ class Cliente {
         $stmt->execute([':email' => $email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
  
+        return $row ? new self(
+            (int)$row['id'],
+            $row['nombre'],
+            $row['telefono'] ?? '',
+            $row['email']    ?? '',
+            $row['created_at']
+        ) : null;
+    }
+
+    /**
+ * Busca un cliente por teléfono exacto.
+ * Útil para validar duplicados antes de guardar.
+ */
+    public static function getByTelefono(string $telefono): ?self {
+        $pdo  = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare(
+            "SELECT id, nombre, telefono, email, created_at
+            FROM cliente
+            WHERE telefono = :telefono"
+        );
+        $stmt->execute([':telefono' => $telefono]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
         return $row ? new self(
             (int)$row['id'],
             $row['nombre'],

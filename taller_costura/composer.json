@@ -1,0 +1,19 @@
+{
+    "name": "delfi/taller_costura",
+    "authors": [
+        {
+            "name": "Delfina ibanez",
+            "email": "delfinaibanezgiordano@gmail.com"
+        }
+    ],
+    "config": {
+        "policy": {
+            "advisories": {
+                "block": false
+            }
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "9"
+    }
+}
