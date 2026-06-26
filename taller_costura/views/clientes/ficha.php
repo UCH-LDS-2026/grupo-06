@@ -192,7 +192,10 @@ $msgTurno    = "Hola {$nombre}! 📅 ¿Querés coordinar un turno para una prueb
     <div class="alerta alerta-err"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
 
-<a href="<?= BASE_URL ?>/index.php?page=clientes" class="volver">← Volver a Clientes</a>
+<?php $origenFicha = $_GET['origen'] ?? 'clientes'; ?>
+<a href="<?= $origenFicha === 'pagos' ? BASE_URL . '/index.php?page=pagos&tab=historial' : BASE_URL . '/index.php?page=clientes' ?>" class="volver">
+    ← Volver a <?= $origenFicha === 'pagos' ? 'Pagos' : 'Clientes' ?>
+</a>
 
 <h1 class="cliente-titulo"><?= htmlspecialchars($cliente->getNombre()) ?></h1>
 

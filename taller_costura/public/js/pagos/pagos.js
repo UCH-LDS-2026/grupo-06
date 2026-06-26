@@ -7,6 +7,14 @@ function cambiarTab(tab, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
     btn.classList.add('active');
+    
+    const filtros = document.getElementById('filtros-barra');
+    if (filtros) filtros.style.display = tab === 'historial' ? 'none' : 'block';
+
+    // Actualizar URL sin recargar
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tab);
+    window.history.pushState({}, '', url);
 }
 
 /* ── Modal ────────────────────────────────────────── */
@@ -444,4 +452,11 @@ function toggleSinRetirar(btn) {
 
         mostrarPaginaFiltrada(1);
     }, 50);
+}
+function abrirModalPagosMes() {
+    document.getElementById('modalPagosMes').classList.add('open');
+}
+
+function cerrarModalPagosMes() {
+    document.getElementById('modalPagosMes').classList.remove('open');
 }

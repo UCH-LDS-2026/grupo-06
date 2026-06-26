@@ -116,7 +116,7 @@ function etiquetaEstado(string $estado): string {
 
         <!-- ── Filtros ───────────────────────────────────── -->
     <!-- ── Filtros ───────────────────────────────────── -->
-<div class="ag-buscador-bar">
+<div class="ag-buscador-bar" id="filtros-barra" <?= $tabActiva === 'historial' ? 'style="display:none"' : '' ?>>
     <div class="toolbar">
         <div class="search-wrap">
             <span class="material-symbols-outlined search-icon">search</span>
@@ -328,36 +328,77 @@ function etiquetaEstado(string $estado): string {
             <div class="resumen-card">
                 <h4 class="resumen-card-titulo">QUIÉN PAGÓ MÁS</h4>
                 <?php foreach ($detalleMes['topClientes'] as $i => $c): ?>
-                <div class="resumen-cliente-item">
+                <div class="resumen-cliente-item <?= !empty($c['cliente_id']) ? 'clickeable' : '' ?>"
+                    <?= !empty($c['cliente_id']) ? "onclick=\"window.location.href='index.php?page=ficha-cliente&id={$c['cliente_id']}&origen=pagos'\" style=\"cursor:pointer;\"" : '' ?>>
                     <span class="resumen-cliente-num"><?= $i + 1 ?></span>
                     <span class="resumen-cliente-nombre"><?= htmlspecialchars($c['nombre']) ?></span>
                     <span class="resumen-cliente-monto"><?= formatPesos((float)$c['total']) ?></span>
+                    <span class="material-symbols-outlined" style="font-size:16px; color:var(--texto-ter); visibility:<?= !empty($c['cliente_id']) ? 'visible' : 'hidden' ?>;">chevron_right</span>
                 </div>
                 <?php endforeach; ?>
             </div>
         </div>
 
         <!-- Cada pago del mes -->
-        <div class="resumen-card" style="margin-top:16px;">
-            <h4 class="resumen-card-titulo">CADA PAGO DEL MES</h4>
-            <?php foreach ($detalleMes['pagos'] as $p): ?>
-            <div class="resumen-pago-item">
-                <div class="resumen-pago-metodo-icon resumen-icon-<?= $p['metodo'] ?>">
-                    <?php if ($p['metodo'] === 'efectivo'): ?>💵
-                    <?php elseif ($p['metodo'] === 'transferencia'): ?>⇄
-                    <?php else: ?>💳<?php endif; ?>
-                </div>
-                <div class="resumen-pago-info">
-                    <strong><?= htmlspecialchars($p['cliente_nombre']) ?></strong>
-                    <span><?= htmlspecialchars($p['tipo']) ?></span>
-                </div>
-                <div class="resumen-pago-derecha">
-                    <strong><?= formatPesos((float)$p['monto']) ?></strong>
-                    <span><?= date('j/n', strtotime($p['fecha'])) ?></span>
-                </div>
-            </div>
-            <?php endforeach; ?>
+     <!-- Cada pago del mes -->
+<div class="resumen-card" style="margin-top:12px;">
+    <h4 class="resumen-card-titulo">CADA PAGO DEL MES</h4>
+    <?php foreach (array_slice($detalleMes['pagos'], 0, 2) as $p): ?>
+    <div class="resumen-pago-item">
+        <div class="resumen-pago-metodo-icon">
+            <?php
+            $iconos = ['efectivo' => 'payments', 'transferencia' => 'swap_horiz', 'tarjeta' => 'credit_card'];
+            $icono = $iconos[$p['metodo']] ?? 'payments';
+            ?>
+            <span class="material-symbols-outlined" style="font-size:18px;"><?= $icono ?></span>
         </div>
+        <div class="resumen-pago-info">
+            <strong><?= htmlspecialchars($p['cliente_nombre']) ?></strong>
+            <span><?= htmlspecialchars($p['tipo']) ?></span>
+        </div>
+        <div class="resumen-pago-derecha">
+            <strong><?= formatPesos((float)$p['monto']) ?></strong>
+            <span><?= date('j/n', strtotime($p['fecha'])) ?></span>
+        </div>
+    </div>
+    <?php endforeach; ?>
+
+    <?php if (count($detalleMes['pagos']) > 2): ?>
+    <button class="btn-ver-todos-pagos" onclick="abrirModalPagosMes()">
+        Ver todos los pagos (<?= count($detalleMes['pagos']) ?>)
+    </button>
+    <?php endif; ?>
+</div>
+
+<!-- Modal todos los pagos del mes -->
+<div id="modalPagosMes" class="modal-overlay" onclick="if(event.target===this) cerrarModalPagosMes()">
+    <div class="modal-box" style="max-width:500px; max-height:80vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0; font-family:var(--serif); font-weight:400;">
+                Pagos de <?= $mesesNombres[$mesActivo] ?> <?= $anioActivo ?>
+            </h3>
+            <button onclick="cerrarModalPagosMes()" style="background:none;border:none;cursor:pointer;font-size:1.3rem;color:var(--texto-sec);">&times;</button>
+        </div>
+        <?php foreach ($detalleMes['pagos'] as $p): ?>
+        <div class="resumen-pago-item">
+            <div class="resumen-pago-metodo-icon">
+                <?php
+                $icono = $iconos[$p['metodo']] ?? 'payments';
+                ?>
+                <span class="material-symbols-outlined" style="font-size:18px;"><?= $icono ?></span>
+            </div>
+            <div class="resumen-pago-info">
+                <strong><?= htmlspecialchars($p['cliente_nombre']) ?></strong>
+                <span><?= htmlspecialchars($p['tipo']) ?></span>
+            </div>
+            <div class="resumen-pago-derecha">
+                <strong><?= formatPesos((float)$p['monto']) ?></strong>
+                <span><?= date('j/n', strtotime($p['fecha'])) ?></span>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>   
 
     <?php endif; ?>
 </div><!-- /#tab-historial -->

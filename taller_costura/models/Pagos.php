@@ -277,6 +277,7 @@ public function getDetalleMes(int $adminId, int $anio, int $mes): array {
     // Top clientas
     $stmtClientes = $this->pdo->prepare(
         "SELECT 
+             c.id as cliente_id,
             COALESCE(c.nombre, 'Sin cliente') as nombre,
             SUM(p.monto) as total
          FROM pago p
@@ -286,7 +287,8 @@ public function getDetalleMes(int $adminId, int $anio, int $mes): array {
            AND YEAR(p.fecha) = :anio
            AND MONTH(p.fecha) = :mes
          GROUP BY c.id, c.nombre
-         ORDER BY total DESC
+        HAVING c.id IS NOT NULL
+        ORDER BY total DESC
          LIMIT 3"
     );
     $stmtClientes->execute([':admin_id' => $adminId, ':anio' => $anio, ':mes' => $mes]);
