@@ -107,19 +107,22 @@ http://localhost/grupo-06/taller_costura/views/auth/login.php
 ## Screenshots
 
 ### Login
-![Login](docs/screenshots/login.png)
+![Login](docs/screenshots/login.png) 
 
 ### Panel de encargos
 ![Encargos](docs/screenshots/encargos.png)
+![Encargos](docs/screenshots/encargos2.png)
 
 ### Detalle de encargo
 ![Detalle encargo](docs/screenshots/encargo-detalle.png)
+![Detalle encargo](docs/screenshots/encargo-detalle2.png)
 
 ### Fichas de clientes
 ![Ficha cliente](docs/screenshots/clientes.png)
 
 ### Detalle de clientes
 ![Detalle encargo](docs/screenshots/cliente-detalle.png)
+![Detalle encargo](docs/screenshots/cliente-detalle2.png)
 
 ### Nuevo Cliente
 ![Ficha cliente](docs/screenshots/nuevo-cliente.png)
