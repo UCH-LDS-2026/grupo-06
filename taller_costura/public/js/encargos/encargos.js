@@ -132,10 +132,14 @@ function cambiarPaginaEnc(dir) {
 function toggleCalendarioEnc() {
   document.getElementById('enc-date-picker').classList.toggle('visible');
 }
-
 function filtrarPorEstadoCard(estados) {
-  encFiltroEstados = estados;
-  filtrarEncargos();
+    // Si ya está activo ese filtro, lo limpia
+    if (JSON.stringify(encFiltroEstados) === JSON.stringify(estados)) {
+        encFiltroEstados = [];
+    } else {
+        encFiltroEstados = estados;
+    }
+    filtrarEncargos();
 }
 
 function filtrarSinCliente() {
@@ -170,7 +174,7 @@ function filtrarEncargos() {
   encPaginaActual = 1;
   renderPaginaEnc();
 
-  const activo = textoVal || desde || hasta || encFiltroEstados.length > 0;
+  const activo = textoVal || desde || hasta;
   document.getElementById('enc-limpiar-btn').style.display = activo ? '' : 'none';
 }
 
