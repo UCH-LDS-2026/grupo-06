@@ -49,12 +49,20 @@ $badgeTxt    = $estadoLabel[$enc['estado']] ?? ucfirst($enc['estado']);
 $origen = $_GET['origen'] ?? 'agenda';
 $filtro = $_GET['filtro'] ?? '';
 
-// Iniciales cliente
 $inicialesCliente = '';
 if ($cliente) {
     $partes = explode(' ', trim($cliente['nombre']));
     $inicialesCliente = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : '', array_slice($partes, 0, 2)));
 }
+
+// Dot de color por estado para el badge
+$dotColor = [
+    'pendiente' => '#f0b800',
+    'proceso'   => '#1ac880',
+    'listo'     => '#7850e0',
+    'entregado' => '#e050a0',
+];
+$currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['estado']] ?? '#aaa';
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/encargos/detalle_encargo.css">
@@ -86,7 +94,12 @@ if ($cliente) {
             </svg>
             Eliminar
         </button>
-        <span class="badge <?= $badgeClass ?>" id="badgeEstado"><?= $badgeTxt ?></span>
+
+        <!-- BADGE ESTADO GRANDE -->
+        <span class="badge-estado-grande <?= $badgeClass ?>" id="badgeEstado">
+            <span class="estado-dot-badge" style="background:<?= $currentDot ?><?= $enc['estado']==='listo' ? '; box-shadow:0 0 6px rgba(120,80,220,0.5)' : '' ?>"></span>
+            <?= $badgeTxt ?>
+        </span>
     </div>
 </div>
 
@@ -100,10 +113,12 @@ if ($cliente) {
         <div class="det-card">
             <div class="det-card-titulo">
                 <h3>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
+                    <div class="det-icono icono-cliente">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
                     Cliente
                 </h3>
             </div>
@@ -132,12 +147,14 @@ if ($cliente) {
         <div class="det-card">
             <div class="det-card-titulo">
                 <h3>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                    </svg>
+                    <div class="det-icono icono-descripcion">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
                     Descripción
                 </h3>
             </div>
@@ -152,11 +169,13 @@ if ($cliente) {
         <div class="det-card">
             <div class="det-card-titulo">
                 <h3>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
+                    <div class="det-icono icono-obs-esp">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
                     Observaciones Especiales
                 </h3>
             </div>
@@ -176,9 +195,11 @@ if ($cliente) {
         <div class="det-card" id="cardHistorialObs">
             <div class="det-card-titulo">
                 <h3>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
+                    <div class="det-icono icono-obs-hist">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
                     Historial de Observaciones
                 </h3>
                 <button onclick="abrirFormObs()" class="det-card-accion">+ Agregar</button>
@@ -213,10 +234,12 @@ if ($cliente) {
         <div class="det-card">
             <div class="det-card-titulo">
                 <h3>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 11 12 14 22 4"></polyline>
-                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                    </svg>
+                    <div class="det-icono icono-estado">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                    </div>
                     Estado del Encargo
                 </h3>
             </div>
@@ -247,12 +270,14 @@ if ($cliente) {
         <div class="det-card-sm">
             <div class="det-card-titulo">
                 <h3>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
+                    <div class="det-icono icono-fechas">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
                     Fechas
                 </h3>
             </div>
@@ -270,10 +295,12 @@ if ($cliente) {
         <div class="det-card-sm">
             <div class="det-card-titulo">
                 <h3>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                    </svg>
+                    <div class="det-icono icono-pagos">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
                     Resumen de Pagos
                 </h3>
             </div>
@@ -449,18 +476,3 @@ function eliminarPago(pagoId, monto, encargoId) {
     .catch(() => alert('Error de conexión'));
 }
 </script>
-
-
-<!-- 
-//cambiar esto para los emojis // 
-
-
-<h3>
-    <div class="det-icono-wrap icono-cliente">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-    </div>
-    Cliente
-</h3> -->
