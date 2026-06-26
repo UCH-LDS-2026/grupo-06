@@ -45,22 +45,21 @@ if (!empty($clienteIdBuscar)) {
   <div class="det-grid">
 
     <div>
-      <div class="card" style="overflow: visible;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h3 style="margin-bottom:0;">
+      <div class="card card--overflow-visible">
+        <div class="card-header-row">
+          <h3 class="h3--no-margin">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             Cliente
           </h3>
         </div>
 
-        <div class="form-group" style="margin-top:20px; margin-bottom:0;">
-          <div class="cliente-autocomplete" style="position:relative;">
+        <div class="form-group form-group--cliente">
+          <div class="cliente-autocomplete">
             <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
                    placeholder="Escribí para buscar un cliente..."
                    value="<?= htmlspecialchars($clienteSeleccionado ?? '') ?>">
             <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($clienteIdPreseleccionado) ?>">
-            <div id="clienteLista" class="cliente-lista"
-                 style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #e3d8cc; border-radius:var(--r-m); max-height:220px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
+            <div id="clienteLista" class="cliente-lista"></div>
           </div>
         </div>
       </div>
@@ -90,7 +89,7 @@ if (!empty($clienteIdBuscar)) {
                     placeholder="Detalles importantes, preferencias del cliente..."><?= htmlspecialchars($_POST['observaciones_encargo'] ?? '') ?></textarea>
         </div>
 
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group form-group--last">
           <label for="fecha_entrega">Fecha de Entrega *</label>
           <input type="date" name="fecha_entrega" id="fecha_entrega" class="form-control" required
                  value="<?= htmlspecialchars($_POST['fecha_entrega'] ?? '') ?>">
@@ -125,7 +124,7 @@ if (!empty($clienteIdBuscar)) {
           </div>
         </div>
 
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group form-group--last">
           <label for="metodo_pago">Método de Pago</label>
           <select name="metodo_pago" id="metodo_pago" class="form-control custom-select">
             <option value="efectivo">Efectivo</option>
@@ -136,7 +135,7 @@ if (!empty($clienteIdBuscar)) {
       </div>
 
       <div class="card">
-        <div class="form-actions" style="margin:0; justify-content:space-between;">
+        <div class="form-actions form-actions--spread">
           <a href="<?= $baseUrl ?>/index.php" class="btn-cancel">Cancelar</a>
           <button type="submit" class="btn-submit">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

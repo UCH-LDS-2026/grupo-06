@@ -46,22 +46,21 @@ $error   = isset($_GET['error']);
 <div class="det-grid">
 
   <div>
-    <div class="card" style="overflow: visible;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="margin-bottom:0;">
+    <div class="card card--overflow-visible">
+      <div class="card-header-row">
+        <h3 class="h3--no-margin">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           Cliente
         </h3>
       </div>
 
-      <div class="form-group" style="margin-top:20px; margin-bottom:0;">
-        <div class="cliente-autocomplete" style="position:relative;">
+      <div class="form-group form-group--cliente">
+        <div class="cliente-autocomplete">
           <input type="text" id="clienteBusqueda" class="form-control" autocomplete="off"
                  placeholder="Escribí para buscar un cliente..."
                  value="<?= htmlspecialchars($clienteSeleccionado ?? '') ?>">
           <input type="hidden" name="cliente_id" id="cliente_id" value="<?= htmlspecialchars($enc['cliente_id'] ?? '') ?>">
-          <div id="clienteLista" class="cliente-lista"
-               style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #e3d8cc; border-radius:var(--r-m); max-height:220px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
+          <div id="clienteLista" class="cliente-lista"></div>
         </div>
       </div>
     </div>
@@ -91,7 +90,7 @@ $error   = isset($_GET['error']);
                   placeholder="Detalles importantes, preferencias del cliente..."><?= htmlspecialchars($enc['observaciones_encargo'] ?? '') ?></textarea>
       </div>
 
-      <div class="form-group" style="margin-bottom:0;">
+      <div class="form-group form-group--last">
         <label for="fecha_entrega">Fecha de Entrega *</label>
         <input type="date" name="fecha_entrega" id="fecha_entrega" class="form-control" required
                min="<?= date('Y-m-d', strtotime($enc['created_at'])) ?>"
@@ -106,7 +105,7 @@ $error   = isset($_GET['error']);
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="9 12 12 15 16 10"></polyline></svg>
         Estado
       </h3>
-      <div class="form-group" style="margin-bottom:0;">
+      <div class="form-group form-group--last">
         <select name="estado" id="estado" class="form-control custom-select">
           <option value="pendiente"  <?= $enc['estado']==='pendiente'  ? 'selected':'' ?>>Pendiente</option>
           <option value="en_proceso" <?= $enc['estado']==='en_proceso' ? 'selected':'' ?>>En Proceso</option>
@@ -122,7 +121,7 @@ $error   = isset($_GET['error']);
         Información de Pago
       </h3>
 
-      <div class="form-group" style="margin-bottom:0;">
+      <div class="form-group form-group--last">
         <label for="monto_total">Precio Total</label>
         <div class="input-with-prefix">
           <span class="input-prefix">$</span>
@@ -135,8 +134,8 @@ $error   = isset($_GET['error']);
     </div>
 
     <div class="card">
-      <div id="editar-error" style="display:none; margin-bottom:16px; padding:10px 14px; background:#fff3f3; color:#b05040; border:1px solid rgba(176,80,64,0.25); border-radius:10px; font-size:0.86rem;"></div>
-      <div class="form-actions" style="margin:0; justify-content:space-between;">
+      <div id="editar-error" class="editar-error"></div>
+      <div class="form-actions form-actions--spread">
         <a href="<?= $baseUrl ?>/index.php?page=detalle-encargo&id=<?= $idEncargo ?>" class="btn-cancel">Cancelar</a>
         <button type="submit" class="btn-submit">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -153,30 +152,7 @@ $error   = isset($_GET['error']);
 </div>
 </form>
 
+<div id="editar-meta" data-sena="<?= (float)$enc['sena'] ?>" style="display:none;"></div>
+<script>const CLIENTES = <?= json_encode($clientes, JSON_UNESCAPED_UNICODE) ?>;</script>
 <script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
-<script>
-const CLIENTES = <?= json_encode($clientes, JSON_UNESCAPED_UNICODE) ?>;
-document.addEventListener('DOMContentLoaded', () => {
-  initClienteAutocomplete(CLIENTES);
-
-  document.querySelector('form').addEventListener('submit', function(e) {
-    const total = parseFloat(document.getElementById('monto_total').value) || 0;
-    const errorDiv = document.getElementById('editar-error');
-
-    const errores = [];
-    const senActual = <?= (float)$enc['sena'] ?>;
-    if (senActual > total) {
-      errores.push('El precio total no puede ser menor a lo ya cobrado ($' + Math.round(senActual).toLocaleString('es-AR') + ').');
-    }
-
-    if (errores.length > 0) {
-      e.preventDefault();
-      errorDiv.innerHTML = errores.map(e => `• ${e}`).join('<br>');
-      errorDiv.style.display = 'block';
-      errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } else {
-      errorDiv.style.display = 'none';
-    }
-  });
-});
-</script>
+<script src="<?= BASE_URL ?>/public/js/encargos/editar.js"></script>
