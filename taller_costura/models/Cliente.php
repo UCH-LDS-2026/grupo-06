@@ -39,7 +39,7 @@ class Cliente {
     public function setEmail(string $email): void       { $this->email    = $email; }
  
     // =========================================================================
-    // CRUD
+    // CRUD 
     // =========================================================================
  
     /**
@@ -90,7 +90,7 @@ class Cliente {
  
     /**
      * Busca clientes por nombre o email (búsqueda parcial).
-     * Devuelve todos los que coincidan.
+     * funcion Devuelve todos los que coincidan.
      * @return self[]
      */
     public static function buscar(string $termino): array {
@@ -120,7 +120,7 @@ class Cliente {
  
     /**
      * Busca un cliente por email exacto.
-     * Útil para validar duplicados antes de guardar.
+     * funcion para validar duplicados antes de guardar.
      */
     public static function getByEmail(string $email): ?self {
         $pdo  = Database::getInstance()->getConnection();
@@ -143,7 +143,7 @@ class Cliente {
 
     /**
  * Busca un cliente por teléfono exacto.
- * Útil para validar duplicados antes de guardar.
+ * funcion para validar duplicados antes de guardar.
  */
     public static function getByTelefono(string $telefono): ?self {
         $pdo  = Database::getInstance()->getConnection();
