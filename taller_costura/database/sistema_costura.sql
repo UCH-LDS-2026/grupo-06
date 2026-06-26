@@ -1,231 +1,325 @@
--- ============================================================
--- Sistema Costura - Script completo
--- Crear base de datos, tablas e insertar datos de ejemplo
--- ============================================================
 
-START TRANSACTION;
 
-CREATE DATABASE IF NOT EXISTS `sistema_costura` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `sistema_costura`;
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1:3306
+-- Tiempo de generación: 26-06-2026 a las 19:30:17
+-- Versión del servidor: 9.1.0
+-- Versión de PHP: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
 SET time_zone = "+00:00";
-SET NAMES utf8mb4;
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `sistema_costura`
+--
 
 -- --------------------------------------------------------
--- Tabla: administrador
--- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `administrador`
+--
 
 DROP TABLE IF EXISTS `administrador`;
-CREATE TABLE `administrador` (
+CREATE TABLE IF NOT EXISTS `administrador` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `contrasena` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contrasena` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `administrador` (`nombre`, `email`, `contrasena`) VALUES
-('Costurera Admin', 'admin@taller.com', '$2y$10$0kf1V9v5jHvzv9vIsJzWTe1pR5XQatJvRU4aaMjQRYvQoh2wRAVYO');
+--
+-- Volcado de datos para la tabla `administrador`
+--
+
+INSERT INTO `administrador` (`id`, `nombre`, `email`, `contrasena`, `created_at`) VALUES
+(1, 'Costurera Admin', 'admin@taller.com', '$2y$10$0kf1V9v5jHvzv9vIsJzWTe1pR5XQatJvRU4aaMjQRYvQoh2wRAVYO', '2026-06-22 14:34:04');
 
 -- --------------------------------------------------------
--- Tabla: cliente
+
+--
+-- Estructura de tabla para la tabla `alerta`
+--
+
+DROP TABLE IF EXISTS `alerta`;
+CREATE TABLE IF NOT EXISTS `alerta` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `administrador_id` int NOT NULL,
+  `encargo_id` int DEFAULT NULL,
+  `mensaje` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo` enum('vencimiento','estado','pago') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `leida` tinyint(1) DEFAULT '0',
+  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_alerta_admin` (`administrador_id`),
+  KEY `fk_alerta_encargo` (`encargo_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `alerta`
+--
+
+INSERT INTO `alerta` (`id`, `administrador_id`, `encargo_id`, `mensaje`, `tipo`, `leida`, `fecha`) VALUES
+(1, 1, NULL, 'Vestido de María García vence en 3 días y tiene saldo pendiente.', 'vencimiento', 1, '2026-06-22 14:34:05'),
+(2, 1, 2, 'Pantalón de Laura Pérez vence en 2 días y tiene saldo pendiente.', 'vencimiento', 1, '2026-06-22 14:34:05'),
+(3, 1, 6, 'Arreglo de vestido de novia está listo para entregar.', 'estado', 1, '2026-06-22 14:34:05'),
+(4, 1, 4, 'Camisa de Agostina Ruiz tiene saldo pendiente.', 'pago', 1, '2026-06-22 14:34:05'),
+(5, 1, 3, 'Arreglo está listo para entregar.', 'estado', 1, '2026-06-22 14:41:02'),
+(6, 1, 2, 'Pantalón de Laura Pérez está listo para entregar.', 'estado', 1, '2026-06-22 14:41:15'),
+(7, 1, NULL, 'La clienta candela aguilar no tiene ficha de medidas.', '', 1, '2026-06-22 23:51:06'),
+(8, 1, 8, 'faldaa vence en 3 día/s.', 'vencimiento', 1, '2026-06-23 03:04:47'),
+(9, 1, 6, 'Arreglo de María García está listo para entregar.', 'estado', 1, '2026-06-23 04:01:14'),
+(10, 1, 8, 'faldaa vence en 2 día/s.', 'vencimiento', 1, '2026-06-24 20:23:25'),
+(11, 1, NULL, 'La clienta usuario1 no tiene ficha de medidas.', '', 1, '2026-06-24 21:26:44'),
+(12, 1, NULL, 'La clienta asdsadas no tiene ficha de medidas.', '', 1, '2026-06-24 22:44:58'),
+(13, 1, NULL, 'La clienta sgfsgfdgdfgdf no tiene ficha de medidas.', '', 1, '2026-06-24 22:44:58'),
+(14, 1, NULL, 'La clienta erwerwet no tiene ficha de medidas.', '', 1, '2026-06-24 23:09:04'),
+(15, 1, NULL, 'La clienta eeeeeeeeeeeeeeeeee no tiene ficha de medidas.', '', 1, '2026-06-24 23:09:04'),
+(16, 1, 8, 'faldaa vence en 1 día/s.', 'vencimiento', 1, '2026-06-25 04:01:13'),
+(17, 1, NULL, 'La clienta mariluvina no tiene ficha de medidas.', '', 1, '2026-06-25 04:42:25'),
+(18, 1, NULL, 'tanga de candela aguilar vence en 1 día/s.', 'vencimiento', 1, '2026-06-25 04:43:15'),
+(19, 1, NULL, 'La clienta 55555555555 no tiene ficha de medidas.', '', 1, '2026-06-25 04:56:00'),
+(20, 1, NULL, 'La clienta usuario milefa no tiene ficha de medidas.', '', 1, '2026-06-25 04:56:33'),
+(21, 1, NULL, 'La clienta usuario56 no tiene ficha de medidas.', '', 1, '2026-06-25 14:15:02'),
+(22, 1, NULL, 'La clienta usuario90 no tiene ficha de medidas.', '', 1, '2026-06-25 14:15:02'),
+(23, 1, NULL, 'La clienta usuario24 no tiene ficha de medidas.', '', 1, '2026-06-25 14:15:02'),
+(24, 1, NULL, 'La clienta usuario50 no tiene ficha de medidas.', '', 1, '2026-06-25 14:15:02'),
+(25, 1, NULL, 'La clienta usuario400 no tiene ficha de medidas.', '', 1, '2026-06-25 14:15:02'),
+(26, 1, 8, 'faldaa tiene saldo pendiente.', 'pago', 1, '2026-06-25 22:48:12'),
+(27, 1, NULL, 'tanga de usuario56 tiene saldo pendiente.', 'pago', 1, '2026-06-25 23:41:41'),
+(28, 1, 3, 'Arreglo tiene saldo pendiente.', 'pago', 1, '2026-06-25 23:42:15'),
+(29, 1, 10, 'faldaa de usuario1 está listo para entregar.', 'estado', 1, '2026-06-26 00:30:53'),
+(30, 1, 8, 'faldaa vence hoy.', 'vencimiento', 1, '2026-06-26 03:00:12'),
+(31, 1, 13, 'mariguana de usuario45 vence hoy.', 'vencimiento', 1, '2026-06-26 03:00:12'),
+(32, 1, 10, 'faldaa de usuario1 venció hace 3 día/s y tiene saldo pendiente de $5.000.', 'pago', 1, '2026-06-26 03:00:12'),
+(33, 1, 11, 'faldaa venció hace 1 día/s y tiene saldo pendiente de $5.000.', 'pago', 1, '2026-06-26 03:00:12'),
+(34, 1, 12, 'pantalon cargo venció hace 1 día/s y tiene saldo pendiente de $5.000.', 'pago', 1, '2026-06-26 03:00:12'),
+(35, 1, 14, 'falda acuadrille de usuario400 vence hoy.', 'vencimiento', 0, '2026-06-26 03:24:52');
+
 -- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `cliente`
+--
 
 DROP TABLE IF EXISTS `cliente`;
-CREATE TABLE `cliente` (
+CREATE TABLE IF NOT EXISTS `cliente` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `cliente` (`nombre`, `telefono`, `email`) VALUES
-('Valentina Ríos',      '2994112233', 'vale.rios@gmail.com'),
-('Sofía Mendoza',       '2994224455', 'sofi.mendoza@gmail.com'),
-('Lucía Ferreyra',      '2614336677', 'lu.ferreyra@gmail.com'),
-('Camila Bustos',       '2616448899', 'cami.bustos@gmail.com'),
-('Florencia Alvarez',   '2994550011', 'flor.alvarez@gmail.com'),
-('Matías Correa',       '2994661122', 'mati.correa@gmail.com'),
-('Tomás Herrera',       '2614772233', 'tomas.herrera@gmail.com'),
-('Agustín Molina',      '2616883344', 'agus.molina@gmail.com'),
-('Julieta Paredes',     '2994994455', 'juli.paredes@gmail.com'),
-('Renata Villanueva',   '2614005566', 'rena.villa@gmail.com');
+--
+-- Volcado de datos para la tabla `cliente`
+--
+
+INSERT INTO `cliente` (`id`, `nombre`, `telefono`, `email`, `created_at`) VALUES
+(1, 'usuario503', '2994001122', 'maria@mail.com', '2026-06-22 14:34:04'),
+(2, 'usuario15', '2994003344', 'laura@mail.com', '2026-06-22 14:34:04'),
+(3, 'usuario567', '2615059493', 'agostina@mail.com', '2026-06-22 14:34:04'),
+(4, 'usuario1', '02616938099', 'delfinaibanezgiordano@gmail.com', '2026-06-22 14:34:04'),
+(5, 'usuario56', '2615059493', 'candelobaaguile@gmail.com', '2026-06-22 23:50:06'),
+(7, 'usuario90', '253546343', 'sadada@asdasdasda.com', '2026-06-24 22:44:23'),
+(9, 'usuario24', '2615363', 'erterterter@gmail.com', '2026-06-24 23:08:09'),
+(10, 'usuario50', '272637248', 'eeeeeeeeee@gmail.com', '2026-06-24 23:08:54'),
+(13, 'usuario45', '2616938099', 'fghdfhgdo@gmail.com', '2026-06-25 04:40:52'),
+(14, 'usuario67', '2616938099', 'tttttttt@gmail.com', '2026-06-25 04:41:16'),
+(15, 'usuario1', '5555555', 'juulios@gmail.com', '2026-06-25 04:53:23'),
+(16, 'usuario400', '35337732', 'sdasads@gmial.com', '2026-06-25 04:56:33');
 
 -- --------------------------------------------------------
--- Tabla: ficha_cliente
+
+--
+-- Estructura de tabla para la tabla `encargo`
+--
+
+DROP TABLE IF EXISTS `encargo`;
+CREATE TABLE IF NOT EXISTS `encargo` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `administrador_id` int NOT NULL,
+  `cliente_id` int DEFAULT NULL,
+  `tipo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `observaciones_encargo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `fecha_entrega` date NOT NULL,
+  `monto_total` decimal(10,2) DEFAULT '0.00',
+  `sena` decimal(10,2) DEFAULT '0.00',
+  `estado` enum('pendiente','en_proceso','listo','entregado') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
+  `metodo_pago` enum('efectivo','transferencia','tarjeta') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'efectivo',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_encargo_admin` (`administrador_id`),
+  KEY `fk_encargo_cliente` (`cliente_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `encargo`
+--
+
+INSERT INTO `encargo` (`id`, `administrador_id`, `cliente_id`, `tipo`, `descripcion`, `observaciones_encargo`, `fecha_entrega`, `monto_total`, `sena`, `estado`, `metodo_pago`, `created_at`) VALUES
+(2, 1, 2, 'Pantalón', 'Pantalón de vestir negro', NULL, '2026-07-10', 12000.00, 10000.00, 'entregado', 'efectivo', '2026-06-22 14:34:04'),
+(3, 1, NULL, 'Arreglo', 'Ruedo de jeans sin cliente registrado', NULL, '2026-07-08', 3000.00, 3000.00, 'entregado', 'efectivo', '2026-06-22 14:34:04'),
+(4, 1, 3, 'Camisa', 'Camisa de lino beige manga corta', NULL, '2026-07-20', 15000.00, 5000.00, 'pendiente', 'efectivo', '2026-06-22 14:34:04'),
+(5, 1, 4, 'Falda', 'Falda plisada color verde', 'Largo hasta la rodilla', '2026-07-25', 9000.00, 3000.00, 'en_proceso', 'efectivo', '2026-06-22 14:34:04'),
+(6, 1, 1, 'Arreglo', 'Achique de vestido de novia', NULL, '2026-06-30', 8000.00, 8000.00, 'en_proceso', 'efectivo', '2026-06-22 14:34:04'),
+(7, 1, 2, 'Vestido', 'Vestido casual estampado flores', NULL, '2026-08-01', 18000.00, 6000.00, 'en_proceso', 'efectivo', '2026-06-22 14:34:04'),
+(8, 1, NULL, 'faldaa', '2222', '22222', '2026-06-26', 2000.00, 2000.00, 'pendiente', 'transferencia', '2026-06-22 23:54:53'),
+(10, 1, 15, 'faldaa', 'gvj', 'nhgjgjghh', '2026-06-23', 10000.00, 5000.00, 'listo', 'efectivo', '2026-06-26 00:25:10'),
+(11, 1, NULL, 'faldaa', 'retret', 'ertretre', '2026-06-25', 10000.00, 5000.00, 'pendiente', 'transferencia', '2026-06-26 00:25:43'),
+(12, 1, NULL, 'pantalon cargo', 'retret', 'ertretre', '2026-06-25', 10000.00, 5000.00, 'pendiente', 'efectivo', '2026-06-26 00:26:05'),
+(13, 1, 13, 'mariguana', 'sdfsdfs', 'fsdfsd', '2026-06-26', 1000000.00, 8767.00, 'pendiente', 'efectivo', '2026-06-26 02:26:10'),
+(14, 1, 16, 'falda acuadrille', 'sdfsdfs', 'fsdfsd', '2026-06-26', 1000000.00, 8767.00, 'pendiente', 'efectivo', '2026-06-26 03:24:52');
+
 -- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ficha_cliente`
+--
 
 DROP TABLE IF EXISTS `ficha_cliente`;
-CREATE TABLE `ficha_cliente` (
+CREATE TABLE IF NOT EXISTS `ficha_cliente` (
   `id` int NOT NULL AUTO_INCREMENT,
   `cliente_id` int NOT NULL,
-  `talle` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `talle` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `contorno_pecho` decimal(5,2) DEFAULT NULL,
   `contorno_cintura` decimal(5,2) DEFAULT NULL,
   `contorno_cadera` decimal(5,2) DEFAULT NULL,
   `largo_manga` decimal(5,2) DEFAULT NULL,
   `largo_espalda` decimal(5,2) DEFAULT NULL,
   `largo_pantalon` decimal(5,2) DEFAULT NULL,
-  `observaciones_cliente` text COLLATE utf8mb4_unicode_ci,
+  `observaciones_cliente` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `cliente_id` (`cliente_id`),
-  CONSTRAINT `fk_ficha_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `cliente` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `cliente_id` (`cliente_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `ficha_cliente` (`cliente_id`, `talle`, `contorno_pecho`, `contorno_cintura`, `contorno_cadera`, `largo_manga`, `largo_espalda`, `largo_pantalon`, `observaciones_cliente`) VALUES
-(1,  'S',  83.00, 63.00, 89.00,  55.00, 38.00, 96.00, 'Prefiere cortes entallados'),
-(2,  'M',  90.00, 70.00, 96.00,  58.00, 40.00, 98.00, 'Alérgica a la lana'),
-(3,  'L',  96.00, 76.00, 102.00, 60.00, 41.00, 100.00, 'Le gustan las telas livianas'),
-(4,  'XS', 80.00, 60.00, 86.00,  53.00, 37.00, 94.00, NULL),
-(5,  'M',  88.00, 68.00, 94.00,  57.00, 39.00, 97.00, 'Usa escotes moderados'),
-(6,  'L',  100.00, 82.00, 104.00, 62.00, 42.00, 102.00, NULL),
-(7,  'M',  91.00, 74.00, 97.00,  59.00, 40.00, 100.00, 'Prefiere ropa holgada'),
-(8,  'S',  85.00, 65.00, 91.00,  56.00, 38.00, 97.00, NULL),
-(9,  'M',  89.00, 69.00, 95.00,  57.00, 39.00, 98.00, 'Clienta frecuente, muy puntual'),
-(10, 'S',  84.00, 64.00, 90.00,  55.00, 38.00, 96.00, 'Prefiere colores neutros');
+--
+-- Volcado de datos para la tabla `ficha_cliente`
+--
 
--- --------------------------------------------------------
--- Tabla: encargo
--- --------------------------------------------------------
-
-DROP TABLE IF EXISTS `encargo`;
-CREATE TABLE `encargo` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `administrador_id` int NOT NULL,
-  `cliente_id` int DEFAULT NULL,
-  `tipo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
-  `observaciones_encargo` text COLLATE utf8mb4_unicode_ci,
-  `fecha_entrega` date NOT NULL,
-  `monto_total` decimal(10,2) DEFAULT '0.00',
-  `sena` decimal(10,2) DEFAULT '0.00',
-  `estado` enum('pendiente','en_proceso','listo','entregado') COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
-  `metodo_pago` enum('efectivo','transferencia','tarjeta') COLLATE utf8mb4_unicode_ci DEFAULT 'efectivo',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_encargo_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`),
-  CONSTRAINT `fk_encargo_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `cliente` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `encargo` (`administrador_id`, `cliente_id`, `tipo`, `descripcion`, `observaciones_encargo`, `fecha_entrega`, `monto_total`, `sena`, `estado`, `metodo_pago`) VALUES
-
--- ENTREGADOS (saldo = 0, pagados completos)
-(1, 1,  'Vestido de fiesta',       'Vestido largo azul marino con escote en V',         'Sin cierre, con corchetes en espalda',     '2026-06-10', 28000.00, 28000.00, 'entregado',  'transferencia'),
-(1, 9,  'Pantalón de vestir',      'Pantalón negro con pinzas, tiro alto',               NULL,                                       '2026-06-15', 14000.00, 14000.00, 'entregado',  'efectivo'),
-
--- LISTOS para retirar (saldo pendiente, esperando que el cliente pase)
-(1, 2,  'Vestido de novia',        'Vestido blanco con bordado en el corpiño',           'Prueba final aprobada, solo falta retirar', '2026-06-28', 85000.00, 40000.00, 'listo',      'transferencia'),
-(1, 5,  'Saco sastre',             'Saco gris marengo con forro, talle M',               'Botones nacarados, no dorados',             '2026-07-01', 32000.00, 16000.00, 'listo',      'efectivo'),
-
--- EN PROCESO (en confección, sena cobrada)
-(1, 3,  'Falda plisada',           'Falda midi verde oliva, plisado fino',               'Largo exacto hasta la rodilla',             '2026-07-12', 18000.00, 9000.00,  'en_proceso', 'efectivo'),
-(1, 6,  'Camisa de lino',          'Camisa beige manga corta, escote mao',               NULL,                                        '2026-07-15', 15000.00, 7000.00,  'en_proceso', 'transferencia'),
-(1, 10, 'Conjunto de baño',        'Malla entera negra con refuerzo interno',            'Tela elastizada importada del cliente',     '2026-07-18', 22000.00, 11000.00, 'en_proceso', 'tarjeta'),
-
--- PENDIENTES (todavía no se empezaron, con seña)
-(1, 4,  'Vestido de egresadas',    'Vestido rojo corto con escote cruzado',              'Entrega urgente, evento el 25/07',          '2026-07-25', 35000.00, 15000.00, 'pendiente',  'efectivo'),
-(1, 7,  'Pantalón cargo',          'Pantalón verde militar con bolsillos laterales',     NULL,                                        '2026-07-30', 20000.00, 8000.00,  'pendiente',  'transferencia'),
-(1, 8,  'Blusa de seda',           'Blusa color champagne, manga larga con lazo',        'No usar tela sintética',                    '2026-08-05', 17000.00, 8500.00,  'pendiente',  'efectivo'),
-
--- PENDIENTE sin cliente (caso especial para mostrar alerta)
-(1, NULL, 'Arreglo ruedo',         'Ruedo de jeans, cliente dejó sin datos',             NULL,                                        '2026-07-08',  3000.00,  0.00,    'pendiente',  'efectivo'),
-
--- PENDIENTE atrasado (fecha vencida, para mostrar badge "Atrasado")
-(1, 2,  'Arreglo vestido',         'Achique de vestido de fiesta floreado',              'Clienta llamó dos veces, prioridad',        '2026-06-20', 8000.00,  4000.00, 'pendiente',  'efectivo'),
-
--- LISTOS con fecha vencida (sin retirar)
-(1, 3,  'Vestido de cóctel',       'Vestido verde esmeralda, manga corta, talle L',      'Cierre lateral invisible',                  '2026-06-05', 24000.00, 12000.00, 'listo',      'efectivo'),
-(1, 7,  'Pantalón de vestir',      'Pantalón gris oscuro con pinzas, tiro medio',        NULL,                                        '2026-06-08', 16000.00, 16000.00, 'listo',      'transferencia'),
-(1, 4,  'Blusa con volados',       'Blusa blanca manga larga con volados en escote',     'No almidonar',                              '2026-06-12', 12000.00,  6000.00, 'listo',      'efectivo'),
-(1, 10, 'Falda lápiz',             'Falda negra entallada con abertura atrás',           'Largo hasta la rodilla exacto',             '2026-06-18', 14000.00,  7000.00, 'listo',      'tarjeta'),
-(1, 6,  'Camisa formal',           'Camisa blanca manga larga, cuello clásico',          NULL,                                        '2026-06-22', 13000.00, 13000.00, 'listo',      'transferencia');
+INSERT INTO `ficha_cliente` (`id`, `cliente_id`, `talle`, `contorno_pecho`, `contorno_cintura`, `contorno_cadera`, `largo_manga`, `largo_espalda`, `largo_pantalon`, `observaciones_cliente`, `updated_at`) VALUES
+(1, 1, 'M', 90.00, 70.00, 96.00, 58.00, NULL, NULL, NULL, '2026-06-22 14:34:04'),
+(2, 2, 'S', 85.00, 65.00, 92.00, 56.00, NULL, NULL, NULL, '2026-06-22 14:34:04'),
+(3, 3, 'L', 95.00, 75.00, 100.00, 60.00, 40.00, 98.00, NULL, '2026-06-22 14:34:04'),
+(4, 4, NULL, 53.50, 53.50, NULL, 45.00, 53.50, 46.00, NULL, '2026-06-22 14:34:04'),
+(6, 13, NULL, 5.00, 5.00, 8.00, 98.00, 5.00, 8.00, NULL, '2026-06-25 04:40:52'),
+(7, 14, NULL, 5.00, 5.00, 8.00, 98.00, 5.00, 8.00, NULL, '2026-06-25 04:41:16');
 
 -- --------------------------------------------------------
--- Tabla: observacion
--- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `observacion`
+--
 
 DROP TABLE IF EXISTS `observacion`;
-CREATE TABLE `observacion` (
+CREATE TABLE IF NOT EXISTS `observacion` (
   `id` int NOT NULL AUTO_INCREMENT,
   `encargo_id` int NOT NULL,
-  `detalle` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `detalle` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_observacion_encargo` FOREIGN KEY (`encargo_id`) REFERENCES `encargo` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_observacion_encargo` (`encargo_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `observacion` (`encargo_id`, `detalle`, `fecha`) VALUES
-(3,  'Primera prueba de vestuario realizada, queda perfecto',            '2026-06-05 11:00:00'),
-(3,  'Segunda prueba: ajuste en el corpiño, un cm más de busto',        '2026-06-18 10:30:00'),
-(3,  'Prueba final aprobada. Lista para retirar',                        '2026-06-25 16:00:00'),
-(5,  'Tela cortada, comenzando confección',                              '2026-06-28 09:00:00'),
-(5,  'Plisado terminado, falta coser cierre',                            '2026-07-02 14:00:00'),
-(8,  'Clienta confirmó talle S tras medición',                           '2026-07-01 10:00:00'),
-(12, 'Clienta no pasó a buscar, se la avisó por WhatsApp',              '2026-06-21 09:00:00'),
-(12, 'Segunda llamada sin respuesta',                                    '2026-06-25 11:00:00');
+--
+-- Volcado de datos para la tabla `observacion`
+--
 
--- --------------------------------------------------------
--- Tabla: alerta
--- --------------------------------------------------------
-
-DROP TABLE IF EXISTS `alerta`;
-CREATE TABLE `alerta` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `administrador_id` int NOT NULL,
-  `encargo_id` int DEFAULT NULL,
-  `mensaje` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tipo` enum('vencimiento','estado','pago') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `leida` tinyint(1) DEFAULT '0',
-  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_alerta_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`),
-  CONSTRAINT `fk_alerta_encargo` FOREIGN KEY (`encargo_id`) REFERENCES `encargo` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `alerta` (`administrador_id`, `encargo_id`, `mensaje`, `tipo`, `leida`) VALUES
-(1, 3,  'Vestido de novia de Sofía Mendoza está listo y tiene saldo pendiente de $25.000.',        'estado',      0),
-(1, 4,  'Saco sastre de Florencia Alvarez está listo para retirar. Saldo pendiente: $16.000.',     'estado',      0),
-(1, 8,  'Vestido de egresadas de Camila Bustos vence el 25/07. Marcar como urgente.',              'vencimiento', 0),
-(1, 12, 'Arreglo de Sofía Mendoza está ATRASADO. Fecha de entrega: 20/06.',                       'vencimiento', 0),
-(1, 11, 'Hay un encargo sin cliente asignado (ruedo de jeans).',                                   'pago',        0),
-(1, 6,  'Camisa de Matías Correa en proceso. Vence el 15/07.',                                     'vencimiento', 1),
-(1, 9,  'Pantalón cargo de Tomás Herrera registrado. Seña cobrada: $8.000.',                       'pago',        1),
-(1, 13, 'Vestido de cóctel de Lucía Ferreyra listo desde el 05/06. Sin retirar.',                 'estado',      0),
-(1, 15, 'Blusa con volados de Camila Bustos lista desde el 12/06. Sin retirar.',                  'estado',      0),
-(1, 16, 'Falda lápiz de Renata Villanueva lista desde el 18/06. Sin retirar.',                    'estado',      0);
+INSERT INTO `observacion` (`id`, `encargo_id`, `detalle`, `fecha`) VALUES
+(3, 2, 'El pantalón lleva pinzas adelante', '2026-06-22 14:34:04'),
+(4, 4, 'Confirmar talle antes de cortar', '2026-06-22 14:34:04'),
+(5, 6, 'Urgente, evento el 2 de julio', '2026-06-22 14:34:04');
 
 -- --------------------------------------------------------
--- Tabla: pago
--- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pago`
+--
 
 DROP TABLE IF EXISTS `pago`;
-CREATE TABLE `pago` (
+CREATE TABLE IF NOT EXISTS `pago` (
   `id` int NOT NULL AUTO_INCREMENT,
   `encargo_id` int NOT NULL,
   `administrador_id` int NOT NULL,
   `monto` decimal(10,2) NOT NULL,
-  `metodo` enum('efectivo','transferencia','tarjeta') NOT NULL DEFAULT 'efectivo',
-  `nota` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `metodo` enum('efectivo','transferencia','tarjeta') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'efectivo',
+  `nota` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `encargo_id` (`encargo_id`),
-  KEY `administrador_id` (`administrador_id`),
-  CONSTRAINT `fk_pago_encargo` FOREIGN KEY (`encargo_id`) REFERENCES `encargo` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_pago_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `administrador_id` (`administrador_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `pago` (`encargo_id`, `administrador_id`, `monto`, `metodo`, `nota`, `fecha`) VALUES
-(3,  1, 20000.00, 'transferencia', 'Segundo pago antes de la prueba',   '2026-06-20 10:00:00'),
-(12, 1,  2000.00, 'efectivo',      'Abono parcial, prometió el resto',  '2026-06-22 15:30:00');
+--
+-- Volcado de datos para la tabla `pago`
+--
 
-UPDATE `encargo` SET `sena` = 60000.00 WHERE `id` = 3;
-UPDATE `encargo` SET `sena` =  6000.00 WHERE `id` = 12;
+INSERT INTO `pago` (`id`, `encargo_id`, `administrador_id`, `monto`, `metodo`, `nota`, `fecha`) VALUES
+(1, 2, 1, 5000.00, 'efectivo', NULL, '2026-06-23 04:00:27'),
+(2, 6, 1, 3000.00, 'efectivo', NULL, '2026-06-23 04:00:39'),
+(3, 6, 1, 1000.00, 'efectivo', NULL, '2026-06-23 04:00:50'),
+(4, 8, 1, 1500.00, 'efectivo', NULL, '2026-06-25 22:48:12'),
+(5, 8, 1, 100.00, 'efectivo', NULL, '2026-06-25 22:48:45'),
+(6, 8, 1, 398.00, 'efectivo', NULL, '2026-06-25 23:40:57'),
+(9, 3, 1, 1000.00, 'efectivo', NULL, '2026-06-25 23:42:15'),
+(10, 3, 1, 1000.00, 'transferencia', NULL, '2026-06-25 23:42:26'),
+(11, 3, 1, 1000.00, 'tarjeta', NULL, '2026-06-25 23:42:34'),
+(12, 14, 1, 8767.00, 'efectivo', 'Seña inicial', '2026-06-26 03:24:52');
 
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `alerta`
+--
+ALTER TABLE `alerta`
+  ADD CONSTRAINT `fk_alerta_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`),
+  ADD CONSTRAINT `fk_alerta_encargo` FOREIGN KEY (`encargo_id`) REFERENCES `encargo` (`id`) ON DELETE SET NULL;
+
+--
+-- Filtros para la tabla `encargo`
+--
+ALTER TABLE `encargo`
+  ADD CONSTRAINT `fk_encargo_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`),
+  ADD CONSTRAINT `fk_encargo_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `cliente` (`id`) ON DELETE SET NULL;
+
+--
+-- Filtros para la tabla `ficha_cliente`
+--
+ALTER TABLE `ficha_cliente`
+  ADD CONSTRAINT `fk_ficha_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `cliente` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `observacion`
+--
+ALTER TABLE `observacion`
+  ADD CONSTRAINT `fk_observacion_encargo` FOREIGN KEY (`encargo_id`) REFERENCES `encargo` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `pago`
+--
+ALTER TABLE `pago`
+  ADD CONSTRAINT `fk_pago_admin` FOREIGN KEY (`administrador_id`) REFERENCES `administrador` (`id`),
+  ADD CONSTRAINT `fk_pago_encargo` FOREIGN KEY (`encargo_id`) REFERENCES `encargo` (`id`) ON DELETE CASCADE;
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

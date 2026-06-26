@@ -43,6 +43,7 @@ unset($_SESSION['exito_cliente'], $_SESSION['error_cliente']);
 $modoEdicion      = isset($_GET['editar'])         && $_GET['editar']         === '1';
 $modoEdicionDatos = isset($_GET['editar_cliente']) && $_GET['editar_cliente'] === '1';
 
+
 function waLink(string $telefono, string $mensaje): string {
     $tel = preg_replace('/[^0-9]/', '', $telefono);
     $tel = ltrim($tel, '0');

@@ -26,6 +26,7 @@ class Administrador {
         $this->created_at = $created_at;
     }
  
+    
     // ─── Getters ──────────────────────────────────────────────────────────────
     public function getId(): int          { return $this->id; }
     public function getNombre(): string   { return $this->nombre; }
