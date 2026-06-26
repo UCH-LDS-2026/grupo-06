@@ -1,21 +1,4 @@
 <?php
-/**
- * views/pagos/index.php
- * 
- * Variables esperadas (extraídas por PagoController::index() via extract()):
- *   float  $totalCobrado
- *   float  $saldoPendienteTotal
- *   float  $totalSenas
- *   int    $cuentasCount
- *   array  $cuentasPorCobrar
- *   array  $historialPagos
- *   string $tabActiva          ('cuentas' | 'historial')
- *   array|null $flash          ['ok' => bool, 'mensaje' => string]
- * 
- * Se incluye dentro del layout (header.php + footer.php).
- */
- 
-// Helper de formato
 function formatPesos(float $n): string {
     return '$' . number_format($n, 0, ',', '.');
 }
@@ -115,7 +98,6 @@ function etiquetaEstado(string $estado): string {
 </div><!-- /.pagos-stats -->
 
         <!-- ── Filtros ───────────────────────────────────── -->
-    <!-- ── Filtros ───────────────────────────────────── -->
 <div class="ag-buscador-bar" id="filtros-barra" <?= $tabActiva === 'historial' ? 'style="display:none"' : '' ?>>
     <div class="toolbar">
         <div class="search-wrap">

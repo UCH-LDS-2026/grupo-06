@@ -1,8 +1,4 @@
 <?php
-/**
- * views/alertas/index.php
- * Variables esperadas: $alertas (array), $adminId (int)
- */
 
 require_once BASE_PATH . '/controllers/AlertaController.php';
 $alertaCtrl = new AlertaController();
