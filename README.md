@@ -189,7 +189,7 @@ taller_costura/
 
 - **Autenticación**: Login con hash seguro (bcrypt), sesiones PHP, logout
 - **Clientes**: Alta, listado, ficha con medidas (talle, pecho, cintura, cadera, manga, espalda, pantalón)
-- **Encargos**: Crear, listar, ver detalle, editar, cambio de estado
+- **Encargos**: Crear, listar, ver detalle, editar, eliminar, cambio de estado
 - **Estados de encargo**: `pendiente → en_proceso → listo → entregado`
 - **Pagos**: Registro de señas y pagos parciales por encargo, cálculo de saldo pendiente, métodos: efectivo / transferencia / tarjeta
 - **Observaciones**: Notas internas por encargo
@@ -206,6 +206,7 @@ taller_costura/
 | `ficha_cliente` | Medidas de cada cliente (relación 1:1 con cliente) |
 | `encargo` | Encargos con tipo, descripción, fecha de entrega, monto, seña y estado |
 | `observacion` | Notas internas asociadas a un encargo |
+| `pago` | Pagos registrados contra un encargo |
 | `alerta` | Alertas de vencimiento, estado y pago por encargo |
 | `pago` | Pagos registrados contra un encargo |
 
