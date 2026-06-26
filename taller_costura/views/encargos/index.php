@@ -215,7 +215,7 @@ function estadoBadge($estado) {
           &nbsp;·&nbsp; Pendiente: <span class="pend"><?= fmtMonto($saldo) ?></span>
         </p>
       </div>
-      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+      <div class="container-sin-cliente">
         <?= estadoBadge($enc['estado']) ?>
         <?php if (empty($enc['cliente_nombre'])): ?>
           <span class="badge-sin-cliente">⚠</span>
@@ -290,26 +290,24 @@ function estadoBadge($estado) {
         </div>
 
         <?php if ($errorCrear): ?>
-          <div class="alerta alerta-err" style="margin-bottom:16px;">
+          <div class="alerta alerta-err alerta-err-crear">
             Completá los campos obligatorios: Tipo de prenda, Fecha de entrega y Seña inicial (mayor a $0).
           </div>
         <?php endif; ?>
-        <div id="modal-error-encargo" style="display:none; margin-bottom:16px; padding:10px 14px; background:#fff3f3; color:#b05040; border:1px solid rgba(176,80,64,0.25); border-radius:10px; font-size:0.86rem;"></div>
+        <div class="modal-error-encargo" id="modal-error-encargo"></div>
 
         <form method="POST" action="index.php?page=crear">
           <div class="modal-encargo-grid">
             <div class="modal-encargo-col">
-                <div class="seccion-label" style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="seccion-label seccion-label--flex">
                     Cliente
-                    <a href="index.php?page=clientes" target="_blank"
-                       style="text-transform:none; letter-spacing:0; font-weight:700; font-size:0.75rem; color:var(--acento-2); text-decoration:none; line-height:1;">+ Nuevo</a>
+                    <a href="index.php?page=clientes" target="_blank" class="seccion-label-link">+ Nuevo</a>
                 </div>
                 <div class="form-group">
-                    <div class="cliente-autocomplete" style="position:relative;">
+                    <div class="cliente-autocomplete">
                         <input type="text" id="clienteBusqueda" autocomplete="off" placeholder="Escribí para buscar un cliente..." value="">
                         <input type="hidden" name="cliente_id" id="cliente_id" value="">
-                        <div id="clienteLista" class="cliente-lista"
-                             style="display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid var(--borde); border-radius:var(--r-md); max-height:200px; overflow-y:auto; z-index:20; box-shadow:0 4px 12px rgba(0,0,0,0.08); margin-top:4px;"></div>
+                        <div id="clienteLista" class="cliente-lista"></div>
                     </div>
                 </div>
                 <hr class="divider">
@@ -326,7 +324,7 @@ function estadoBadge($estado) {
                     <label>Observaciones Especiales</label>
                     <input type="text" name="observaciones_encargo" placeholder="Detalles importantes, preferencias del cliente...">
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
+                <div class="form-group form-group--last">
                     <label>Fecha de Entrega <span class="req">*</span></label>
                     <input type="date" name="fecha_entrega" id="modal_fecha_entrega" min="<?= date('Y-m-d') ?>" required>
                 </div>
@@ -335,21 +333,21 @@ function estadoBadge($estado) {
                 <div class="seccion-label">Información de Pago</div>
                 <div class="form-group">
                     <label>Precio Total</label>
-                    <div class="input-cm" style="text-align:left;">
-                        <input type="number" name="monto_total" id="modal_monto_total" placeholder="1000" min="1000" step="1" style="padding-left:24px;">
-                        <span style="left:12px; right:auto;">$</span>
+                    <div class="input-cm input-cm--left">
+                        <input type="number" name="monto_total" id="modal_monto_total" placeholder="1000" min="1000" step="1">
+                        <span class="input-cm-prefix">$</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Seña Inicial <span class="req">*</span></label>
-                    <div class="input-cm" style="text-align:left;">
-                        <input type="number" name="sena" id="modal_sena" required placeholder="0" min="1" step="1" style="padding-left:24px;">
-                        <span style="left:12px; right:auto;">$</span>
+                    <div class="input-cm input-cm--left">
+                        <input type="number" name="sena" id="modal_sena" required placeholder="0" min="1" step="1">
+                        <span class="input-cm-prefix">$</span>
                     </div>
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
+                <div class="form-group form-group--last">
                     <label>Método de Pago</label>
-                    <select name="metodo_pago" style="width:100%; padding:0.62rem 0.95rem; border:1px solid var(--borde); border-radius:var(--r-md); background:var(--bg-input); font-family:var(--sans); font-size:0.86rem; color:var(--texto-pri);">
+                    <select name="metodo_pago" class="select-metodo-pago">
                         <option value="efectivo">Efectivo</option>
                         <option value="transferencia">Transferencia</option>
                         <option value="tarjeta">Tarjeta</option>
@@ -365,144 +363,7 @@ function estadoBadge($estado) {
     </div>
 </div>
 
+<div id="index-meta" data-error-crear="<?= $errorCrear ? '1' : '0' ?>" style="display:none;"></div>
+<script>const CLIENTES_MODAL = <?= json_encode($clientesModal, JSON_UNESCAPED_UNICODE) ?>;</script>
 <script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
-<script>
-const CLIENTES_MODAL = <?= json_encode($clientesModal, JSON_UNESCAPED_UNICODE) ?>;
-
-// ── Switch de tabs ──────────────────────────────────────────
-function switchTabEnc(tab) {
-  document.querySelectorAll('.enc-tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.enc-tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-btn-' + tab).classList.add('active');
-  document.getElementById('tab-panel-' + tab).classList.add('active');
-}
-
-function validarYGuardarEncargo() {
-  const tipo     = document.querySelector('[name="tipo"]');
-  const fecha    = document.getElementById('modal_fecha_entrega');
-  const total    = document.getElementById('modal_monto_total');
-  const sena     = document.getElementById('modal_sena');
-  const errorDiv = document.getElementById('modal-error-encargo');
-  const hoy      = new Date(); hoy.setHours(0,0,0,0);
-  const errores  = [];
-
-  if (!tipo || !tipo.value.trim()) errores.push('El tipo de prenda es obligatorio.');
-
-  if (!fecha.value) {
-    errores.push('La fecha de entrega es obligatoria.');
-  } else if (new Date(fecha.value + 'T00:00:00') < hoy) {
-    errores.push('La fecha de entrega no puede ser anterior a hoy.');
-  }
-
-  const montoVal = parseFloat(total.value);
-  const senaVal  = parseFloat(sena.value);
-
-  if (total.value !== '' && !isNaN(montoVal) && montoVal < 1000)
-    errores.push('El precio total debe ser al menos $1.000.');
-
-  if (!sena.value || isNaN(senaVal) || senaVal < 1) {
-    errores.push('La seña inicial es obligatoria y debe ser mayor a $0.');
-  } else if (total.value !== '' && !isNaN(montoVal) && montoVal >= 1000 && senaVal > montoVal) {
-    errores.push('La seña no puede superar el precio total.');
-  } else if ((total.value === '' || isNaN(montoVal)) && senaVal <= 1000) {
-    errores.push('La seña no puede ser menor o igual al precio total mínimo ($1.000). Completá el precio total primero.');
-  }
-
-  if (errores.length > 0) {
-    errorDiv.innerHTML = errores.map(e => `• ${e}`).join('<br>');
-    errorDiv.style.display = 'block';
-    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    return;
-  }
-
-  errorDiv.style.display = 'none';
-  tipo.closest('form').submit();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initClienteAutocomplete(CLIENTES_MODAL);
-    <?php if ($errorCrear): ?>
-    abrirModalEncargo();
-    <?php endif; ?>
-});
-</script>
-
-<style>
-.stats-grid {
-    grid-template-columns: repeat(5, 1fr);
-}
-
-.stat-card--fecha {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 2px;
-    background: linear-gradient(145deg, #fff7f2 0%, #fff0f6 100%);
-    border: 1px solid #f5d0c0;
-    border-left: 3px solid var(--acento);
-    padding: 18px 16px;
-    cursor: default;
-}
-
-.stat-card--fecha:hover {
-    transform: none;
-    box-shadow: var(--shadow-card);
-}
-
-.fecha-card-icon {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--acento);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-}
-
-.fecha-card-dia {
-    font-family: var(--serif);
-    font-size: 2.2rem;
-    font-weight: 400;
-    color: var(--texto-pri);
-    line-height: 1;
-}
-
-.fecha-card-mes {
-    font-size: 0.7rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--texto-ter);
-    margin-top: 2px;
-}
-
-.fecha-card-dow {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--texto-sec);
-    margin-top: 6px;
-}
-
-.stat-sub {
-    font-size: 0.68rem;
-    color: var(--texto-mute);
-    letter-spacing: 0.5px;
-    margin-top: 1px;
-}
-
-@media (max-width: 900px) {
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .stat-card--fecha {
-        grid-column: 1 / -1;
-        flex-direction: row;
-        align-items: center;
-        gap: 16px;
-    }
-    .fecha-card-dia { font-size: 2rem; }
-}
-
-@media (max-width: 500px) {
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-}
-</style>
+<script src="<?= BASE_URL ?>/public/js/encargos/index.js"></script>

@@ -798,3 +798,47 @@
     .estado-grid { grid-template-columns: 1fr; }
     .det-card, .det-card-sm { padding: 18px 20px; }
 }
+
+/* ── DETALLE — clases extraídas de inline styles ─────────── */
+
+.det-obs-form--hidden {
+    display: none;
+    margin-bottom: 16px;
+}
+
+.btn-obs-sm {
+    font-size: 0.78rem;
+    padding: 5px 12px;
+}
+
+.btn-modal-confirmar.btn-obs-sm {
+    padding: 5px 14px;
+}
+
+.det-card-sm--hidden {
+    display: none;
+}
+
+.historial-pagos-lista--hidden {
+    display: none;
+    margin-top: 14px;
+}
+
+.det-pago-nota {
+    font-size: 0.72rem;
+    color: var(--texto-ter);
+    font-style: italic;
+}
+
+.modal-overlay--hidden {
+    display: none;
+}
+
+.span-pagado {
+    color: #558B65;
+    font-weight: 600;
+}
+
+.spinner--hidden {
+    display: none;
+}

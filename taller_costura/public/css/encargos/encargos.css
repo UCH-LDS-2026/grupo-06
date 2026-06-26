@@ -909,6 +909,9 @@ textarea.form-control { resize: vertical; min-height: 100px; }
 }
 .alerta-ok  { background: #eef8e6; color: #3a7018; border: 1px solid #b8e090; }
 .alerta-err { background: #fff0ee; color: #c04a00; border: 1px solid #ffc5a0; }
+.alerta-err-crear{
+    margin-bottom:16px;
+}
 
 .custom-select {
     appearance: none;
@@ -1055,6 +1058,17 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     border-top: 0.5px solid var(--borde);
 }
 
+.modal-error-encargo{
+    display:none; 
+    margin-bottom:16px; 
+    padding:10px 14px; 
+    background:#fff3f3; 
+    color:#b05040; 
+    border:1px solid rgba(176,80,64,0.25); 
+    border-radius:10px; 
+    font-size:0.86rem;
+}
+
 /* ── BUSCADOR BAR ─────────────────────────────────────────── */
 .ag-buscador-bar {
     margin-bottom: 24px;
@@ -1183,6 +1197,13 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     border-radius: 999px;
     padding: 2px 9px;
     white-space: nowrap;
+}
+
+.container-sin-cliente{
+    display:flex; 
+    flex-direction:column; 
+    align-items:flex-end; 
+    gap:6px;
 }
 
 #cardHistorial { overflow: hidden; }
@@ -1438,4 +1459,245 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     justify-content: center;
     flex-shrink: 0;
     color: var(--oro-dark);
+}
+/* ── STAT CARD FECHA ───────────────────────────────────────── */
+.stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.stat-card--fecha {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    background: linear-gradient(145deg, #fff7f2 0%, #fff0f6 100%);
+    border: 1px solid #f5d0c0;
+    border-left: 3px solid var(--acento);
+    padding: 18px 16px;
+    cursor: default;
+}
+
+.stat-card--fecha:hover {
+    transform: none;
+    box-shadow: var(--shadow-card);
+}
+
+.fecha-card-icon {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--acento);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.fecha-card-dia {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: var(--texto-pri);
+    line-height: 1;
+}
+
+.fecha-card-mes {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--texto-ter);
+    margin-top: 2px;
+}
+
+.fecha-card-dow {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--texto-sec);
+    margin-top: 6px;
+}
+
+.stat-sub {
+    font-size: 0.68rem;
+    color: var(--texto-mute);
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+}
+
+/* ── BUSCADOR BAR — fila buscador + tabs ──────────────────── */
+.ag-buscador-bar {
+    margin-bottom: 20px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.enc-tabs {
+    margin-bottom: 0;
+}
+
+/* ── PANEL DE CARDS — contenedor con fondo ────────────────── */
+.enc-tab-panel.active {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-xl);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+/* que las cards dentro no dupliquen borde exterior */
+.enc-tab-panel .card-encargo:last-child {
+    margin-bottom: 0;
+}
+
+/* ── CLIENTE AUTOCOMPLETE OPCIONES ─────────────────────────── */
+.cliente-opcion { padding: 10px 12px; cursor: pointer; font-size: 0.92rem; }
+.cliente-opcion:hover { background: #FAF3EA; }
+.cliente-opcion.vacia { color: #8B7355; cursor: default; }
+
+/* ── RESPONSIVE STATS FECHA ────────────────────────────────── */
+@media (max-width: 900px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stat-card--fecha {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+    }
+    .fecha-card-dia { font-size: 2rem; }
+}
+
+@media (max-width: 500px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+
+
+/* ── MODAL ENCARGO — clases extraídas de inline styles ───── */
+
+.seccion-label--flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.seccion-label-link {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--acento-2);
+    text-decoration: none;
+    line-height: 1;
+}
+
+.cliente-autocomplete {
+    position: relative;
+}
+
+.cliente-lista {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: var(--r-md);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 4px;
+}
+
+.form-group--last {
+    margin-bottom: 0;
+}
+
+.input-cm--left {
+    text-align: left;
+}
+
+.input-cm--left input {
+    padding-left: 24px;
+}
+
+.input-cm-prefix {
+    left: 12px;
+    right: auto;
+}
+
+.select-metodo-pago {
+    width: 100%;
+    padding: 0.62rem 0.95rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--r-md);
+    background: var(--bg-input);
+    font-family: var(--sans);
+    font-size: 0.86rem;
+    color: var(--texto-pri);
+}
+
+.alerta-err-crear {
+    margin-bottom: 16px;
+}
+
+/* ── PANEL TABS — contenedor con fondo ───────────────────── */
+.enc-tab-panel.active {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--borde);
+    border-radius: var(--r-xl);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+.enc-tab-panel .card-encargo:last-child {
+    margin-bottom: 0;
+}
+
+.enc-tabs {
+    margin-bottom: 0;
+}
+
+/* ── EDITAR ENCARGO — clases extraídas de inline styles ───── */
+
+.card--overflow-visible {
+    overflow: visible;
+}
+
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.h3--no-margin {
+    margin-bottom: 0;
+}
+
+.form-group--cliente {
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+.editar-error {
+    display: none;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: #fff3f3;
+    color: #b05040;
+    border: 1px solid rgba(176,80,64,0.25);
+    border-radius: 10px;
+    font-size: 0.86rem;
+}
+
+.form-actions--spread {
+    margin: 0;
+    justify-content: space-between;
 }
