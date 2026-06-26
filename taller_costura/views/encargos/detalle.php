@@ -23,9 +23,9 @@ $stmtObs->execute([$idEncargo]);
 $observaciones = $stmtObs->fetchAll(PDO::FETCH_ASSOC);
 
 $stmtPagos = $pdo->prepare(
-    "SELECT id, monto, metodo, nota, fecha 
-     FROM pago 
-     WHERE encargo_id = ? 
+    "SELECT id, monto, metodo, nota, fecha
+     FROM pago
+     WHERE encargo_id = ?
      ORDER BY fecha ASC"
 );
 $stmtPagos->execute([$idEncargo]);
@@ -55,7 +55,6 @@ if ($cliente) {
     $inicialesCliente = implode('', array_map(fn($p) => !empty($p) ? strtoupper($p[0]) : '', array_slice($partes, 0, 2)));
 }
 
-// Dot de color por estado para el badge
 $dotColor = [
     'pendiente' => '#f0b800',
     'proceso'   => '#1ac880',
@@ -63,6 +62,7 @@ $dotColor = [
     'entregado' => '#e050a0',
 ];
 $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['estado']] ?? '#aaa';
+$estiloListo = $enc['estado'] === 'listo' ? ' box-shadow:0 0 6px rgba(120,80,220,0.5)' : '';
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/encargos/detalle_encargo.css">
@@ -95,9 +95,8 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
             Eliminar
         </button>
 
-        <!-- BADGE ESTADO GRANDE -->
         <span class="badge-estado-grande <?= $badgeClass ?>" id="badgeEstado">
-            <span class="estado-dot-badge" style="background:<?= $currentDot ?><?= $enc['estado']==='listo' ? '; box-shadow:0 0 6px rgba(120,80,220,0.5)' : '' ?>"></span>
+            <span class="estado-dot-badge" style="background:<?= $currentDot ?>;<?= $estiloListo ?>"></span>
             <?= $badgeTxt ?>
         </span>
     </div>
@@ -205,11 +204,11 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
                 <button onclick="abrirFormObs()" class="det-card-accion">+ Agregar</button>
             </div>
 
-            <div id="formNuevaObs" class="det-obs-form" style="display:none; margin-bottom:16px;">
+            <div id="formNuevaObs" class="det-obs-form det-obs-form--hidden">
                 <textarea id="inputNuevaObs" rows="2" placeholder="Escribí una nueva observación..."></textarea>
                 <div class="det-obs-form-acciones">
-                    <button onclick="cancelarFormObs()" class="btn-modal-cancelar" style="font-size:0.78rem; padding:5px 12px;">Cancelar</button>
-                    <button onclick="guardarNuevaObs()" class="btn-modal-confirmar" style="font-size:0.78rem; padding:5px 14px;">Guardar</button>
+                    <button onclick="cancelarFormObs()" class="btn-modal-cancelar btn-obs-sm">Cancelar</button>
+                    <button onclick="guardarNuevaObs()" class="btn-modal-confirmar btn-obs-sm">Guardar</button>
                 </div>
             </div>
 
@@ -310,7 +309,7 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
             </div>
             <div class="det-pago-row">
                 <span>Total Pagado</span>
-                <span id="spanTotalPagado" style="color:#558B65; font-weight:600;"><?= fmtMonto($totalPagado) ?></span>
+                <span id="spanTotalPagado" class="span-pagado"><?= fmtMonto($totalPagado) ?></span>
             </div>
             <div class="det-pago-row total">
                 <span>Saldo Pendiente</span>
@@ -339,12 +338,12 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
         </div>
 
         <!-- Historial Pagos -->
-        <div class="det-card-sm" id="cardHistorial" style="<?= empty($historialPagos) ? 'display:none;' : '' ?>">
+        <div class="det-card-sm det-card-sm--hidden" id="cardHistorial" <?= !empty($historialPagos) ? 'style="display:block;"' : '' ?>>
             <div class="det-historial-toggle" onclick="toggleHistorialPagos()">
                 <h3>Historial de Pagos</h3>
                 <span class="det-historial-icon" id="historial-toggle-icon">↓</span>
             </div>
-            <div id="historial-pagos-lista" style="display:none; margin-top:14px;">
+            <div id="historial-pagos-lista" class="historial-pagos-lista--hidden">
                 <?php foreach ($historialPagos as $p): ?>
                     <div class="det-pago-hist-item" id="pago-<?= $p['id'] ?>">
                         <div class="det-pago-hist-icon">✓</div>
@@ -353,7 +352,7 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
                             <span><?= fmtFecha($p['fecha'], $meses) ?></span>
                             <span class="det-metodo-tag"><?= ucfirst($p['metodo']) ?></span>
                             <?php if (!empty($p['nota'])): ?>
-                                <span style="font-size:0.72rem; color:var(--texto-ter); font-style:italic;"><?= htmlspecialchars($p['nota']) ?></span>
+                                <span class="det-pago-nota"><?= htmlspecialchars($p['nota']) ?></span>
                             <?php endif; ?>
                         </div>
                         <button onclick="eliminarPago(<?= $p['id'] ?>, <?= $p['monto'] ?>, <?= $idEncargo ?>)"
@@ -368,7 +367,7 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
 </div><!-- /det-grid -->
 
 <!-- ── Modal Registrar Pago ── -->
-<div class="modal-overlay" id="modalPago" style="display:none" onclick="if(event.target===this) cerrarModalPago()">
+<div class="modal-overlay modal-overlay--hidden" id="modalPago" onclick="if(event.target===this) cerrarModalPago()">
     <div class="modal-box">
         <div class="modal-header-det">
             <h3>Registrar Pago</h3>
@@ -402,7 +401,7 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
             <button class="btn-modal-cancelar" onclick="cerrarModalPago()">Cancelar</button>
             <button class="btn-modal-confirmar" id="btnConfirmarPagoDetalle">
                 Confirmar Pago
-                <span id="spinnerPago" style="display:none;">⏳</span>
+                <span id="spinnerPago" class="spinner--hidden">⏳</span>
             </button>
         </div>
     </div>
@@ -410,69 +409,10 @@ $currentDot = $dotColor[$enc['estado'] === 'en_proceso' ? 'proceso' : $enc['esta
 
 <div id="toast" class="toast"></div>
 
+<div id="detalle-meta"
+     data-saldo="<?= $saldo ?>"
+     data-monto-total="<?= (float)$enc['monto_total'] ?>"
+     style="display:none;"></div>
+
 <script src="<?= BASE_URL ?>/public/js/encargos/encargos.js"></script>
-<script>
-const SALDO_PENDIENTE_DETALLE = <?= $saldo ?>;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const fill = document.getElementById('progresoFill');
-    if (fill) fill.dataset.total = <?= (float)$enc['monto_total'] ?>;
-});
-
-function cerrarModalPago() {
-    document.getElementById('modalPago').style.display = 'none';
-    document.getElementById('inputMonto').value = '';
-    document.getElementById('inputNota').value  = '';
-    document.getElementById('inputMontoHint').textContent = '';
-    document.getElementById('btnConfirmarPagoDetalle').disabled = false;
-    const efectivo = document.querySelector('input[name="detalle_metodo_pago"][value="efectivo"]');
-    if (efectivo) efectivo.checked = true;
-}
-
-function validarMontoDetalle(input) {
-    const hint = document.getElementById('inputMontoHint');
-    const btn  = document.getElementById('btnConfirmarPagoDetalle');
-    const val  = parseFloat(input.value);
-    if (isNaN(val) || val <= 0) {
-        hint.textContent = 'Ingresá un monto mayor a cero.';
-        btn.disabled = true;
-    } else if (val > SALDO_PENDIENTE_DETALLE) {
-        hint.textContent = 'El monto no puede superar el saldo pendiente.';
-        btn.disabled = true;
-    } else {
-        hint.textContent = '';
-        btn.disabled = false;
-    }
-}
-
-function toggleHistorialPagos() {
-    const lista = document.getElementById('historial-pagos-lista');
-    const icon  = document.getElementById('historial-toggle-icon');
-    if (lista.style.display === 'none') {
-        lista.style.display = 'block';
-        icon.textContent = '↑';
-    } else {
-        lista.style.display = 'none';
-        icon.textContent = '↓';
-    }
-}
-
-function eliminarPago(pagoId, monto, encargoId) {
-    if (!confirm('¿Eliminar este pago de $' + Number(monto).toLocaleString('es-AR') + '?')) return;
-    fetch('index.php?page=eliminar-pago', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pago_id: pagoId, encargo_id: encargoId, monto: monto })
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.ok) {
-            document.getElementById('pago-' + pagoId).remove();
-            setTimeout(() => location.reload(), 800);
-        } else {
-            alert(data.mensaje || 'Error al eliminar');
-        }
-    })
-    .catch(() => alert('Error de conexión'));
-}
-</script>
+<script src="<?= BASE_URL ?>/public/js/encargos/detalle.js"></script>
