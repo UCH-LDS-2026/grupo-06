@@ -136,6 +136,22 @@ http://localhost/grupo-06/taller_costura/views/auth/login.php
 ### Alertas
 ![Alertas](docs/screenshots/alertas.png)
 
+## Responsive
+### Login
+![Login](docs/screenshots/login-responsive.png) 
+
+### Panel de encargos
+![Encargos](docs/screenshots/encargos-responsive.png)
+
+### Fichas de clientes
+![Ficha cliente](docs/screenshots/clientes-responsive.png)
+
+### Módulo de pagos
+![Pagos](docs/screenshots/pagos-responsive.png)
+
+### Alertas
+![Alertas](docs/screenshots/alertas-responsive.png)
+
 ---
 
 ## Arquitectura — MVC
